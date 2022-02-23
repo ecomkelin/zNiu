@@ -1,0 +1,5 @@
+env/
+./package-lock.js
+node_modules/
+public/
+devNote/
