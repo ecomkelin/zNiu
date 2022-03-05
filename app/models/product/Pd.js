@@ -11,6 +11,8 @@ const dbSchema = new Schema({
 	/* 强制 完全相同 */
 	code: String, 								// 条形号码
 	nome: String,								// 产品名称
+	nomeCN: String,								// 中文名称
+	weight: Float,								// 产品重量
 	img_urls: [String], 						// imgs
 	Brand: {type: ObjectId, ref: 'Brand'},
 	Nation: {type: ObjectId, ref: 'Nation'},
@@ -27,10 +29,11 @@ const dbSchema = new Schema({
 	}],
 	// Tags: [{type: ObjectId, ref: 'Tag'}],
 	sort: Number,
+
 	price_cost: Float,								// 采购价
 	price_regular: Float,							// 默认标价 默认Sku 一般同步此价格
 	price_sale: Float,								// 建议售价 默认Sku 一般同步此价格
-	is_fixPrice: { type: Boolean, default: false },	// 价格是否固定 如果是否则分店是可以更改价格
+	is_fixPrice: { type: Boolean, default: false },	// 价格是否固定 如果为否则分店是可以更改价格
 
 	is_usable: { type: Boolean, default: true },	// 只是不能被同步, 已经被同步的商品 不受此字段影响
 

@@ -24,7 +24,7 @@ exports.ProdPost = async(req, res) => {
 
 		if(req.body.Pd) {		// 从总公司同步
 			Prod_PdSynchronize(res, req.body.Pd, payload);
-		} else if(req.body.Pds) {	// 批量同步
+		} else if(req.body.Pds) {	// 从公司批量同步
 			Prods_PdSynchronize(res, req.body.Pds, payload);
 		} else {
 			let obj = req.body.obj;
@@ -51,6 +51,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 			const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['nome']);
 			if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 		}
+		if(isNaN(obj.weight)) obj.weight = parseFloat(obj.weight);
 		if(isNaN(obj.price_regular)) return MdFilter.jsonFailed(res, {message: "price_regular要为数字"});
 		obj.price_regular = parseFloat(obj.price_regular);
 
@@ -124,6 +125,8 @@ const Pd_to_Prod = (Pd) => {
 
 	obj.code = Pd.code;
 	obj.nome = Pd.nome;
+	if(obj.nomeCN) obj.nomeCN = Pd.nomeCN;
+	if(obj.weight) obj.weight = Pd.weight;
 	obj.price_regular = Pd.price_regular;
 	obj.price_sale = Pd.price_sale;
 	obj.price_cost = Pd.price_cost;
@@ -241,9 +244,14 @@ exports.ProdPut = async(req, res) => {
 		if(!Prod.Pd) {	// 如果是单店 可以修改名称等 暂时没有做
 			Prod.code = obj.code.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
 			Prod.nome = obj.nome.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
+			Prod.nomeCN = obj.nomeCN.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
 			Prod.Nation = obj.Nation;	// 注意 Pd code 没有转大写
 			Prod.Brand = obj.Brand;	// 注意 Pd code 没有转大写
 			Prod.Categ = obj.Categ;	// 注意 Pd code 没有转大写
+			if(obj.weight) {
+				obj.weight = parseFloat(obj.weight);
+				if(!isNaN(obj.weight)) Prod.weight = obj.weight;
+			}
 			if(obj.price_regular) {
 				obj.price_regular = parseFloat(obj.price_regular);
 				if(!isNaN(obj.price_regular)) Prod.price_regular = obj.price_regular;

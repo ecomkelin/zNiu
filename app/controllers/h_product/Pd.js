@@ -62,6 +62,8 @@ exports.PdPost = async(req, res) => {
 			if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 		}
 
+		if(isNaN(obj.weight)) obj.weight = parseFloat(obj.weight)
+
 		if(isNaN(obj.price_regular)) return MdFilter.jsonFailed(res, {message: '商品标价要为数字'});
 		obj.price_regular = parseFloat(obj.price_regular);
 
@@ -173,6 +175,22 @@ const Pd_general = async(res, obj, Pd, payload) => {
 				Pd.nome = obj.nome;
 			}
 		}
+		if(obj.nomeCN) {
+			obj.nomeCN = obj.nomeCN.replace(/^\s*/g,"");	// 注意 Pd nomeCN 没有转大写
+			if(obj.nomeCN != Pd.nomeCN) {
+				updManyProdObj.nomeCN = obj.nomeCN;
+				Pd.nomeCN = obj.nomeCN;
+			}
+		}
+
+		if(obj.weight) {
+			obj.weight = parseFloat(obj.weight);
+			if(!isNaN(obj.weight) && (Pd.weight !== obj.weight)) {
+				Pd.weight = obj.weight;
+				updManyProdObj.weight = obj.weight;
+			}
+		}
+
 		if(obj.unit) {
 			obj.unit = obj.unit.replace(/^\s*/g,"");	// 注意 Pd unit 没有转大写
 			if(obj.unit && (obj.unit != Pd.unit)) {

@@ -14,6 +14,8 @@ const dbSchema = new Schema({
 	/* 如果 Pd 不为空则 只读*/
 	code: String, 									// [if(Pd !== null)只读] 产品条形码
 	nome: String,									// [if(Pd !== null)只读] 产品名称
+	nomeCN: String,									// [if(Pd !== null)只读] 中文名称
+	weight: Float,									// [if(Pd !== null)只读] 产品重量
 	unit: String,									// [if(Pd !== null)只读] 产品名称
 	img_urls: [String], 							// [if(Pd !== null)只读] 产品图片
 	Brand: {type: ObjectId, ref: 'Brand'},			// [if(Pd !== null)只读] 产品品牌
