@@ -12,7 +12,6 @@ const dbSchema = new Schema({
 	code: String, 								// 条形号码
 	nome: String,								// 产品名称
 	nomeCN: String,								// 中文名称
-	weight: Float,								// 产品重量
 	img_urls: [String], 						// imgs
 	Brand: {type: ObjectId, ref: 'Brand'},
 	Nation: {type: ObjectId, ref: 'Nation'},
@@ -30,6 +29,7 @@ const dbSchema = new Schema({
 	// Tags: [{type: ObjectId, ref: 'Tag'}],
 	sort: Number,
 
+	weight: Float, 										// [只读] 	订单的货品重量
 	price_cost: Float,								// 采购价
 	price_regular: Float,							// 默认标价 默认Sku 一般同步此价格
 	price_sale: Float,								// 建议售价 默认Sku 一般同步此价格

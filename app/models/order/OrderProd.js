@@ -19,6 +19,7 @@ const dbSchema = new Schema({
 
 	OrderSkus: [{type: ObjectId, ref: "OrderSku"}],		//
 	/* 如果 is_simple 为 true */
+	weight: Float, 										// [只读] 	订单的货品重量
 	price_regular: Float,								// [只读 相对]
 	price_sale: Float,									// [只读 权限 Client只读]
 	price: Float, 										// 前台给的
@@ -26,6 +27,7 @@ const dbSchema = new Schema({
 	is_picked: {type:Boolean, default: false},			// 是否配货完成 辅助配货员用的
 
 	/* 如果 is_simple 为 false 由 ProSku决定的信息  否则 由 price_* 决定 */
+	prod_weight: Float, 								// [只读] 	订单的货品重量
 	prod_quantity: {type:Number, default: 0},			// [只读 相对] 本条目总量
 	prod_regular: {type:Float, default: 0},				// [只读 相对] 总原价
 	prod_sale: {type:Float, default: 0},				// [只读 相对] 本条目总价

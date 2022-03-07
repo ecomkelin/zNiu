@@ -14,6 +14,7 @@ const dbSchema = new Schema({
 		option: String
 	}],
 
+	weight: Float,
 	price_cost: Float,						// 采购价
 	price_regular: Float,
 	price_sale: Float,

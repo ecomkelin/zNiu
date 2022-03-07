@@ -68,6 +68,8 @@ const dbSchema = new Schema({
 		phone: String,
 	},
 
+	goods_weight: Float, 										// [只读 OrderProds] 	订单的货品重量
+
 	goods_quantity: {type:Number, default: 0},			// [只读 OrderProds] 	采购本条目总数
 
 	goods_regular: {type: Float, default: 0},			// [只读 OrderProds]		货物原价

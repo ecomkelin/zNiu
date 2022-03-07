@@ -106,6 +106,7 @@ exports.OrderPost = async(req, res) => {
 		const oProds = [...obj_Order.OrderProds];
 		obj_Order.OrderProds = [];	// 数据格式化, 在循环中再添加 OrderProd 的 _id;
 
+		obj_Order.goods_weight = 0;
 		obj_Order.goods_quantity = 0;
 		obj_Order.goods_regular = 0;
 		obj_Order.goods_sale = 0;
@@ -151,6 +152,7 @@ exports.OrderPost = async(req, res) => {
 			obj_OrderProd.unit = Prod.unit;
 
 			obj_OrderProd.prod_quantity = 0;
+			obj_OrderProd.prod_weight = 0;
 			obj_OrderProd.prod_regular = 0;
 			obj_OrderProd.prod_sale = 0;
 			obj_OrderProd.prod_price = 0;
@@ -159,6 +161,7 @@ exports.OrderPost = async(req, res) => {
 			if(Prod.is_simple === true) {
 				if(isNaN(obj_OrderProd.quantity)) continue;
 				obj_OrderProd.quantity = parseInt(obj_OrderProd.quantity);
+				obj_OrderProd.weight = Prod.weight;
 
 				// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
 				obj_OrderProd.price_regular = (type_Order === 1) ? Prod.price_cost : Prod.price_regular;
@@ -176,6 +179,7 @@ exports.OrderPost = async(req, res) => {
 				}
 
 				obj_OrderProd.prod_quantity = obj_OrderProd.quantity;
+				obj_OrderProd.prod_weight = obj_OrderProd.quantity * obj_OrderProd.weight;
 				obj_OrderProd.prod_regular = obj_OrderProd.quantity * obj_OrderProd.price_regular;
 				obj_OrderProd.prod_sale = obj_OrderProd.quantity * obj_OrderProd.price_sale;
 				obj_OrderProd.prod_price = obj_OrderProd.quantity * obj_OrderProd.price;
@@ -211,16 +215,17 @@ exports.OrderPost = async(req, res) => {
 
 					obj_OrderSku.quantity = parseInt(obj_OrderSku.quantity);
 					if(isNaN(obj_OrderSku.quantity) || obj_OrderSku.quantity < 1) continue;
+					obj_OrderSku.weight = Sku.weight;
 					// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
-					obj_OrderSku.price_regular = (type_Order === 1) ? Prod.price_cost : Prod.price_regular;
-					obj_OrderSku.price_sale = (type_Order === 1) ? Prod.price_cost : Prod.price_sale;
+					obj_OrderSku.price_regular = (type_Order === 1) ? Sku.price_cost : Sku.price_regular;
+					obj_OrderSku.price_sale = (type_Order === 1) ? Sku.price_cost : Sku.price_sale;
 					if(type_Order === 1) {
-						if(isNaN(obj_OrderSku.price)) obj_OrderSku.price = Prod.price_cost;
+						if(isNaN(obj_OrderSku.price)) obj_OrderSku.price = Sku.price_cost;
 					} else {
 						if(ConfUser.role_Arrs.includes(payload.role)) {
-							if(isNaN(obj_OrderSku.price)) obj_OrderSku.price = Prod.price_sale;
+							if(isNaN(obj_OrderSku.price)) obj_OrderSku.price = Sku.price_sale;
 						} else {
-							obj_OrderSku.price = Prod.price_sale;
+							obj_OrderSku.price = Sku.price_sale;
 						}
 					}
 
@@ -229,7 +234,8 @@ exports.OrderPost = async(req, res) => {
 					if(!OSkuSave) continue;
 
 					_OrderProd.prod_quantity += OSkuSave.quantity;
-					_OrderProd.prod_regular += Sku.price_regular * OSkuSave.quantity;
+					_OrderProd.prod_weight += OSkuSave.weight * OSkuSave.quantity;
+					_OrderProd.prod_regular += OSkuSave.price_regular * OSkuSave.quantity;
 					_OrderProd.prod_sale += OSkuSave.price_sale * OSkuSave.quantity;
 					_OrderProd.prod_price += OSkuSave.price * OSkuSave.quantity;
 					_OrderProd.OrderSkus.push(OSkuSave._id);
@@ -244,6 +250,7 @@ exports.OrderPost = async(req, res) => {
 				continue;
 			}
 
+			_Order.goods_weight += OProdSave.prod_weight;
 			_Order.goods_quantity += OProdSave.prod_quantity;
 			_Order.goods_regular += OProdSave.prod_regular;
 			_Order.goods_sale += OProdSave.prod_sale;
