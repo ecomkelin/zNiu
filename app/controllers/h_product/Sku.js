@@ -81,9 +81,7 @@ exports.SkuPost = async(req, res) => {
 		obj.Pd = Prod.Pd;
 		obj.Firm = Prod.Firm;
 		obj.Shop = Prod.Shop;
-		console.log('----Post----', obj.weight)
 		obj.weight = isNaN(parseFloat(obj.weight)) ? Prod.weight : parseFloat(obj.weight);
-		console.log('----Post----', obj.weight)
 		obj.price_regular = isNaN(parseFloat(obj.price_regular)) ? Prod.price_regular : parseFloat(obj.price_regular);
 		obj.price_sale = isNaN(parseFloat(obj.price_sale)) ? Prod.price_sale : parseFloat(obj.price_sale);
 		obj.limit_quantity = isNaN(parseInt(obj.limit_quantity)) ? 0 : parseInt(obj.limit_quantity);
@@ -106,7 +104,6 @@ exports.SkuPost = async(req, res) => {
 
 		obj.User_crt = payload._id;
 		const _object = new SkuDB(obj);
-		console.log("_object.weight", _object.weight)
 
 		if(!Prod.Skus) Prod.Skus = [];
 		Prod.Skus.push(_object._id);
@@ -115,7 +112,6 @@ exports.SkuPost = async(req, res) => {
 
 		const objSave = await _object.save();
 		if(!objSave) return MdFilter.jsonFailed(res, {message: '商品Product保存失败 '});
-		console.log("objSave.weight", objSave.weight)
 
 		ProdUpd_fromSku_Prom(Prod._id);
 
@@ -198,9 +194,7 @@ exports.SkuPut = async(req, res) => {
 			if(iPt != Skus.length) return MdFilter.jsonFailed(res, {message: '商品已经有此系列属性 '});
 			Sku.attrs = obj.attrs;
 		}
-		console.log('---Put----', obj.weight)
 		if(obj.weight && !isNaN(parseFloat(obj.weight))) Sku.weight =parseFloat(obj.weight);
-		console.log('+++Put++++', obj.weight)
 		if(obj.price_regular && !isNaN(parseFloat(obj.price_regular))) Sku.price_regular =parseFloat(obj.price_regular);
 		if(obj.price_sale && !isNaN(parseFloat(obj.price_sale))) Sku.price_sale =parseFloat(obj.price_sale);
 		if(obj.limit_quantity && !isNaN(parseInt(obj.limit_quantity))) Sku.limit_quantity =parseInt(obj.limit_quantity);
