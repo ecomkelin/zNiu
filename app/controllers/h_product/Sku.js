@@ -106,6 +106,7 @@ exports.SkuPost = async(req, res) => {
 
 		obj.User_crt = payload._id;
 		const _object = new SkuDB(obj);
+		console.log("_object.weight", _object.weight)
 
 		if(!Prod.Skus) Prod.Skus = [];
 		Prod.Skus.push(_object._id);
@@ -114,6 +115,7 @@ exports.SkuPost = async(req, res) => {
 
 		const objSave = await _object.save();
 		if(!objSave) return MdFilter.jsonFailed(res, {message: '商品Product保存失败 '});
+		console.log("objSave.weight", objSave.weight)
 
 		ProdUpd_fromSku_Prom(Prod._id);
 
