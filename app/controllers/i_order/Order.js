@@ -161,7 +161,7 @@ exports.OrderPost = async(req, res) => {
 			if(Prod.is_simple === true) {
 				if(isNaN(obj_OrderProd.quantity)) continue;
 				obj_OrderProd.quantity = parseInt(obj_OrderProd.quantity);
-				obj_OrderProd.weight = Prod.weight;
+				obj_OrderProd.weight = Prod.weight || 0;
 
 				// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
 				obj_OrderProd.price_regular = (type_Order === 1) ? Prod.price_cost : Prod.price_regular;
@@ -215,7 +215,7 @@ exports.OrderPost = async(req, res) => {
 
 					obj_OrderSku.quantity = parseInt(obj_OrderSku.quantity);
 					if(isNaN(obj_OrderSku.quantity) || obj_OrderSku.quantity < 1) continue;
-					obj_OrderSku.weight = Sku.weight;
+					obj_OrderSku.weight = Sku.weight || 0;
 					// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
 					obj_OrderSku.price_regular = (type_Order === 1) ? Sku.price_cost : Sku.price_regular;
 					obj_OrderSku.price_sale = (type_Order === 1) ? Sku.price_cost : Sku.price_sale;
