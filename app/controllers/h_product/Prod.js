@@ -264,10 +264,11 @@ exports.ProdPut = async(req, res) => {
 				obj.price_sale = parseFloat(obj.price_sale);
 				if(!isNaN(obj.price_sale)) Prod.price_sale = obj.price_sale;
 			}
-			if(obj.price_cost || obj.price_cost == 0) {
+			if(obj.price_cost) {
 				obj.price_cost = parseFloat(obj.price_cost);
 				if(!isNaN(obj.price_cost)) Prod.price_cost = obj.price_cost;
 			}
+			if(obj.price_cost == 0) Prod.price_cost = 0;
 		}
 		Prod.User_upd = payload._id;
 
