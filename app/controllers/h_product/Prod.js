@@ -256,11 +256,11 @@ exports.ProdPut = async(req, res) => {
 				obj.weight = parseFloat(obj.weight);
 				if(!isNaN(obj.weight)) Prod.weight = obj.weight;
 			}
-			if(obj.price_regular || obj.price_cost == 0) {
+			if(obj.price_regular || obj.price_regular == 0) {
 				obj.price_regular = parseFloat(obj.price_regular);
 				if(!isNaN(obj.price_regular)) Prod.price_regular = obj.price_regular;
 			}
-			if(obj.price_sale || obj.price_cost == 0) {
+			if(obj.price_sale || obj.price_sale == 0) {
 				obj.price_sale = parseFloat(obj.price_sale);
 				if(!isNaN(obj.price_sale)) Prod.price_sale = obj.price_sale;
 			}
