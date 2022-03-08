@@ -309,7 +309,7 @@ const Prod_path_Func = (pathObj, payload, queryObj) => {
 		if(payload.role >= ConfUser.role_set.boss) {
 			pathObj.Shop = payload.Shop;
 		} else {
-			if(queryObj.Shops) {
+			if(queryObj && queryObj.Shops) {
 				const ids = MdFilter.stringToObjectIds(queryObj.Shops);
 				pathObj.Shop = {$in: ids};
 			}
