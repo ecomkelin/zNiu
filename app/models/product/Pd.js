@@ -29,7 +29,9 @@ const dbSchema = new Schema({
 	// Tags: [{type: ObjectId, ref: 'Tag'}],
 	sort: Number,
 
-	weight: Float, 										// [只读] 	订单的货品重量
+	weight: Float, 									// [只读] 	订单的货品重量
+	iva: Float, 									// [只读] 	税 意大利 默认 22
+	num_batch: Number, 								// [只读] 一箱包含的数量
 	price_cost: Float,								// 采购价
 	price_regular: Float,							// 默认标价 默认Sku 一般同步此价格
 	price_sale: Float,								// 建议售价 默认Sku 一般同步此价格

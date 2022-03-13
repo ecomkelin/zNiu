@@ -42,7 +42,7 @@ block content
 			form(method="post", action='/excel_Pd', enctype="multipart/form-data")
 				.form-group.row.udPhoto
 					.col-md-4
-						select#FirmIpt.form-control(name="obj[Firm]", data-style="btn-info")
+						select#FirmIpt2.form-control(name="obj[Firm]", data-style="btn-info")
 							//- option(value=0) 请选择
 							each Firm in Firms
 								-a;
@@ -51,6 +51,24 @@ block content
 						input.btn.btn-info.btn-block(type="file", name="mulFile")
 					.col-md-4
 						input.btn.btn-success(type="submit" value="Pd批量上传")
+			form(method="post", action='/excel_Prod', enctype="multipart/form-data")
+				.form-group.row.udPhoto
+					.col-md-3
+						select#FirmIpt3.form-control(name="obj[Firm]", data-style="btn-info")
+							//- option(value=0) 请选择
+							each Firm in Firms
+								-a;
+								option(value=Firm._id) #{Firm.code}
+					.col-md-3
+						select#ShopIpt.form-control(name="obj[Shop]", data-style="btn-info")
+							//- option(value=0) 请选择
+							each Shop in Shops
+								-a;
+								option(value=Shop._id) #{Shop.code}
+					.col-md-3
+						input.btn.btn-info.btn-block(type="file", name="mulFile")
+					.col-md-3
+						input.btn.btn-success(type="submit" value="Prod批量上传")
 		else
 			h1 admin login
 			hr

@@ -24,7 +24,8 @@ module.exports = (app) => {
 	/* ========================================== Ader 首页 登录页面 登录 登出 ========================================== */
 	app.get('/adHome', async(req, res, next) => {
 		const Firms = await FirmDB.find();
-		return res.render('./ader/adHome', {title: '超级管理', Firms, curAder : req.session.curAder}); 
+		const Shops = await ShopDB.find();
+		return res.render('./ader/adHome', {title: '超级管理', Firms, Shops, curAder : req.session.curAder}); 
 	});
 	app.post('/loginAder', async(req, res) => {
 		try {
@@ -685,13 +686,13 @@ module.exports = (app) => {
 				if(obj.code === 'undefined' || obj.nome === 'undefined') continue;
 				const errorInfo = MdFilter.objMatchStint(StintBrand, obj, ['code', 'nome']);
 				if(errorInfo) {
-					console.log(i, xuhao, "errorInfo", errorInfo);
+					console.log(i+2, xuhao, errorInfo, obj.code);
 					continue;
 				}
 
 				const objSame = await BrandDB.findOne({'code': obj.code, Firm});
 				if(objSame) {
-					console.log(i, xuhao, 'objSame');
+					console.log(i+2, xuhao, '已经有相同的编号', obj.code);
 					continue;
 				}
 				obj.Firm = Firm;
@@ -747,13 +748,13 @@ module.exports = (app) => {
 				if(obj.code === 'undefined' || obj.nome === 'undefined') continue;
 				const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code', 'nome']);
 				if(errorInfo) {
-					console.log(i, xuhao, errorInfo);
+					console.log(i+2, xuhao, errorInfo);
 					continue;
 				}
 
 				const objSame = await PdDB.findOne({$or:[{'code': obj.code}, {'nome': obj.nome}], Firm});
 				if(objSame) {
-					console.log(i, xuhao, '有相同的编号或名称');
+					console.log(i+2, xuhao, '有相同的编号或名称');
 					continue;
 				}
 				obj.Firm = Firm;
@@ -762,7 +763,7 @@ module.exports = (app) => {
 
 				const price_regular = parseFloat(String(arr[4]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
 				if(isNaN(price_regular) || price_regular <= 0) {
-					console.log(i, xuhao, '价格错误');
+					console.log(i+2, xuhao, '价格错误');
 					continue;
 				}
 				obj.price_regular = price_regular;
@@ -794,6 +795,108 @@ module.exports = (app) => {
 					if(img_url !== "undefined") obj.img_urls.push('/upload/Pd/'+img_url);
 				}
 
+				const _object = new PdDB(obj);
+				const objSave = await _object.save();
+			}
+			return res.redirect('/adHome');
+		} catch(error) {
+			console.log(error)
+			return res.redirect('/?error=adUserDel,Error: '+error+'&reUrl=/adUsers');
+		}
+	});
+	app.post('/excel_Prod', postForm, async(req, res) => {
+		console.log("Ader Prod excel");
+		if(!P_Brands) P_Brands = await BrandDB.find();
+		if(!P_Categs) P_Categs = await CategDB.find({level: 2});
+		if(!BP_Nations) BP_Nations = await NationDB.find();
+		try{
+			const Firm = req.body.obj.Firm;
+			const Shop = req.body.obj.Shop;
+			const fileData = req.files.mulFile;
+			if(!fileData) return res.redirect('/?error=!req.files.mulFile');
+
+			const filePath = fileData.path;
+			if(!filePath) return res.redirect('/?error=!filePath');
+
+			const types = filePath.split('.');
+			const type = types[types.length -1]
+			if(type !== 'xlsx') return res.redirect('/?error=!xlsx');
+			const excel = require('node-xlsx').parse(filePath)[0];
+			const arrs = excel.data;
+			for(let i=1; i<arrs.length; i++) {
+				const arr = arrs[i];
+				const obj = {};
+				// const xuhao = String(arr[0]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				const xuhao = i+1;
+				let col = 0;
+				obj.code = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				if(obj.code === 'undefined') continue;
+				const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code']);
+				if(errorInfo) {
+					console.log(i+2, xuhao, errorInfo, obj.code);
+					continue;
+				}
+				const objSame = await PdDB.findOne({'code': obj.code, Shop});
+				if(objSame) {
+					console.log(i+2, xuhao, '已经有相同的编号', obj.code);
+					continue;
+				}
+
+				obj.nome = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				obj.nomeCN = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+
+				obj.unit = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+
+				obj.price_cost = parseFloat(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
+				if(isNaN(obj.price_cost) || obj.price_cost < 0) obj.price_cost = 0;
+
+				obj.price_regular = parseFloat(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
+				if(isNaN(obj.price_regular) || obj.price_regular <= 0) {
+					console.log(i+2, xuhao, '标价错误', obj.price_regular);
+					continue;
+				}
+
+				obj.price_sale = parseFloat(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
+				if(isNaN(obj.price_sale) || obj.price_sale <= 0) obj.price_sale = obj.price_regular;
+
+				col=9;
+				obj.weight = parseFloat(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
+				if(isNaN(obj.weight) || obj.weight < 0) obj.weight = 0;
+
+				obj.num_batch = parseInt(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
+				if(isNaN(obj.num_batch) || obj.num_batch < 0) obj.num_batch = 1;
+
+				obj.iva = parseFloat(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
+				if(isNaN(obj.iva) || obj.iva < 0) obj.iva = 22;
+
+				// const sort = parseInt(String(arr[5]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
+				// obj.sort = isNaN(sort) ? 0 : sort;
+
+				// const CategCode = String(arr[6]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				// const Categ = P_Categs.find(item => item.code === CategCode);
+				// if(Categ) obj.Categ = Categ._id;
+
+				// const BrandCode = String(arr[7]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				// const Brand = P_Brands.find(item => item.code === BrandCode);
+				// if(Brand) obj.Brand = Brand._id;
+
+				// const NationCode = String(arr[8]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				// if(NationCode.length === 2) {
+				// 	const Nation = BP_Nations.find(item => item.code === NationCode);
+				// 	if(Nation) obj.Nation = Nation._id;
+				// }
+
+				// const is_usable = String(arr[9]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				// if(is_usable === '1') obj.is_usable = true;
+
+				// obj.img_urls = [];
+				// for(let j=10; j<15; j++) {
+				// 	const img_url = String(arr[j]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				// 	if(img_url !== "undefined") obj.img_urls.push('/upload/Pd/'+img_url);
+				// }
+				obj.Firm = Firm;
+				obj.Shop = Shop;
+				obj.Pd = null;
 				const _object = new PdDB(obj);
 				const objSave = await _object.save();
 			}

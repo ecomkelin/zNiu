@@ -15,6 +15,8 @@ const dbSchema = new Schema({
 	}],
 
 	weight: Float,
+	iva: Float, 									// [只读] 	税 意大利 默认 22
+	num_batch: Number, 								// [只读] 一箱包含的数量
 	price_cost: Float,						// 采购价
 	price_regular: Float,
 	price_sale: Float,
