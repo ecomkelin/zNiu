@@ -900,7 +900,7 @@ module.exports = (app) => {
 				obj.is_usable = true;
 				obj.is_simple = true;
 				obj.is_sell = true;
-				const _object = new PdDB(obj);
+				const _object = new ProdDB(obj);
 				const objSave = await _object.save();
 			}
 			return res.redirect('/adHome');
