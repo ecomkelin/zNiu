@@ -85,7 +85,7 @@ app.use(function(req, res, next) {
 // const serverHttps = require('https').createServer(objcred, app);
 // serverHttps.listen(process.env.HTTPS, function(){
 // 	console.log('Server start on port: https://localhost:' + process.env.HTTPS);
-// });
+// }); 
 
 const serverHttp = require('http').createServer(app);
 serverHttp.listen(process.env.HTTP, function(){
