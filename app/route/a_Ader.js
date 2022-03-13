@@ -18,6 +18,7 @@ const NationDB = require(path.resolve(process.cwd(), 'app/models/address/Nation'
 const BrandDB = require(path.resolve(process.cwd(), 'app/models/complement/Brand'));
 const CategDB = require(path.resolve(process.cwd(), 'app/models/complement/Categ'));
 const PdDB = require(path.resolve(process.cwd(), 'app/models/product/Pd'));
+const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 
 module.exports = (app) => {
 
