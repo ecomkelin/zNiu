@@ -897,6 +897,9 @@ module.exports = (app) => {
 				obj.Firm = Firm;
 				obj.Shop = Shop;
 				obj.Pd = null;
+				obj.is_usable = true;
+				obj.is_simple = true;
+				obj.is_sell = true;
 				const _object = new PdDB(obj);
 				const objSave = await _object.save();
 			}
