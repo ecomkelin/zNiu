@@ -331,7 +331,7 @@ const dbPd = 'Pd';
 exports.Pds = async(req, res) => {
 	console.log("/Pds");
 	try {
-		const payload = req.payload;
+		const payload = req.payload || req.ip;
 		const GetDB_Filter = {
 			payload: payload,
 			queryObj: req.query,
@@ -351,7 +351,7 @@ exports.Pds = async(req, res) => {
 exports.Pd = async(req, res) => {
 	console.log("/Pd");
 	try {
-		const payload = req.payload;
+		const payload = req.payload || req.ip;
 		const GetDB_Filter = {
 			id: req.params.id,
 			payload: payload,
