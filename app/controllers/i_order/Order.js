@@ -1,3 +1,4 @@
+const ObjectId = require('mongodb').ObjectId;
 const moment = require('moment');
 
 const path = require('path');
@@ -514,6 +515,8 @@ const dbOrder = 'Order';
 exports.Orders = async(req, res) => {
 	console.log("/Orders");
 	// console.log(req.query)
+	// const ods = await OrderDB.find({});
+	// console.log(ods);
 	try {
 		const payload = req.payload
 		const GetDB_Filter = {
@@ -549,12 +552,8 @@ exports.Order = async(req, res) => {
 	}
 }
 
-
-
-
 exports.Orders_Analys = async(req, res) => {
 	console.log("/Orders_Analys");
-	
 	try {
 		const payload = req.payload
 		const queryObj = req.query;
@@ -563,7 +562,11 @@ exports.Orders_Analys = async(req, res) => {
 		const match = MdFilter.path_Func(queryObj);
 		// 再过一遍 特殊 path
 		Order_path_Func(match, payload, queryObj);
-
+		Object.keys(match).forEach(item => {
+			if(match[item].length === 24 && MdFilter.isObjectId(match[item])) {
+				match[item] = ObjectId(match[item]);
+			}
+		})
 		const group = {
 			_id: null,
 			count: {$sum: 1},
@@ -576,12 +579,14 @@ exports.Orders_Analys = async(req, res) => {
 			tot_noPay: {$sum: '$order_noPay'},
 		};
 		if(queryObj.field) group._id = '$'+queryObj.field;	// Paidtype
+
 		let analys = await OrderDB.aggregate([
 			{$match: match}, 
 			{$group: group},
 			// {$project: {...group, _id: 0, 'field': '$_id'}}
 		])
-		
+		// console.log('analys', analys)
+
 		// const GetDB_Filter = {
 		// 	payload: payload,
 		// 	queryObj: req.query,
