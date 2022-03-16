@@ -843,8 +843,8 @@ module.exports = (app) => {
 					continue;
 				}
 
+				obj.nomeTR = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
 				obj.nome = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
-				obj.nomeCN = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
 
 				obj.unit = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
 

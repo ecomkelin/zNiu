@@ -175,11 +175,11 @@ const Pd_general = async(res, obj, Pd, payload) => {
 				Pd.nome = obj.nome;
 			}
 		}
-		if(obj.nomeCN) {
-			obj.nomeCN = obj.nomeCN.replace(/^\s*/g,"");	// 注意 Pd nomeCN 没有转大写
-			if(obj.nomeCN != Pd.nomeCN) {
-				updManyProdObj.nomeCN = obj.nomeCN;
-				Pd.nomeCN = obj.nomeCN;
+		if(obj.nomeTR) {
+			obj.nomeTR = obj.nomeTR.replace(/^\s*/g,"");	// 注意 Pd nomeTR 没有转大写
+			if(obj.nomeTR != Pd.nomeTR) {
+				updManyProdObj.nomeTR = obj.nomeTR;
+				Pd.nomeTR = obj.nomeTR;
 			}
 		}
 

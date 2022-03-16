@@ -129,7 +129,7 @@ const Pd_to_Prod = (Pd) => {
 
 	obj.code = Pd.code;
 	obj.nome = Pd.nome;
-	if(obj.nomeCN) obj.nomeCN = Pd.nomeCN;
+	if(obj.nomeTR) obj.nomeTR = Pd.nomeTR;
 	if(obj.weight) obj.weight = Pd.weight;
 	obj.price_regular = Pd.price_regular;
 	obj.price_sale = Pd.price_sale;
@@ -248,7 +248,7 @@ exports.ProdPut = async(req, res) => {
 		if(!Prod.Pd) {	// 如果是单店 可以修改名称等 暂时没有做
 			Prod.code = obj.code.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
 			Prod.nome = obj.nome.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
-			Prod.nomeCN = obj.nomeCN.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
+			Prod.nomeTR = obj.nomeTR.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
 			Prod.Nation = obj.Nation;	// 注意 Pd code 没有转大写
 			Prod.Brand = obj.Brand;	// 注意 Pd code 没有转大写
 			Prod.Categ = obj.Categ;	// 注意 Pd code 没有转大写
