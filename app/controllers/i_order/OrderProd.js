@@ -71,7 +71,7 @@ exports.OrderProds_Analys = async(req, res) => {
 		})
 
 		const group = {
-			_id: null,
+			_id: "$Prod.nome",
 			count: {$sum: 1},
 			prod_weight: {$sum: '$prod_weight'},
 			prod_quantity: {$sum: '$prod_quantity'},
@@ -83,22 +83,19 @@ exports.OrderProds_Analys = async(req, res) => {
 
 		let analys = await OrderProdDB.aggregate([
 			{$match: match}, 
-			{$group: group}
+			{$lookup: {
+				from: "prods",
+				localField: "Prod",
+				foreignField: "_id",
+				as: "Prod",
+				pipeline: [
+					{$project: {code: 1, nome: 1}}
+				]
+			}},
+			{$group: group},
+			{$sort: {"prod_quantity", -1}}
 		]);
 		// console.log('analys', analys)
-
-		// const GetDB_Filter = {
-		// 	payload: payload,
-		// 	queryObj: req.query,
-		// 	objectDB: OrderProdDB,
-		// 	path_Callback: OrderProd_path_Func,
-		// 	dbName: dbOrderProd,
-		// };
-		// const dbs_res = await GetDB.dbs(GetDB_Filter);
-		// dbs_res.analys = analys;
-		// dbs_res.message = '分析成功';
-		// console.log('obj', count)
-		// return MdFilter.jsonSuccess(res, dbs_res);
 		
 		return MdFilter.jsonSuccess(res, {status: 200, message: '分析成功', analys});
 	} catch(error) {
