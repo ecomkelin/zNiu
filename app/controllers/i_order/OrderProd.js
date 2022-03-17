@@ -98,7 +98,7 @@ exports.OrderProds_Analys = async(req, res) => {
 		// dbs_res.analys = analys;
 		// dbs_res.message = '分析成功';
 		// console.log('obj', count)
-		return MdFilter.jsonSuccess(res, dbs_res);
+		// return MdFilter.jsonSuccess(res, dbs_res);
 		
 		return MdFilter.jsonSuccess(res, {status: 200, message: '分析成功', analys});
 	} catch(error) {
