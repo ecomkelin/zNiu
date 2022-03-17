@@ -6,7 +6,7 @@ const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const OrderProdDB = require(path.resolve(process.cwd(), 'app/models/order/OrderProd'));
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
-const vOrderProd_path_Func = (pathObj, payload, queryObj) => {
+const OrderProd_path_Func = (pathObj, payload, queryObj) => {
 	if(payload.Firm) {
 		pathObj.Firm = payload.Firm;
 		if(payload.role >= ConfUser.role_set.boss) {
@@ -42,7 +42,7 @@ exports.OrderProds = async(req, res) => {
 			payload: payload,
 			queryObj: req.query,
 			objectDB: OrderProdDB,
-			path_Callback: vOrderProd_path_Func,
+			path_Callback: OrderProd_path_Func,
 			dbName: dbOrderProd,
 		};
 		const dbs_res = await GetDB.dbs(GetDB_Filter);
