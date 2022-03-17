@@ -60,6 +60,7 @@ exports.OrderProds_Analys = async(req, res) => {
 		const payload = req.payload
 		const queryObj = req.query;
 
+		const aggregates = [];
 		// 过一遍整体 path
 		const match = MdFilter.path_Func(queryObj);
 		// 再过一遍 特殊 path
@@ -69,9 +70,10 @@ exports.OrderProds_Analys = async(req, res) => {
 				match[item] = ObjectId(match[item]);
 			}
 		})
+		aggregates.push({$match: match});
 
 		const group = {
-			_id: "$Prod.nome",
+			_id: null,
 			count: {$sum: 1},
 			prod_weight: {$sum: '$prod_weight'},
 			prod_quantity: {$sum: '$prod_quantity'},
@@ -79,23 +81,31 @@ exports.OrderProds_Analys = async(req, res) => {
 			prod_sale: {$sum: '$prod_sale'},
 			prod_price: {$sum: '$prod_price'},
 		};
-		if(queryObj.field) group._id = '$'+queryObj.field;
+		if(queryObj.field) {
+			group._id = '$'+queryObj.field;
+			if(queryObj.field === "Prod") {
+				const lookup = {
+					from: "prods",
+					localField: "Prod",
+					foreignField: "_id",
+					as: "Prod",
+					pipeline: [
+						{$project: {Prod_id: "$_id", code: 1, nome: 1, _id: 0}}
+					]
+				}
+				aggregates.push({$lookup: lookup});
+			}
+		}
+		aggregates.push({$group: group});
 
-		let analys = await OrderProdDB.aggregate([
-			{$match: match}, 
-			{$lookup: {
-				from: "prods",
-				localField: "Prod",
-				foreignField: "_id",
-				as: "Prod",
-				pipeline: [
-					{$project: {code: 1, nome: 1}}
-				]
-			}},
-			{$group: group},
-			{$sort: {"prod_quantity": -1}}
-		]);
-		// console.log('analys', analys)
+		let sortObj = {"prod_quantity": -1};
+		if(queryObj.sortKey) MdFilter.sort_Func(queryObj.sortKey, parseInt(queryObj.sortVal), dbName);
+		aggregates.push({$sort: sortObj});
+		// aggregates.push({$project: {groupBy: "$_id", count: 1, "销售数量": "$prod_quantity", _id: 0});
+		const analys = await OrderProdDB.aggregate(aggregates);
+		// analys.forEach(item => {
+		// 	console.log(item)
+		// })
 		
 		return MdFilter.jsonSuccess(res, {status: 200, message: '分析成功', analys});
 	} catch(error) {
