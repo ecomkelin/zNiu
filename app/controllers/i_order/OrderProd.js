@@ -93,7 +93,7 @@ exports.OrderProds_Analys = async(req, res) => {
 				]
 			}},
 			{$group: group},
-			{$sort: {"prod_quantity", -1}}
+			{$sort: {"prod_quantity": -1}}
 		]);
 		// console.log('analys', analys)
 		
