@@ -8,7 +8,7 @@ const MdAuth = require(path.resolve(process.cwd(), 'app/middle/MdAuth'));
 module.exports = (app) => {
 	/* ============================== OrderProd ============================== */
 	app.get('/api/b1/OrderProds', MdAuth.path_User, OrderProd.OrderProds);
-	app.get('/api/b1/OrderProds_Analys', OrderProd.OrderProds_Analys);
+	app.get('/api/b1/OrderProds_Analys', MdAuth.path_User, OrderProd.OrderProds_Analys);
 
 	/* ============================== OrderSku ============================== */
 	app.delete('/api/b1/OrderSku/:id', MdAuth.path_User, OrderSku.OrderSkuDelete);
