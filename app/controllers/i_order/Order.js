@@ -570,13 +570,13 @@ exports.Orders_Analys = async(req, res) => {
 		const group = {
 			_id: null,
 			count: {$sum: 1},
-			tot_weight: {$sum: '$goods_weight'},
-			tot_quantity: {$sum: '$goods_quantity'},
-			tot_regular: {$sum: 'order_regular'},
-			tot_sale: {$sum: '$order_sale'},
-			tot_imp: {$sum: '$order_imp'},
-			tot_paid: {$sum: '$order_paid'},
-			tot_noPay: {$sum: '$order_noPay'},
+			goods_weight: {$sum: '$goods_weight'},
+			goods_quantity: {$sum: '$goods_quantity'},
+			order_regular: {$sum: '$order_regular'},
+			order_sale: {$sum: '$order_sale'},
+			order_imp: {$sum: '$order_imp'},
+			order_paid: {$sum: '$order_paid'},
+			order_noPay: {$sum: '$order_noPay'},
 		};
 		if(queryObj.field) group._id = '$'+queryObj.field;	// Paidtype
 

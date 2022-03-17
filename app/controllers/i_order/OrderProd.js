@@ -73,11 +73,11 @@ exports.OrderProds_Analys = async(req, res) => {
 		const group = {
 			_id: null,
 			count: {$sum: 1},
-			tot_weight: {$sum: 'prod_weight'},
-			tot_quantity: {$sum: 'prod_quantity'},
-			tot_regular: {$sum: 'prod_regular'},
-			tot_sale: {$sum: 'prod_sale'},
-			tot_price: {$sum: 'prod_price'},
+			prod_weight: {$sum: '$prod_weight'},
+			prod_quantity: {$sum: '$prod_quantity'},
+			prod_regular: {$sum: '$prod_regular'},
+			prod_sale: {$sum: '$prod_sale'},
+			prod_price: {$sum: '$prod_price'},
 		};
 		if(queryObj.field) group._id = '$'+queryObj.field;
 
@@ -85,18 +85,18 @@ exports.OrderProds_Analys = async(req, res) => {
 			{$match: match}, 
 			{$group: group}
 		]);
-		console.log('analys', analys)
+		// console.log('analys', analys)
 
-		const GetDB_Filter = {
-			payload: payload,
-			queryObj: req.query,
-			objectDB: OrderProdDB,
-			path_Callback: OrderProd_path_Func,
-			dbName: dbOrderProd,
-		};
-		const dbs_res = await GetDB.dbs(GetDB_Filter);
-		dbs_res.analys = analys;
-		dbs_res.message = '分析成功';
+		// const GetDB_Filter = {
+		// 	payload: payload,
+		// 	queryObj: req.query,
+		// 	objectDB: OrderProdDB,
+		// 	path_Callback: OrderProd_path_Func,
+		// 	dbName: dbOrderProd,
+		// };
+		// const dbs_res = await GetDB.dbs(GetDB_Filter);
+		// dbs_res.analys = analys;
+		// dbs_res.message = '分析成功';
 		// console.log('obj', count)
 		return MdFilter.jsonSuccess(res, dbs_res);
 		
