@@ -1,6 +1,7 @@
 const ObjectId = require('mongodb').ObjectId;
 
 const path = require('path');
+const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
 const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const OrderProdDB = require(path.resolve(process.cwd(), 'app/models/order/OrderProd'));
