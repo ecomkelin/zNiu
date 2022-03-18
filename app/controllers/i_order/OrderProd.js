@@ -97,7 +97,7 @@ exports.OrderProds_Analys = async(req, res) => {
 			}
 		}
 		aggregates.push({$group: group});
-
+		console.log(group)
 		let sortObj = {"prod_quantity": -1};
 		if(queryObj.sortKey) MdFilter.sort_Func(queryObj.sortKey, parseInt(queryObj.sortVal), dbName);
 		aggregates.push({$sort: sortObj});
