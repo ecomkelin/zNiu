@@ -8,13 +8,13 @@ module.exports = (app) => {
 	app.delete('/api/b1/Coin/:id', MdAuth.path_bser, Coin.CoinDelete);
 	app.post('/api/b1/Coin', MdAuth.path_bser, Coin.CoinPost);
 	app.put('/api/b1/Coin/:id', MdAuth.path_bser, Coin.CoinPut);
-	app.get('/api/b1/Coins', MdAuth.path_bser, Coin.Coins);
-	app.get('/api/b1/Coin/:id', MdAuth.path_bser, Coin.Coin);
+	app.get('/api/b1/Coins', MdAuth.path_User, Coin.Coins);
+	app.get('/api/b1/Coin/:id', MdAuth.path_User, Coin.Coin);
 
 	/* =============================== Paidtype =============================== */
 	app.delete('/api/b1/Paidtype/:id', MdAuth.path_bser, Paidtype.PaidtypeDelete);
 	app.post('/api/b1/Paidtype', MdAuth.path_bser, Paidtype.PaidtypePost);
 	app.put('/api/b1/Paidtype/:id', MdAuth.path_bser, Paidtype.PaidtypePut);
-	app.get('/api/b1/Paidtypes', MdAuth.path_bser, Paidtype.Paidtypes);
-	app.get('/api/b1/Paidtype/:id', MdAuth.path_bser, Paidtype.Paidtype);
+	app.get('/api/b1/Paidtypes', MdAuth.path_User, Paidtype.Paidtypes);
+	app.get('/api/b1/Paidtype/:id', MdAuth.path_User, Paidtype.Paidtype);
 };
