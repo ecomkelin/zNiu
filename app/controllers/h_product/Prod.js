@@ -250,7 +250,7 @@ exports.ProdPut = async(req, res) => {
 		if(!Prod.Pd) {	// 如果是单店 可以修改名称等 暂时没有做
 			Prod.code = obj.code.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
 			Prod.nome = obj.nome.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
-			Prod.nomeTR = obj.nomeTR.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
+			if(Prod.nomeTR) Prod.nomeTR = obj.nomeTR.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
 			Prod.Nation = obj.Nation;	// 注意 Pd code 没有转大写
 			Prod.Brand = obj.Brand;	// 注意 Pd code 没有转大写
 			Prod.Categ = obj.Categ;	// 注意 Pd code 没有转大写
