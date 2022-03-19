@@ -6,44 +6,60 @@ const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
 
 const OrderDB = require(path.resolve(process.cwd(), 'app/models/order/Order'));
 const OrderProdDB = require(path.resolve(process.cwd(), 'app/models/order/OrderProd'));
+const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 
 module.exports = (app) => {
 	app.post('/api/b1/analys', MdAuth.path_User, analys);
+	app.post('/api/b1/test', MdAuth.is_User, (req, res) => {
+
+		const payload = req.payload;
+		return MdFilter.jsonSuccess(res, {status: 200, message: 'post ok', data: {
+			payload,
+			bodyObj: req.body
+		}});
+	});
 };
 
 const analys = async(req, res) => {
 	console.log("analys");
 	try {
 		const payload = req.payload;
-		const objs = req.body.objs;
-
+		const objs = req.body.objs || [];
 		const errMessage = [];
-		const analys = [];
+		const analys = {};
+
 		for(let i=0; i<objs.length; i++) {
-			const data = await objectDB.aggregate(getAggregate(objs[i], i, payload));
-			analys.push(data);
+			/* 找到要分析的数据库 */
+			const {key=i, dbName="Order", is_native, aggregates, pipeline} = objs[i];
+			const objectDB = get_DB(dbName);
+			if(!objectDB) {
+				const errMsg = `第${i}个objs 需要传递正确的 数据库名 您传递的dbName: ${dbName}`;
+				errMessage.push(errMsg);
+				return;
+			}
+
+			let aggregateObjs;
+			if(is_native === true) {	// 如果前端写了原生 就不用分析了
+				aggregateObjs = aggregates;
+			} else {
+				aggregateObjs = getAggregate(i, dbName, pipeline, errMessage, payload);
+				if(!aggregateObjs) continue;
+			}
+			
+			const data = await objectDB.aggregate(aggregateObjs);
+			analys[key] = data;
 		}
 
-		return MdFilter.jsonSuccess(res, {status: 200, message: '分析成功', analys, errMessage});
+		return MdFilter.jsonSuccess(res, {status: 200, message: '分析完成', analys, errMessage});
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Orders", error});
 	}
 }
 
-const getAggregate = (obj, i, payload) => {
-	const {dbName, is_native, aggregates, pipeline} = obj;
-	/* 找到要分析的数据库 */
-	const objectDB = get_DB(dbName);
-	if(!objectDB) {
-		const errMsg = `第${i}个objs 需要传递正确的 数据库名 您传递的dbName: ${dbName}`;
-		errMessage.push(errMsg);
-		return;
-	}
-
-	if(is_native === true) return aggregates; // 如果前端写了原生 就不用分析了
-
+const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {	
 	const aggregateObjs = [];
-	const {matchObj, field, is_interval, bucketObj, groupObj, sortObj} = pipeline;
+
+	const {matchObj, field, is_interval, bucketObj, groupObj={}, sortObj} = pipeline;
 
 	if(judge_field(dbName, field) === false) {
 		const errMsg = `第${i}个objs ${dbName} 中, 没有 此 field: ${field}`;
@@ -61,12 +77,17 @@ const getAggregate = (obj, i, payload) => {
 
 	if(is_interval)  {	// 分析区间 用 bucket
 		const groupBy = field ? '$'+field : null;
+		if(!bucketObj) {
+			const errMsg = `第${i}个objs中 bucketObj: ${bucketObj}`;
+			errMessage.push(errMsg);
+			return;
+		}
 		let {span, boundaries, df, outputs} = bucketObj;
 		boundaries = path_boundaries(field, matchObj, span, boundaries);
 		if(!boundaries) {
 			const errMsg = `第${i}个objs 没有传递正确的 bucketObj.boundaries`;
 			errMessage.push(errMsg);
-			return;
+			return {};
 		}
 		if(!df) df = 'Other';
 		const output = {count: {$sum: 1}};
@@ -80,11 +101,17 @@ const getAggregate = (obj, i, payload) => {
 			output
 		}});
 	} else {		// 分析点 用 group
-		const {is_join, joinDB, lookup_as, group_fields} = groupObj;
+		const {is_join, lookup_as, group_fields} = groupObj;
 		const group = {_id: null, count: {$sum: 1}};
 		if(field) {
 			group._id = '$'+field;	// Paidtype
-			if(is_join && joinDB) {
+			if(is_join) {
+				const joinDB = get_joinDB(field);
+				if(!joinDB) {
+					const errMsg = `第${i}个objs 系统中无${field}数据库`;
+					errMessage.push(errMsg);
+					return;
+				};
 				const lookup = {
 					from: joinDB,
 					localField: field,
@@ -105,6 +132,7 @@ const getAggregate = (obj, i, payload) => {
 	if(sortObj && Object.keys(sortObj).length > 0) {
 		aggregateObjs.push({$sort: sortObj});
 	}
+
 	return aggregateObjs;
 }
 
@@ -121,6 +149,7 @@ const getAggregate = (obj, i, payload) => {
 const dbs_obj = {
 	"Order": {
 		db: OrderDB,
+		joinDB: 'orders',
 		fields: [
 			'Shop', 'Client', 'type_Order', 'Supplier', 'status',
 			'is_hide_client', 'is_payAfter', 'type_ship', 'is_ship',
@@ -131,17 +160,34 @@ const dbs_obj = {
 	},
 	"OrderProd": {
 		db: OrderProdDB,
+		joinDB: 'orderprods',
 		fields: ['Client', 'Supplier', 'Prod', 'is_simple', 'Shop'],
+	},
+	"Prod": {
+		db: ProdDB,
+		joinDB: 'prods',
+		fields: [
+			'Shop', 'Brand', 'Nation', 'Categ',
+			'price_regular', 'price_sale', 'price_cost',
+			'is_discount'
+		]
 	}
-	// "Prod": ProdDB,
 };
+
+const get_joinDB = (dbName) => {
+	if(!dbName) return null;
+	if(!dbs_obj[dbName]) return null;
+	return dbs_obj[dbName].joinDB;
+}
 const get_DB = (dbName) => {
 	if(!dbName) return null;
-	const objectDB = dbs_obj[dbName].db;
+	if(!dbs_obj[dbName]) return null;
+	return dbs_obj[dbName].db;
 }
+
 const judge_field = (dbName, field) => {
 	if(!field) return true;
-	if(!dbs_obj[dbName].fields.includes(field)) return false;
+	return dbs_obj[dbName].fields.includes(field);
 }
 const path_match = (dbName, match, payload) => {
 	if(!match) match = {};
