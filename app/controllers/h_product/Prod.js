@@ -407,7 +407,7 @@ exports.Prods_Analys = async(req, res) => {
 
 		if(queryObj.field) return MdFilter.jsonFailed(res, {message: "请传递正确的数据field"});
 		const groupBy = queryObj.field ? '$'+queryObj.field : null;
-		if(queryObj.boundaries) return MdFilter.jsonFailed(res, {message: "请传递正确的数据boundaries"});
+		if(!queryObj.boundaries) return MdFilter.jsonFailed(res, {message: "请传递正确的数据boundaries"});
 		const boundaries = MdFilter.stringToArray(queryObj.boundaries);
 		const output = {count: {$sum: 1}};
 		const outputs = queryObj.outputs ? MdFilter.stringToArray(queryObj.outputs): [];
