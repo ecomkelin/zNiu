@@ -1,4 +1,5 @@
 const ObjectId = require('mongodb').ObjectId;
+const moment = require('moment');
 
 const path = require('path');
 const MdAuth = require(path.resolve(process.cwd(), 'app/middle/MdAuth'));
@@ -52,14 +53,14 @@ const analys = async(req, res) => {
 
 		return MdFilter.jsonSuccess(res, {status: 200, message: '分析完成', analys, errMessage});
 	} catch(error) {
-		return MdFilter.json500(res, {message: "Orders", error});
+		return MdFilter.json500(res, {message: "analys", error});
 	}
 }
 
 const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {	
 	const aggregateObjs = [];
 
-	const {matchObj, field, is_interval, bucketObj, groupObj={}, sortObj} = pipeline;
+	const {matchObj, field, is_interval, sortObj} = pipeline;
 
 	if(judge_field(dbName, field) === false) {
 		const errMsg = `第${i}个objs ${dbName} 中, 没有 此 field: ${field}`;
@@ -74,22 +75,22 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 		}
 	});
 	aggregateObjs.push({$match: match});
-
 	if(is_interval)  {	// 分析区间 用 bucket
+		const {bucketObj} = pipeline;
 		const groupBy = field ? '$'+field : null;
 		if(!bucketObj) {
 			const errMsg = `第${i}个objs中 bucketObj: ${bucketObj}`;
 			errMessage.push(errMsg);
 			return;
 		}
-		let {span, boundaries, df, outputs} = bucketObj;
-		boundaries = path_boundaries(field, matchObj, span, boundaries);
+		const {is_at, outputs} = bucketObj;
+		const boundaries = is_at ? path_boundaries(bucketObj) : bucketObj.splits;
 		if(!boundaries) {
 			const errMsg = `第${i}个objs 没有传递正确的 bucketObj.boundaries`;
 			errMessage.push(errMsg);
 			return {};
 		}
-		if(!df) df = 'Other';
+
 		const output = {count: {$sum: 1}};
 		if(outputs && outputs.length > 0) {
 			outputs.forEach(item => output[item] = {'$sum': item});
@@ -97,16 +98,17 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 		aggregateObjs.push({$bucket: {
 			groupBy, 
 			boundaries,
-			default: df,
+			default: bucketObj.df || "Other",
 			output
 		}});
 	} else {		// 分析点 用 group
-		const {is_join, lookup_as, group_fields} = groupObj;
+		const { groupObj={} } = pipeline;
+		const {is_join, group_fields} = groupObj;
 		const group = {_id: null, count: {$sum: 1}};
 		if(field) {
 			group._id = '$'+field;	// Paidtype
 			if(is_join) {
-				const joinDB = get_joinDB(field);
+				const {joinDB = get_joinDB(field), lookup_as} = groupObj;
 				if(!joinDB) {
 					const errMsg = `第${i}个objs 系统中无${field}数据库`;
 					errMessage.push(errMsg);
@@ -211,16 +213,23 @@ const path_match = (dbName, match, payload) => {
 	return match;
 }
 
-const path_boundaries = (field, match, span, boundaries) => {
-	if(field === 'at_crt') {
-		if(!match.crt_after) return null;
-		if(!span) span = 1;
-		const start_at = (new Date(match.crt_after).setHours(0,0,0,0)).getTime();
-		const ended_at = (match.crt_before) ? (new Date(match.crt_before).setHours(23,59,59,999)).getTime(): Date.now();
-		boundaries = [];
-		for(let time=start_at; time<ended_at; time+=1000*60*60*24*span) {
-			boundaries.push(time);
-		}
+const path_boundaries = (bucketObj) => {
+	const {splits, atObj={}} = bucketObj;
+	const {start, ended, atUnit="D", span=1, times=30} = atObj;
+	const boundaries=[];
+
+	if(!start) {
+		splits.forEach(item => boundaries.push(new Date(item)));
+		return boundaries;
 	}
+
+	const ts_start = new Date(start).setHours(0,0,0,0);
+	const ts_now = Date.now();
+	for(let i=0; i<times; i++) {
+		const ts_split = ts_start + 1000*60*60*24*span*i;
+		boundaries.push(new Date(ts_split));
+		if(ts_split > ts_now) break;
+	}
+	console.log("boundaries", boundaries);
 	return boundaries;
 }
