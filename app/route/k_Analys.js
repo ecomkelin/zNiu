@@ -11,14 +11,6 @@ const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 
 module.exports = (app) => {
 	app.post('/api/b1/analys', MdAuth.path_User, analys);
-	app.post('/api/b1/test', MdAuth.is_User, (req, res) => {
-
-		const payload = req.payload;
-		return MdFilter.jsonSuccess(res, {status: 200, message: 'post ok', data: {
-			payload,
-			bodyObj: req.body
-		}});
-	});
 };
 
 const analys = async(req, res) => {
@@ -230,6 +222,5 @@ const path_boundaries = (bucketObj) => {
 		boundaries.push(new Date(ts_split));
 		if(ts_split > ts_now) break;
 	}
-	console.log("boundaries", boundaries);
 	return boundaries;
 }
