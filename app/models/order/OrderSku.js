@@ -11,6 +11,7 @@ const dbSchema = new Schema({
 	Client: {type: ObjectId, ref: 'Client'},			// [只读 权限 Client只读]
 	type_Order: Number, 								// [post写(Client[-1]) put只读] enum: [1, -1] 采购 销售
 	Supplier: {type: ObjectId, ref: 'Shop'},			// 供应商
+	status: Number,										// enum: ConfOrder;
 	// 基本信息
 	Sku: {type: ObjectId, ref: "Sku"},					// [post写, put只读]
 	attrs: String,										// [只读 相对 Sku]

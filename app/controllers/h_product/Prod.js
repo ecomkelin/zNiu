@@ -234,16 +234,15 @@ exports.ProdPut = async(req, res) => {
 			obj = req.body.general;
 		} else {
 			obj = await MdFiles.mkPicture_prom(req, {img_Dir:"/Prod", field: "img_urls", is_Array: true});
-		}
-		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
-
-		if(obj.img_urls && obj.img_urls.length > 0) {
-			if(Prod.img_urls && Prod.img_urls.length > 0) {
-				for(let i=0; i<Prod.img_urls.length; i++) {
-					await MdFiles.rmPicture(Prod.img_urls[i]);
-				};
-			} 
-			Prod.img_urls = obj.img_urls;
+			if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
+			if(obj.img_urls && obj.img_urls.length > 0) {
+				if(Prod.img_urls && Prod.img_urls.length > 0) {
+					for(let i=0; i<Prod.img_urls.length; i++) {
+						await MdFiles.rmPicture(Prod.img_urls[i]);
+					};
+				} 
+				Prod.img_urls = obj.img_urls;
+			}
 		}
 		if(obj.desp) Prod.desp = obj.desp.replace(/^\s*/g,"");
 		if(obj.unit) Prod.unit = obj.unit.replace(/^\s*/g,"");

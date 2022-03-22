@@ -134,6 +134,7 @@ exports.OrderPost = async(req, res) => {
 		// 生成 订单(Order)数据库基本信息
 		const _Order = new OrderDB(obj_Order);
 
+		const obj_OrderProds = [];
 		for(let i = 0; i<oProds.length; i++){
 			const obj_OrderProd = oProds[i];
 			if(!MdFilter.isObjectId(obj_OrderProd.Prod)) continue;
@@ -147,6 +148,7 @@ exports.OrderPost = async(req, res) => {
 			obj_OrderProd.Supplier = _Order.Supplier;
 			obj_OrderProd.Shop = _Order.Shop;
 			obj_OrderProd.Firm = _Order.Firm;
+			obj_OrderProd.status = _Order.status;
 			obj_OrderProd.Pd = Prod.Pd;
 
 			obj_OrderProd.nome = Prod.nome;
@@ -194,6 +196,7 @@ exports.OrderPost = async(req, res) => {
 				// 生成 (OrderProd)数据库信息
 				_OrderProd = new OrderProdDB(obj_OrderProd);
 
+				const obj_OrderSkus = [];
 				for(let j=0; j<oSkus.length; j++) {
 					const obj_OrderSku = oSkus[j];
 					if(!MdFilter.isObjectId(obj_OrderSku.Sku)) continue;
@@ -204,6 +207,7 @@ exports.OrderPost = async(req, res) => {
 					obj_OrderSku.OrderProd = _OrderProd._id;
 					obj_OrderSku.type_Order = type_Order;
 
+					obj_OrderSku.status = _OrderProd.status;
 					obj_OrderSku.Client = _OrderProd.Client;
 					obj_OrderSku.Supplier = _OrderProd.Supplier;
 					obj_OrderSku.Shop = _OrderProd.Shop;
@@ -231,36 +235,38 @@ exports.OrderPost = async(req, res) => {
 					}
 
 					const _OrderSku = new OrderSkuDB(obj_OrderSku);
-					const OSkuSave = await _OrderSku.save();
-					if(!OSkuSave) continue;
+					obj_OrderSkus.push(_OrderSku);
 
-					_OrderProd.prod_quantity += OSkuSave.quantity;
-					_OrderProd.prod_weight += OSkuSave.weight * OSkuSave.quantity;
-					_OrderProd.prod_regular += OSkuSave.price_regular * OSkuSave.quantity;
-					_OrderProd.prod_sale += OSkuSave.price_sale * OSkuSave.quantity;
-					_OrderProd.prod_price += OSkuSave.price * OSkuSave.quantity;
-					_OrderProd.OrderSkus.push(OSkuSave._id);
+					_OrderProd.prod_quantity += _OrderSku.quantity;
+					_OrderProd.prod_weight += _OrderSku.weight * _OrderSku.quantity;
+					_OrderProd.prod_regular += _OrderSku.price_regular * _OrderSku.quantity;
+					_OrderProd.prod_sale += _OrderSku.price_sale * _OrderSku.quantity;
+					_OrderProd.prod_price += _OrderSku.price * _OrderSku.quantity;
+					_OrderProd.OrderSkus.push(_OrderSku._id);
 				}
+				const OSinsertMany = await OrderSkuDB.insertMany(obj_OrderSkus);
 			}
 
 			// 判断 如果订单 商品下没有 Sku 则说明没有买此商品 则跳过
 			if(_OrderProd.prod_quantity < 1) continue;
-			const OProdSave = await _OrderProd.save();
-			if(!OProdSave) {
-				OrderSkuDB.deleteMany({OrderProd: _OrderProd._id});
-				continue;
-			}
+			obj_OrderProds.push(_OrderProd);
+			// const OProdSave = await _OrderProd.save();
+			// if(!OProdSave) {
+			// 	OrderSkuDB.deleteMany({OrderProd: _OrderProd._id});
+			// 	continue;
+			// }
 
-			_Order.goods_weight += OProdSave.prod_weight;
-			_Order.goods_quantity += OProdSave.prod_quantity;
-			_Order.goods_regular += OProdSave.prod_regular;
-			_Order.goods_sale += OProdSave.prod_sale;
-			_Order.goods_price += OProdSave.prod_price;
-			_Order.OrderProds.push(OProdSave._id);
+			_Order.goods_weight += _OrderProd.prod_weight;
+			_Order.goods_quantity += _OrderProd.prod_quantity;
+			_Order.goods_regular += _OrderProd.prod_regular;
+			_Order.goods_sale += _OrderProd.prod_sale;
+			_Order.goods_price += _OrderProd.prod_price;
+			_Order.OrderProds.push(_OrderProd._id);
 		}
-
 		// 判断 如果订单 下没有采购商品 则错误
 		if(_Order.goods_quantity < 1) return MdFilter.jsonFailed(res, {message: "订单中没有产品"});
+
+		const OPinsertMany = await OrderProdDB.insertMany(obj_OrderProds);
 
 		// 为 order_price 赋值
 		_Order.order_regular = _Order.goods_regular + ((_Order.ship_regular)?_Order.ship_regular:0);
@@ -310,6 +316,7 @@ exports.OrderPost = async(req, res) => {
 		return MdFilter.json500(res, {message: "OrderPost", error});
 	}
 }
+
 const generate_codeOrder_Prom = (Shop_id, Shop_code) => {
 	return new Promise(async(resolve) => {
 		try{
