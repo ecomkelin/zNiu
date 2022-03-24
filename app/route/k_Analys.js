@@ -100,26 +100,10 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 		const group = {_id: null, count: {$sum: 1}};
 		if(field) {
 			group._id = '$'+field;	// Paidtype
-			if(is_join) {
-				const {joinDB = get_joinDB(field), lookup_as} = groupObj;
-				if(!joinDB) {
-					const errMsg = `第${i}个objs 系统中无${field}数据库`;
-					errMessage.push(errMsg);
-					return;
-				};
-				const lookup = {
-					from: joinDB,
-					localField: field,
-					foreignField: "_id",
-					as: field,
-				}
-				if(lookup_as && Object.keys(lookup_as).length > 0) {
-					lookup.pipeline = [
-						{$project: lookup_as}
-					]
-				}
-				aggregateObjs.push({$lookup: lookup});
-			}
+			console.log(field)
+			const lookup = get_joinDB(dbName, field);
+			console.log(3)
+			if(lookup) aggregateObjs.push({$lookup: lookup});
 		}
 		if(outputs) outputs.forEach(item => group[item] = {$sum: '$'+item});
 		aggregateObjs.push({$group: group});	
@@ -152,11 +136,23 @@ const dbs_obj = {
 			'Paidtype', 'rate', 
 			'at_crt', 
 		],
+		lookupObj: {
+			'Shop': 'shops',
+			'Client': 'clients',
+			'Supplier': 'shops',
+			'Paidtype': 'paidtypes',
+		}
 	},
 	"OrderProd": {
 		db: OrderProdDB,
 		joinDB: 'orderprods',
-		fields: ['Client', 'Supplier', 'Prod', 'is_simple', 'Shop'],
+		fields: ['Shop', 'Client', 'Supplier', 'Prod', 'is_simple', 'Shop'],
+		lookupObj: {
+			'Shop': 'shops',
+			'Client': 'clients',
+			'Supplier': 'shops',
+			'Prod': 'prods'
+		}
 	},
 	"Prod": {
 		db: ProdDB,
@@ -165,14 +161,31 @@ const dbs_obj = {
 			'Shop', 'Brand', 'Nation', 'Categ',
 			'price_regular', 'price_sale', 'price_cost',
 			'is_discount'
-		]
+		],
+		lookupObj: {
+			'Shop': 'shops',
+			'Brand': 'brands',
+			'Nation': 'nations',
+			'Categ': 'categs',
+		}
 	}
 };
 
-const get_joinDB = (dbName) => {
+const get_joinDB = (dbName, field) => {
 	if(!dbName) return null;
 	if(!dbs_obj[dbName]) return null;
-	return dbs_obj[dbName].joinDB;
+	if(!dbs_obj[dbName]["lookupObj"]) return null;
+
+	const from  = dbs_obj[dbName]["lookupObj"][field];
+	if(!from) return null;
+
+	const lookup = {};
+	lookup.from = from;
+	lookup.localField = field;
+	lookup.foreignField = "_id";
+	lookup.as = field;
+	lookup.pipeline = [{$project: {code: 1, nome: 1}} ];
+	return lookup;
 }
 const get_DB = (dbName) => {
 	if(!dbName) return null;
