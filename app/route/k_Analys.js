@@ -20,7 +20,7 @@ const analys = async(req, res) => {
 		const objs = req.body.objs || [];
 		const errMessage = [];
 		const analys = {};
-
+		console.log("objs", objs)
 		for(let i=0; i<objs.length; i++) {
 			/* 找到要分析的数据库 */
 			const {key=i, dbName="Order", is_native, aggregates, pipeline} = objs[i];
@@ -66,6 +66,7 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 			match[item] = ObjectId(match[item]);
 		}
 	});
+	console.log("match", match);
 	aggregateObjs.push({$match: match});
 	if(is_interval)  {	// 分析区间 用 bucket
 		const {bucketObj} = pipeline;
