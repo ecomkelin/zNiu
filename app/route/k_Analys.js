@@ -20,7 +20,7 @@ const analys = async(req, res) => {
 		const objs = req.body.objs || [];
 		const errMessage = [];
 		const analys = {};
-		console.log("objs", objs)
+		// console.log("objs", objs)
 		for(let i=0; i<objs.length; i++) {
 			/* 找到要分析的数据库 */
 			const {key=i, dbName="Order", is_native, aggregates, pipeline} = objs[i];
@@ -66,7 +66,7 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 			match[item] = ObjectId(match[item]);
 		}
 	});
-	console.log("match", match);
+	// console.log("match", match);
 	aggregateObjs.push({$match: match});
 	if(is_interval)  {	// 分析区间 用 bucket
 		const {bucketObj} = pipeline;
@@ -96,7 +96,7 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 		}});
 	} else {		// 分析点 用 group
 		const { groupObj={} } = pipeline;
-		const {is_join, group_fields} = groupObj;
+		const {is_join, outputs} = groupObj;
 		const group = {_id: null, count: {$sum: 1}};
 		if(field) {
 			group._id = '$'+field;	// Paidtype
@@ -121,7 +121,7 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 				aggregateObjs.push({$lookup: lookup});
 			}
 		}
-		if(group_fields) group_fields.forEach(item => group[item] = {$sum: '$'+item});
+		if(outputs) outputs.forEach(item => group[item] = {$sum: '$'+item});
 		aggregateObjs.push({$group: group});	
 	}
 	if(sortObj && Object.keys(sortObj).length > 0) {
