@@ -235,6 +235,7 @@ exports.OrderPost = async(req, res) => {
 					}
 
 					const _OrderSku = new OrderSkuDB(obj_OrderSku);
+					_OrderSku.at_crt = _OrderSku.at_upd = new Date();
 					obj_OrderSkus.push(_OrderSku);
 
 					_OrderProd.prod_quantity += _OrderSku.quantity;
@@ -249,6 +250,7 @@ exports.OrderPost = async(req, res) => {
 
 			// 判断 如果订单 商品下没有 Sku 则说明没有买此商品 则跳过
 			if(_OrderProd.prod_quantity < 1) continue;
+			_OrderProd.at_crt = _OrderProd.at_upd = new Date();
 			obj_OrderProds.push(_OrderProd);
 			// const OProdSave = await _OrderProd.save();
 			// if(!OProdSave) {
