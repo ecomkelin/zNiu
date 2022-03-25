@@ -38,7 +38,9 @@ const analys = async(req, res) => {
 				aggregateObjs = getAggregate(i, dbName, pipeline, errMessage, payload);
 				if(!aggregateObjs) continue;
 			}
-			
+			console.log("aggregateObjs", aggregateObjs)
+			console.log("boundaries", aggregateObjs[1]["$bucket"].boundaries)
+			console.log("output", aggregateObjs[1]["$bucket"].output)
 			const data = await objectDB.aggregate(aggregateObjs);
 			analys[key] = data;
 		}
@@ -53,7 +55,6 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 	const aggregateObjs = [];
 
 	const {matchObj, field, is_interval, sortObj} = pipeline;
-
 	if(judge_field(dbName, field) === false) {
 		const errMsg = `第${i}个objs ${dbName} 中, 没有 此 field: ${field}`;
 		errMessage.push(errMsg);
@@ -68,9 +69,11 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 	});
 	// console.log("match", match);
 	aggregateObjs.push({$match: match});
+
 	if(is_interval)  {	// 分析区间 用 bucket
 		const {bucketObj} = pipeline;
 		const groupBy = field ? '$'+field : null;
+		// console.log("groupBy", groupBy)
 		if(!bucketObj) {
 			const errMsg = `第${i}个objs中 bucketObj: ${bucketObj}`;
 			errMessage.push(errMsg);
@@ -78,6 +81,7 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 		}
 		const {is_at, outputs} = bucketObj;
 		const boundaries = is_at ? path_boundaries(bucketObj) : bucketObj.splits;
+		// console.log("boundaries", boundaries)
 		if(!boundaries) {
 			const errMsg = `第${i}个objs 没有传递正确的 bucketObj.boundaries`;
 			errMessage.push(errMsg);
@@ -130,13 +134,14 @@ const dbs_obj = {
 		db: OrderDB,
 		joinDB: 'orders',
 		fields: [
-			'Shop', 'Client', 'type_Order', 'Supplier', 'status',
+			'Firm', 'Shop', 'Client', 'type_Order', 'Supplier', 'status',
 			'is_hide_client', 'is_payAfter', 'type_ship', 'is_ship',
 			'is_regular', 'is_sale', 'is_pass', 'is_paid', 
 			'Paidtype', 'rate', 
 			'at_crt', 
 		],
 		lookupObj: {
+			'Firm': 'firms',
 			'Shop': 'shops',
 			'Client': 'clients',
 			'Supplier': 'shops',
@@ -146,7 +151,7 @@ const dbs_obj = {
 	"OrderProd": {
 		db: OrderProdDB,
 		joinDB: 'orderprods',
-		fields: ['Shop', 'Client', 'Supplier', 'Prod', 'is_simple', 'Shop'],
+		fields: ['Firm', 'Shop', 'Client', 'Supplier', 'Prod', 'is_simple', 'Shop'],
 		lookupObj: {
 			'Shop': 'shops',
 			'Client': 'clients',
@@ -223,7 +228,6 @@ const path_boundaries = (bucketObj) => {
 	const {splits, atObj={}} = bucketObj;
 	const {start, ended, atUnit="D", span=1, times=30} = atObj;
 	const boundaries=[];
-
 	if(!start) {
 		splits.forEach(item => boundaries.push(new Date(item)));
 		return boundaries;
