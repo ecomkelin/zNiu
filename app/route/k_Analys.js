@@ -81,7 +81,7 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 		}
 		const {is_at, outputs} = bucketObj;
 		const boundaries = is_at ? path_boundaries(bucketObj) : bucketObj.splits;
-		console.log("boundaries", boundaries)
+		// console.log("boundaries", boundaries)
 		if(!boundaries) {
 			const errMsg = `第${i}个objs 没有传递正确的 bucketObj.boundaries`;
 			errMessage.push(errMsg);
@@ -100,13 +100,12 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 		}});
 	} else {		// 分析点 用 group
 		const { groupObj={} } = pipeline;
-		const {is_join, outputs} = groupObj;
+		const {outputs} = groupObj;
 		const group = {_id: null, count: {$sum: 1}};
 		if(field) {
 			group._id = '$'+field;	// Paidtype
-			console.log(field)
+			// console.log(field)
 			const lookup = get_joinDB(dbName, field);
-			console.log(3)
 			if(lookup) aggregateObjs.push({$lookup: lookup});
 		}
 		if(outputs) outputs.forEach(item => group[item] = {$sum: '$'+item});
@@ -137,7 +136,7 @@ const dbs_obj = {
 			'Firm', 'Shop', 'Client', 'type_Order', 'Supplier', 'status',
 			'is_hide_client', 'is_payAfter', 'type_ship', 'is_ship',
 			'is_regular', 'is_sale', 'is_pass', 'is_paid', 
-			'Paidtype', 'rate', 
+			'Paidtype', 'rate', 'symbol',
 			'at_crt', 
 		],
 		lookupObj: {
