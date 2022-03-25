@@ -38,9 +38,9 @@ const analys = async(req, res) => {
 				aggregateObjs = getAggregate(i, dbName, pipeline, errMessage, payload);
 				if(!aggregateObjs) continue;
 			}
-			console.log("aggregateObjs", aggregateObjs)
-			console.log("boundaries", aggregateObjs[1]["$bucket"].boundaries)
-			console.log("output", aggregateObjs[1]["$bucket"].output)
+			// console.log("aggregateObjs", aggregateObjs)
+			// console.log("boundaries", aggregateObjs[1]["$bucket"].boundaries)
+			// console.log("output", aggregateObjs[1]["$bucket"].output)
 			const data = await objectDB.aggregate(aggregateObjs);
 			analys[key] = data;
 		}
@@ -81,7 +81,7 @@ const getAggregate = (i, dbName, pipeline={}, errMessage, payload) => {
 		}
 		const {is_at, outputs} = bucketObj;
 		const boundaries = is_at ? path_boundaries(bucketObj) : bucketObj.splits;
-		// console.log("boundaries", boundaries)
+		console.log("boundaries", boundaries)
 		if(!boundaries) {
 			const errMsg = `第${i}个objs 没有传递正确的 bucketObj.boundaries`;
 			errMessage.push(errMsg);
