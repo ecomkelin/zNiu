@@ -214,7 +214,6 @@ exports.ProdDelete = async(req, res) => {
 }
 
 
-
 exports.ProdPut = async(req, res) => {
 	console.log("/ProdPut");
 	try{
@@ -383,48 +382,5 @@ exports.Prod = async(req, res) => {
 		return MdFilter.jsonSuccess(res, db_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Prod", error});
-	}
-}
-
-
-exports.Prods_Analys = async(req, res) => {
-	console.log("/Prods_Analys");
-	
-	try {
-		const payload = req.payload
-		const queryObj = req.query;
-
-		// 过一遍整体 path
-		const match = MdFilter.path_Func(queryObj);
-		// 再过一遍 特殊 path
-		Prod_path_Func(match, payload, queryObj);
-		Object.keys(match).forEach(item => {
-			if(match[item].length === 24 && MdFilter.isObjectId(match[item])) {
-				match[item] = ObjectId(match[item]);
-			}
-		})
-
-		if(queryObj.field) return MdFilter.jsonFailed(res, {message: "请传递正确的数据field"});
-		const groupBy = queryObj.field ? '$'+queryObj.field : null;
-		if(!queryObj.boundaries) return MdFilter.jsonFailed(res, {message: "请传递正确的数据boundaries"});
-		const boundaries = MdFilter.stringToArray(queryObj.boundaries);
-		const output = {count: {$sum: 1}};
-		const outputs = queryObj.outputs ? MdFilter.stringToArray(queryObj.outputs): [];
-		outputs.forEach(item => {
-			output[item] = {'$sum': item};
-		})
-
-		let analys = await ProdDB.aggregate([
-			{$bucket: {
-				groupBy, 
-				boundaries,
-				default: 'other',
-				output
-			}}
-		])
-		
-		return MdFilter.jsonSuccess(res, {status: 200, message: '分析成功', analys});
-	} catch(error) {
-		return MdFilter.json500(res, {message: "Prods", error});
 	}
 }

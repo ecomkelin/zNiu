@@ -19,7 +19,6 @@ module.exports = (app) => {
 	app.put('/api/b1/Prod/:id', MdAuth.path_User, Prod.ProdPut);
 	app.post('/api/b1/Prod', MdAuth.path_User, Prod.ProdPost);
 	app.get('/api/b1/Prods', MdAuth.path_User, Prod.Prods);
-	app.get('/api/b1/Prods_Analys', MdAuth.path_User, Prod.Prods_Analys);
 
 	/* ------------------------ Prod Attr ------------------------ */
 	app.delete('/api/b1/Attr/:id', MdAuth.path_User, Prod_Attr.AttrDelete);

@@ -163,6 +163,8 @@ exports.OrderPost = async(req, res) => {
 			let _OrderProd
 			if(Prod.is_simple === true) {
 				if(isNaN(obj_OrderProd.quantity)) continue;
+				Prod.quantity -= obj_OrderProd.quantity;
+				Prod.save();
 				obj_OrderProd.quantity = parseInt(obj_OrderProd.quantity);
 				obj_OrderProd.weight = Prod.weight || 0;
 
@@ -556,59 +558,6 @@ exports.Order = async(req, res) => {
 		};
 		const db_res = await GetDB.db(GetDB_Filter);
 		return MdFilter.jsonSuccess(res, db_res);
-	} catch(error) {
-		return MdFilter.json500(res, {message: "Orders", error});
-	}
-}
-
-exports.Orders_Analys = async(req, res) => {
-	console.log("/Orders_Analys");
-	try {
-		const payload = req.payload
-		const queryObj = req.query;
-
-		// 过一遍整体 path
-		const match = MdFilter.path_Func(queryObj);
-		// 再过一遍 特殊 path
-		Order_path_Func(match, payload, queryObj);
-		Object.keys(match).forEach(item => {
-			if(match[item].length === 24 && MdFilter.isObjectId(match[item])) {
-				match[item] = ObjectId(match[item]);
-			}
-		})
-		const group = {
-			_id: null,
-			count: {$sum: 1},
-			goods_weight: {$sum: '$goods_weight'},
-			goods_quantity: {$sum: '$goods_quantity'},
-			order_regular: {$sum: '$order_regular'},
-			order_sale: {$sum: '$order_sale'},
-			order_imp: {$sum: '$order_imp'},
-			order_paid: {$sum: '$order_paid'},
-			order_noPay: {$sum: '$order_noPay'},
-		};
-		if(queryObj.field) group._id = '$'+queryObj.field;	// Paidtype
-
-		let analys = await OrderDB.aggregate([
-			{$match: match}, 
-			{$group: group},
-			// {$project: {...group, _id: 0, 'field': '$_id'}}
-		])
-		// console.log('analys', analys)
-
-		// const GetDB_Filter = {
-		// 	payload: payload,
-		// 	queryObj: req.query,
-		// 	objectDB: OrderDB,
-		// 	path_Callback: Order_path_Func,
-		// 	dbName: dbOrder,
-		// };
-		// const dbs_res = await GetDB.dbs(GetDB_Filter);
-		// dbs_res.analys = analys;
-		// dbs_res.message = '分析成功';
-		// // console.log('obj', count)
-		// return MdFilter.jsonSuccess(res, dbs_res);
-		return MdFilter.jsonSuccess(res, {status: 200, message: '分析成功', analys});
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Orders", error});
 	}
