@@ -164,7 +164,7 @@ exports.OrderPost = async(req, res) => {
 			if(Prod.is_simple === true) {
 				if(isNaN(obj_OrderProd.quantity)) continue;
 				// 简单的更改库存
-				await ProdDB.update({"_id" : Prod._id},{quantity: -obj_OrderProd.quantity } );
+				await ProdDB.update({"_id" : Prod._id},{$inc: {quantity: -obj_OrderProd.quantity }} );
 				// await Prod.save();	// 为了更新其他数据
 
 				obj_OrderProd.quantity = parseInt(obj_OrderProd.quantity);
