@@ -249,6 +249,10 @@ exports.ProdPut = async(req, res) => {
 			obj.sort = parseInt(obj.sort);
 			if(!isNaN(obj.sort)) Prod.sort = obj.sort;
 		}
+		if(obj.quantity) {
+			obj.quantity = parseInt(obj.quantity);
+			if(!isNaN(obj.quantity)) Prod.quantity = obj.quantity;
+		}
 
 		if(obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') Prod.is_usable = true;
 		if(obj.is_usable == 0 || obj.is_usable === false || obj.is_usable === 'false') Prod.is_usable = false;
