@@ -150,6 +150,7 @@ exports.OrderPost = async(req, res) => {
 			obj_OrderProd.Firm = _Order.Firm;
 			obj_OrderProd.status = _Order.status;
 			obj_OrderProd.Pd = Prod.Pd;
+			obj_OrderProd.is_simple = Prod.is_simple;
 
 			obj_OrderProd.nome = Prod.nome;
 			obj_OrderProd.unit = Prod.unit;
@@ -468,15 +469,36 @@ exports.OrderDelete = async(req, res) => {
 		const id = req.params.id;		// 所要更改的Order的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 		
-		const force = req.query.force;
-		if(force !== payload.code) return MdFilter.jsonFailed(res, {message: "请传递force的值为本人code"});
+		// const force = req.query.force;
+		// if(force !== payload.code) return MdFilter.jsonFailed(res, {message: "请传递force的值为本人code"});
 
-		const pathObj = {_id: id, is_hide_client: true, Firm: payload.Firm};
+		const pathObj = {
+			_id: id,
+			Firm: payload.Firm,
+			// is_hide_client: true,
+		};
 		if(payload.Shop) pathObj.Shop = payload.Shop;
 
-		const Order = await OrderDB.findOne(pathObj);
+		const Order = await OrderDB.findOne(pathObj, {OrderProds: 1})
+			.populate({
+				path: "OrderProds",
+				select: "is_simple Prod quantity OrderSkus",
+				populate: {path: "OrderSkus", select: "Sku quantity"}
+			});
 		if(!Order) return MdFilter.jsonFailed(res, {message: "没有找到此订单信息"});
-
+		// console.log(Order)
+		for(let i=0; i<Order.OrderProds.length; i++) {
+			const OrderProd = Order.OrderProds[i];
+			// console.log(OrderProd)
+			if(OrderProd.is_simple === true) {
+				await ProdDB.update({"_id" : OrderProd.Prod},{$inc: {quantity: OrderProd.quantity}} );
+			} else {
+				for(let j=0; j<OrderProd.OrderSkus.length; j++) {
+					const OrderSku = OrderProd.OrderSkus[j];
+					await SkuDB.update({"_id": OrderSku.Sku}, {$inc: {quantity: OrderSku.quantity}});
+				}
+			}
+		}
 		OrderSkuDB.deleteMany({Order: id});
 		OrderProdDB.deleteMany({Order: id});
 		await OrderDB.deleteOne({_id: id});
