@@ -163,8 +163,10 @@ exports.OrderPost = async(req, res) => {
 			let _OrderProd
 			if(Prod.is_simple === true) {
 				if(isNaN(obj_OrderProd.quantity)) continue;
-				Prod.quantity -= obj_OrderProd.quantity;
-				Prod.save();
+				// 简单的更改库存
+				await ProdDB.update({"_id" : Prod._id},{quantity: -obj_OrderProd.quantity } );
+				// await Prod.save();	// 为了更新其他数据
+
 				obj_OrderProd.quantity = parseInt(obj_OrderProd.quantity);
 				obj_OrderProd.weight = Prod.weight || 0;
 
@@ -191,8 +193,11 @@ exports.OrderPost = async(req, res) => {
 				// 生成 订单(OrderProd)数据库信息
 				_OrderProd = new OrderProdDB(obj_OrderProd);
 			} else {
+				// 接受前台 OrderSkus的数据不能为空
 				if(!(obj_OrderProd.OrderSkus instanceof Array)) continue;
+				// 重命名 OrderSkus
 				const oSkus = [...obj_OrderProd.OrderSkus];
+				// 要存入数据库的 OrderSkus
 				obj_OrderProd.OrderSkus = [];
 
 				// 生成 (OrderProd)数据库信息

@@ -233,44 +233,41 @@ const ProdUpd_fromSku_Prom = (id) => {
 				.populate("Skus");
 			if(!Prod) return resolve({status: 400, message: "没有找到此商品信息"});
 
-			if(Prod.is_simple) {
-				if(Prod.Skus.length > 0) return resolve({status: 400, message: "商品Sku错误"});
-			} else {
-				const Skus = Prod.Skus;
-				if(!Skus || Skus.length === 0) return resolve({status: 400, message: "商品Sku错误"});
-				let price_min,price_max,is_discount, is_sell, is_usable, is_alert;
-				for(let i=0; i<Skus.length; i++) {
-					const sku = Skus[i];
-					if(i==0) {
-						price_min = sku.price_sale;
-						price_max = sku.price_sale;
-						is_discount = sku.is_discount;
-						is_sell = sku.is_sell;
-						is_usable = sku.is_usable;
-						is_alert = sku.is_alert;
-					} else {
-						if(price_min>sku.price_sale) price_min = sku.price_sale;
-						if(price_max<sku.price_sale) price_max = sku.price_sale;
-						is_discount += sku.is_discount;
-						is_sell += sku.is_sell;
-						is_usable += sku.is_usable;
-						is_alert += sku.is_alert;
-					}
+			const Skus = Prod.Skus;
+			if(!Skus || Skus.length === 0) return resolve({status: 400, message: "商品Sku错误"});
+			let price_min,price_max,is_discount, is_sell, is_usable, is_alert;
+			for(let i=0; i<Skus.length; i++) {
+				const sku = Skus[i];
+				if(i==0) {
+					price_min = sku.price_sale;
+					price_max = sku.price_sale;
+					is_discount = sku.is_discount;
+					is_sell = sku.is_sell;
+					is_usable = sku.is_usable;
+					is_alert = sku.is_alert;
+				} else {
+					if(price_min>sku.price_sale) price_min = sku.price_sale;
+					if(price_max<sku.price_sale) price_max = sku.price_sale;
+					is_discount += sku.is_discount;
+					is_sell += sku.is_sell;
+					is_usable += sku.is_usable;
+					is_alert += sku.is_alert;
 				}
-
-				Prod.price_min = price_min;
-				Prod.price_max = price_max;
-				Prod.is_discount = is_discount ? true: false;
-				Prod.is_sell = is_sell ? true: false;
-				Prod.is_usable = is_usable ? true: false;
-				Prod.is_alert = is_alert ? true: false;
 			}
+
+			Prod.price_min = price_min;
+			Prod.price_max = price_max;
+			Prod.is_discount = is_discount ? true: false;
+			Prod.is_sell = is_sell ? true: false;
+			Prod.is_usable = is_usable ? true: false;
+			Prod.is_alert = is_alert ? true: false;
+
 			const ProdSave = await Prod.save();
 			resolve({status: 200, data: {object: ProdSave}});
 
 		} catch(error) {
-			console.log(".ProdUpd_fromSku_Prom", error);
-			resolve({status: 400, message: "ProdUpd_fromSku_Prom error"});
+			console.log(".ProdUpd-fromSku-Prom", error);
+			resolve({status: 400, message: "ProdUpd-fromSku-Prom error"});
 		}
 	})
 }
