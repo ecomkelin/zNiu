@@ -12,6 +12,14 @@ const dbSchema = new Schema({
 	nome: String,
 	options: [String],
 
+	key: String,
+	values : [{
+		item: String,
+		price: {type: Float, default: 0}
+	}],
+	is_stock: Boolean,
+	is_price: Boolean,
+
 	langs: [{
 		Lang: {type: ObjectId, ref: 'Lang'},	// 如果为空 则为默认值
 		desp: String, 							// 描述

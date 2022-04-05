@@ -298,14 +298,10 @@ exports.OrderPost = async(req, res) => {
 			 OrderSkuDB.deleteMany({Order: _Order._id});
 			 OrderProdDB.deleteMany({Order: _Order._id});
 		} else {
-			// 删除重现下单的 订单
+			// 删除重新下单的 订单
 			if(MdFilter.isObjectId(org_OrderId)) {
-				const org_Order = await OrderDB.findOne({_id: org_OrderId, status: {$in: ConfOrder.status_confirms}});
-				if(org_Order && [10,70].includs.org_Order.status) {
-					OrderSkuDB.deleteMany({Order: org_OrderId});
-					OrderProdDB.deleteMany({Order: org_OrderId});
-					OrderDB.deleteOne({_id: org_OrderId});
-				}
+				const res_del = await OrderDelete_Prom(payload, org_OrderId);
+				if(res_del.status !== 200) return MdFilter.json500(res, {message: "OrderPost org_Order del"});
 			} 
 		}
 		// 返回给前端，  如果不正确 可以尝试 放到 crt_OrderProds_Fucn 中。 如果正确 要删掉 res 参数
@@ -471,50 +467,63 @@ exports.OrderDelete = async(req, res) => {
 
 		const id = req.params.id;		// 所要更改的Order的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
-		
+
 		// const force = req.query.force;
 		// if(force !== payload.code) return MdFilter.jsonFailed(res, {message: "请传递force的值为本人code"});
 
-		const pathObj = {
-			_id: id,
-			Firm: payload.Firm,
-			// is_hide_client: true,
-		};
-		if(payload.Shop) pathObj.Shop = payload.Shop;
+		const res_del = await OrderDelete_Prom(payload, id);
 
-		const Order = await OrderDB.findOne(pathObj, {OrderProds: 1, type_Order: 1})
-			.populate({
-				path: "OrderProds",
-				select: "is_simple Prod quantity OrderSkus",
-				populate: {path: "OrderSkus", select: "Sku quantity"}
-			});
-		if(!Order) return MdFilter.jsonFailed(res, {message: "没有找到此订单信息"});
-		// console.log(Order)
-		let quantity = parseInt(Order.type_Order);
-		for(let i=0; i<Order.OrderProds.length; i++) {
-			const OrderProd = Order.OrderProds[i];
-			// console.log(OrderProd)
-			if(OrderProd.is_simple === true) {
-				quantity = -(quantity * OrderProd.quantity);
-				await ProdDB.update({"_id" : OrderProd.Prod},{$inc: {quantity}} );
-			} else {
-				for(let j=0; j<OrderProd.OrderSkus.length; j++) {
-					const OrderSku = OrderProd.OrderSkus[j];
-					quantity = -(quantity* OrderSku.quantity);
-					await SkuDB.update({"_id": OrderSku.Sku}, {$inc: {quantity}});
-				}
-			}
-		}
-		OrderSkuDB.deleteMany({Order: id});
-		OrderProdDB.deleteMany({Order: id});
-		await OrderDB.deleteOne({_id: id});
-
-		return MdFilter.jsonSuccess(res, {message: "OrderDelete"});
+		return MdFilter.jsonRes(res, res_del);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "OrderDelete", error});
 	}
 }
 
+
+const OrderDelete_Prom = (payload, id) => {
+	// console.log("/OrderDelete_Prom");
+	return new Promise(async(resolve) => {
+		try{
+			const pathObj = {
+				_id: id,
+				Firm: payload.Firm,
+				// is_hide_client: true,
+			};
+			if(payload.Shop) pathObj.Shop = payload.Shop;
+
+			const Order = await OrderDB.findOne(pathObj, {OrderProds: 1, type_Order: 1})
+				.populate({
+					path: "OrderProds",
+					select: "is_simple Prod quantity OrderSkus",
+					populate: {path: "OrderSkus", select: "Sku quantity"}
+				});
+			if(!Order) return resolve({status: 400, message: "没有找到此订单信息"});
+			// console.log(Order)
+			let quantity = parseInt(Order.type_Order);
+			for(let i=0; i<Order.OrderProds.length; i++) {
+				const OrderProd = Order.OrderProds[i];
+				// console.log(OrderProd)
+				if(OrderProd.is_simple === true) {
+					quantity = -(quantity * OrderProd.quantity);
+					await ProdDB.update({"_id" : OrderProd.Prod},{$inc: {quantity}} );
+				} else {
+					for(let j=0; j<OrderProd.OrderSkus.length; j++) {
+						const OrderSku = OrderProd.OrderSkus[j];
+						quantity = -(quantity* OrderSku.quantity);
+						await SkuDB.update({"_id": OrderSku.Sku}, {$inc: {quantity}});
+					}
+				}
+			}
+			OrderSkuDB.deleteMany({Order: id});
+			OrderProdDB.deleteMany({Order: id});
+			await OrderDB.deleteOne({_id: id});
+
+			return resolve({status: 200, message: "OrderDelete"});
+		} catch(error) {
+			return resolve({status: 500, message: "OrderDelete", error});
+		}
+	})
+}
 
 
 
