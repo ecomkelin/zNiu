@@ -136,6 +136,7 @@ exports.OrderPost = async(req, res) => {
 		const _Order = new OrderDB(obj_Order);
 
 		const obj_OrderProds = [];
+		const obj_OrderSkus = [];
 		for(let i = 0; i<oProds.length; i++){
 			const obj_OrderProd = oProds[i];
 			if(!MdFilter.isObjectId(obj_OrderProd.Prod)) continue;
@@ -205,7 +206,6 @@ exports.OrderPost = async(req, res) => {
 				// 生成 (OrderProd)数据库信息
 				_OrderProd = new OrderProdDB(obj_OrderProd);
 
-				const obj_OrderSkus = [];
 				for(let j=0; j<oSkus.length; j++) {
 					const obj_OrderSku = oSkus[j];
 					if(!MdFilter.isObjectId(obj_OrderSku.Sku)) continue;
@@ -256,7 +256,6 @@ exports.OrderPost = async(req, res) => {
 					_OrderProd.prod_price += _OrderSku.price * _OrderSku.quantity;
 					_OrderProd.OrderSkus.push(_OrderSku._id);
 				}
-				const OSinsertMany = await OrderSkuDB.insertMany(obj_OrderSkus);
 			}
 
 			// 判断 如果订单 商品下没有 Sku 则说明没有买此商品 则跳过
@@ -279,32 +278,31 @@ exports.OrderPost = async(req, res) => {
 		// 判断 如果订单 下没有采购商品 则错误
 		if(_Order.goods_quantity < 1) return MdFilter.jsonFailed(res, {message: "订单中没有产品"});
 
-		const OPinsertMany = await OrderProdDB.insertMany(obj_OrderProds);
-
 		// 为 order_price 赋值
 		_Order.order_regular = _Order.goods_regular + ((_Order.ship_regular)?_Order.ship_regular:0);
 		_Order.order_sale = _Order.goods_sale + ((_Order.ship_sale)?_Order.ship_sale:0);
 		// 判断是客户下单 或者员工没有给order_imp 则 order_imp= goods_price+ship_sale
 		if(!ConfUser.role_Arrs.includes(payload.role) || isNaN(_Order.order_imp)) {
-			console.log(1)
 			_Order.order_imp = _Order.goods_price + ((_Order.ship_sale)?_Order.ship_sale:0);
 		}
 
 		// 计算其他币种的支付方式
 		if(isNaN(_Order.price_coin) && _Order.rate) _Order.price_coin = _Order.order_imp * _Order.rate;
 
-		const OrderSave = await _Order.save();
-		if(!OrderSave) {
-			 OrderSkuDB.deleteMany({Order: _Order._id});
-			 OrderProdDB.deleteMany({Order: _Order._id});
-		} else {
-			// 删除重新下单的 订单
-			if(MdFilter.isObjectId(org_OrderId)) {
-				const res_del = await OrderDelete_Prom(payload, org_OrderId);
-				if(res_del.status !== 200) return MdFilter.json500(res, {message: "OrderPost org_Order del"});
-			} 
+		if(MdFilter.isObjectId(org_OrderId)) {
+			const res_del = await OrderDelete_Prom(payload, org_OrderId);
+			if(res_del.status !== 200) return MdFilter.json500(res, {message: "OrderPost org_Order del"});
 		}
+
+		const OrderSame = await OrderDB.findOne({code: _Order.code, Firm: _Order.Firm, _id: {"$ne": _Order._id}});
+		if(OrderSame) return MdFilter.json500(res, {message: "下单错误 错误码 100101"});
+
+		const OrderSave = await _Order.save();
+		if(!OrderSave) return MdFilter.json500(res, {message: "下单错误 错误码 100102"});
 		// 返回给前端，  如果不正确 可以尝试 放到 crt_OrderProds_Fucn 中。 如果正确 要删掉 res 参数
+		const OPinsertMany = await OrderProdDB.insertMany(obj_OrderProds);
+		const OSinsertMany = await OrderSkuDB.insertMany(obj_OrderSkus);
+
 		if(req.query.populateObjs) {
 			const GetDB_Filter = {
 				id: OrderSave._id,
