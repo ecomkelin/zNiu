@@ -99,6 +99,7 @@ exports.OrderPost = async(req, res) => {
 		// obj_Order.shop 已赋值
 		if(isNaN(obj_Order.price_paid)) obj_Order.price_paid = 0;
 		obj_Order.price_paid = parseFloat(obj_Order.price_paid);
+
 		if(!isNaN(obj_Order.order_imp)) obj_Order.order_imp = parseFloat(obj_Order.order_imp);
 
 		obj_Order.Firm = Shop.Firm;
@@ -175,7 +176,7 @@ exports.OrderPost = async(req, res) => {
 				// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
 				obj_OrderProd.price_regular = (type_Order === 1) ? Prod.price_cost : Prod.price_regular;
 				obj_OrderProd.price_sale = (type_Order === 1) ? Prod.price_cost : Prod.price_sale;
-				
+				console.log(111, obj_OrderProd.price)
 				if(type_Order === 1) {
 					if(isNaN(obj_OrderProd.price)) obj_OrderProd.price = Prod.price_cost;
 				} else {
@@ -285,7 +286,7 @@ exports.OrderPost = async(req, res) => {
 		_Order.order_regular = _Order.goods_regular + ((_Order.ship_regular)?_Order.ship_regular:0);
 		_Order.order_sale = _Order.goods_sale + ((_Order.ship_sale)?_Order.ship_sale:0);
 
-		// 判断是客户下单 或者员工没有给order_imp 则 order_imp=order_sale
+		// 判断是客户下单 或者员工没有给order_imp 则 order_imp= goods_price+ship_sale
 		if(!ConfUser.role_Arrs.includes(payload.role) || isNaN(_Order.order_imp)) {
 			_Order.order_imp = _Order.goods_price + ((_Order.ship_sale)?_Order.ship_sale:0);
 		}

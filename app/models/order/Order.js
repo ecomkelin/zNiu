@@ -124,7 +124,6 @@ dbSchema.pre('save', function(next) {
 
 	this.order_regular = this.goods_regular + this.ship_regular;
 	this.order_sale = this.goods_sale + this.ship_sale;
-	if(!this.order_imp) this.order_imp = this.order_sale;
 
 	this.is_regular = (this.order_imp === this.order_regular);
 	this.is_sale = (this.order_imp === this.order_sale);
