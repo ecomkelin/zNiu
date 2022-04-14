@@ -85,7 +85,7 @@ const dbSchema = new Schema({
 
 	order_regular: {type: Float, default: 0},			// [只读 绝对] <goods_regular> + <ship_regular>
 	order_sale: {type: Float, default: 0},				// [只读 绝对] <goods_sale> + <ship_sale>
-	order_imp: {type: Float, default: 0},				// 前台接收的订单价格
+	order_imp: {type: Float},							// 前台接收的订单价格
 
 	is_regular: Boolean,								// [只读 绝对] 	是否符合regular
 	is_sale: Boolean,									// [只读 绝对] 	是否符合sale
