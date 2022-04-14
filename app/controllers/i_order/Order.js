@@ -99,7 +99,7 @@ exports.OrderPost = async(req, res) => {
 		// obj_Order.shop 已赋值
 		if(isNaN(obj_Order.price_paid)) obj_Order.price_paid = 0;
 		obj_Order.price_paid = parseFloat(obj_Order.price_paid);
-		if(obj_Order.order_imp) obj_Order.order_imp = parseFloat(obj_Order.order_imp);
+		if(!isNaN(obj_Order.order_imp)) obj_Order.order_imp = parseFloat(obj_Order.order_imp);
 
 		obj_Order.Firm = Shop.Firm;
 
