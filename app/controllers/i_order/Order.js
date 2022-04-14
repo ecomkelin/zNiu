@@ -286,7 +286,7 @@ exports.OrderPost = async(req, res) => {
 		_Order.order_sale = _Order.goods_sale + ((_Order.ship_sale)?_Order.ship_sale:0);
 
 		// 判断是客户下单 或者员工没有给order_imp 则 order_imp=order_sale
-		if(!ConfUser.role_Arrs.includes(payload.role) || !_Order.order_imp) {
+		if(!ConfUser.role_Arrs.includes(payload.role) || isNaN(_Order.order_imp)) {
 			_Order.order_imp = _Order.goods_price + ((_Order.ship_sale)?_Order.ship_sale:0);
 		}
 
