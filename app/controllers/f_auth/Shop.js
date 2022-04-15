@@ -293,7 +293,7 @@ const obtFilterObj = (req, id) => {
 
 const Shop_path_Func = (pathObj, payload, queryObj) => {
 	if(payload.Firm) {
-		if(queryObj.Firm == "Supplier") {
+		if(queryObj && queryObj.Firm === "Supplier") {
 			pathObj["Firm"] = {$eq: null};
 		} else {
 			pathObj.Firm = payload.Firm;
