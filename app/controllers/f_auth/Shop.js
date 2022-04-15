@@ -21,7 +21,6 @@ exports.ShopPost = async(req, res) => {
 		let obj = req.body.obj;
 		if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Shop", field: "img_url"});
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
-		console.log(obj.Firm)
 		if(obj.Firm === 'Supplier') {
 			obj.Firm = null;
 		} else {
@@ -68,7 +67,7 @@ exports.ShopDelete = async(req, res) => {
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据 _id"});
 
 		const pathObj = {_id: id};
-		Shop_path_Func(pathObj, payload);
+		Shop_path_Func(pathObj, payload, req.query);
 
 		const Shop = await ShopDB.findOne(pathObj);
 		if(!Shop) return MdFilter.jsonFailed(res, {message: "没有找到此店铺信息"});
@@ -102,7 +101,7 @@ exports.ShopPut = async(req, res) => {
 		const id = req.params.id;		// 所要更改的Shop的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 		const pathObj = {_id: id};
-		Shop_path_Func(pathObj, payload);
+		Shop_path_Func(pathObj, payload, req.query);
 
 		const Shop = await ShopDB.findOne(pathObj);
 		if(!Shop) return MdFilter.jsonFailed(res, {message: "没有找到此店铺信息"});
