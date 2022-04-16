@@ -470,8 +470,9 @@ exports.OrderDelete = async(req, res) => {
 		// if(force !== payload.code) return MdFilter.jsonFailed(res, {message: "请传递force的值为本人code"});
 
 		const res_del = await OrderDelete_Prom(payload, id);
-		OrderSkuDB.deleteMany({Order: id});
-		OrderProdDB.deleteMany({Order: id});
+
+		await OrderSkuDB.deleteMany({Order: id});
+		await OrderProdDB.deleteMany({Order: id});
 
 		return MdFilter.jsonRes(res, res_del);
 	} catch(error) {
