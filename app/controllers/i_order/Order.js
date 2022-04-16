@@ -292,6 +292,8 @@ exports.OrderPost = async(req, res) => {
 		if(MdFilter.isObjectId(org_OrderId)) {
 			const res_del = await OrderDelete_Prom(payload, org_OrderId);
 			if(res_del.status !== 200) return MdFilter.json500(res, {message: "OrderPost org_Order del"});
+			await OrderSkuDB.deleteMany({Order: org_OrderId});
+			await OrderProdDB.deleteMany({Order: org_OrderId});
 		}
 
 		const OrderSame = await OrderDB.findOne({code: _Order.code, Firm: _Order.Firm, _id: {"$ne": _Order._id}});
