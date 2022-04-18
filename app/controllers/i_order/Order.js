@@ -666,13 +666,14 @@ exports.printTicket = (req, res) => {
 		let status = 400;
 		let message = "暂无数据";
 		let object = null;
+		const count = tickets.length;
 		if((tickets instanceof Array) && tickets.length > 0) {
 			object = tickets[0];
 			tickets.splice(0, 1);
 			status = 200;
 			message = "打印成功";
 		}
-		return MdFilter.jsonRes(res, {status, data: {object, count: tickets.length}, })
+		return MdFilter.jsonRes(res, {status, data: {object, count}, })
 	} catch (error) {
 		return MdFilter.json500(res, {message: "printTicket", error});
 	}
