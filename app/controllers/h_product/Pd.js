@@ -313,7 +313,7 @@ const Pd_ImgPost = async(res, obj, Pd, payload) => {
 
 const Pd_path_Func = (pathObj, payload, queryObj) => {
 	pathObj.Firm = payload.Firm;
-	if(payload.role >= ConfUser.role_set.boss) {
+	if(payload.role >= ConfUser.role_set.pter) {
 		pathObj.is_usable = 1;
 	}
 

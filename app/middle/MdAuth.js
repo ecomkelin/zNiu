@@ -125,3 +125,21 @@ exports.by_bser = async(req, res, next) => {
 		return res.json({status: 401, message: "您没有此权限"});
 	}
 }
+
+// 总公司和分店的管理者权限
+exports.by_pter = async(req, res, next) => {
+	try {
+		const access_res = await MdJwt.token_VerifyProm(req.headers['authorization']);
+		if(access_res.status === 401) return res.json(access_res);
+		const payload = access_res.data.payload;
+
+		if(payload.role != ConfUser.role_set.printer)
+			return res.json({status: 401, message: '您没有此公司管理权限'});
+
+		req.payload = payload;
+		return next();
+	} catch(error) {
+		console.log("by_bser", error);
+		return res.json({status: 401, message: "您没有此权限"});
+	}
+}

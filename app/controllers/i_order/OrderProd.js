@@ -10,7 +10,7 @@ const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 const OrderProd_path_Func = (pathObj, payload, queryObj) => {
 	if(payload.Firm) {
 		pathObj.Firm = payload.Firm;
-		if(payload.role >= ConfUser.role_set.boss) {
+		if(payload.role >= ConfUser.role_set.pter) {
 			pathObj.Shop = payload.Shop;
 		}
 	} else {
@@ -27,7 +27,7 @@ const OrderProd_path_Func = (pathObj, payload, queryObj) => {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Clients);
 		if(arrs.length > 0) pathObj.Client = {"$in": arrs};
 	}
-	if(queryObj.Shops && payload.role < ConfUser.role_set.boss) {
+	if(queryObj.Shops && payload.role < ConfUser.role_set.pter) {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Shops);
 		if(arrs.length > 0) pathObj.Shop = {"$in": arrs};
 	}

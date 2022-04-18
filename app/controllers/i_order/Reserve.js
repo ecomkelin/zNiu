@@ -242,7 +242,7 @@ exports.ReserveDelete = async(req, res) => {
 
 const Reserve_path_Func = (pathObj, payload, queryObj) => {
 	pathObj.Firm = payload.Firm;
-	if(payload.role >= ConfUser.role_set.boss) {
+	if(payload.role >= ConfUser.role_set.pter) {
 		pathObj.Shop = payload.Shop;
 	}
 
@@ -252,11 +252,11 @@ const Reserve_path_Func = (pathObj, payload, queryObj) => {
 		// if(arrs.length > 0) pathObj.status["$in"] = arrs;
 		if(arrs.length > 0) pathObj.status = {"$in": arrs};
 	}
-	if(queryObj.Clients && payload.role < ConfUser.role_set.boss) {
+	if(queryObj.Clients && payload.role < ConfUser.role_set.pter) {
 		const arrs = MdFilter.stringToArray(queryObj.Clients);
 		if(arrs.length > 0) pathObj.Client = {"$in": arrs};
 	}
-	if(queryObj.Shops && payload.role < ConfUser.role_set.boss) {
+	if(queryObj.Shops && payload.role < ConfUser.role_set.pter) {
 		const arrs = MdFilter.stringToArray(queryObj.Shops);
 		if(arrs.length > 0) pathObj.Shop = {"$in": arrs};
 	}

@@ -20,6 +20,12 @@ module.exports = (app) => {
 	app.post('/api/b1/Order', MdAuth.path_User, Order.OrderPost);
 	app.get('/api/b1/Orders', MdAuth.path_User, Order.Orders);
 	app.get('/api/b1/Order/:id', MdAuth.path_User, Order.Order);
+
+	app.get('/api/b1/addTicket/:id', MdAuth.path_User, Order.addTicket);
+	app.get('/api/b1/clearTicket', MdAuth.path_User, Order.clearTicket);
+	app.get('/api/b1/printTicket', MdAuth.path_User, Order.printTicket);
+	app.get('/api/b1/getTickets', MdAuth.path_User, Order.getTickets);
+
 	/* ------------------- Order_status ------------------- */
 	app.put('/api/b1/Order_change_status/:id', MdAuth.path_User, Order_status.Order_change_status);
 };

@@ -61,7 +61,7 @@ exports.logout = async(req, res, objectDB) => {
 exports.login = async(req, res, objectDB) => {
 	console.log("/login")
 	try{
-		console.log(req.body)
+		// console.log(req.body)
 		const Obj_res = await obtain_payload(req.body.system, req.body.social, objectDB);
 		if(Obj_res.status !== 200) return MdFilter.jsonRes(res, Obj_res);
 		const payload = Obj_res.data.object;

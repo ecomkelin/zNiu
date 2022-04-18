@@ -539,7 +539,7 @@ const OrderDelete_Prom = (payload, id) => {
 const Order_path_Func = (pathObj, payload, queryObj) => {
 	if(payload.Firm) {
 		pathObj.Firm = payload.Firm;
-		if(payload.role >= ConfUser.role_set.boss) {
+		if(payload.role >= ConfUser.role_set.pter) {
 			pathObj.Shop = payload.Shop;
 		}
 	} else {
@@ -561,7 +561,7 @@ const Order_path_Func = (pathObj, payload, queryObj) => {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Paidtypes);
 		if(arrs.length > 0) pathObj.Paidtype = {"$in": arrs};
 	}
-	if(queryObj.Shops && payload.role < ConfUser.role_set.boss) {
+	if(queryObj.Shops && payload.role < ConfUser.role_set.pter) {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Shops);
 		if(arrs.length > 0) pathObj.Shop = {"$in": arrs};
 	}
@@ -605,5 +605,75 @@ exports.Order = async(req, res) => {
 		return MdFilter.jsonSuccess(res, db_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Orders", error});
+	}
+}
+
+
+const tickets = [];
+indexOfArrayObject = (arrs, field, str) => {
+	if(!(arrs instanceof Array)) return -2;
+	let index=0;
+	for(;index<arrs.length; index++) {
+		if(String(arrs[index][field]) == String(str)) break;
+	}
+	if(index == arrs.length) return -1;
+	return index;
+}
+exports.addTicket = async(req, res) => {
+	console.log("/addTicket");
+	try {
+		const payload = req.payload;
+		const GetDB_Filter = {
+			id: req.params.id,
+			payload: payload,
+			queryObj: req.query,
+			objectDB: OrderDB,
+			path_Callback: Order_path_Func,
+			dbName: dbOrder,
+		};
+		const db_res = await GetDB.db(GetDB_Filter);
+		if(db_res.status !== 200) return MdFilter.jsonSuccess(res, db_res);
+		const object = db_res.data.object;
+		const index = indexOfArrayObject(tickets, '_id', object._id);
+
+		if(index < -1) return MdFilter.json500(res, {message: "addTicket tickets Error"});
+		if(index > -1) tickets.splice(index, 1);
+		tickets.push(object);
+			
+		return MdFilter.jsonSuccess(res, db_res);
+	} catch(error) {
+		return MdFilter.json500(res, {message: "addTicket", error});
+	}
+}
+exports.getTickets = (req, res) => {
+	try {
+		return MdFilter.jsonSuccess(res, {data: {objects: tickets}})
+	} catch (error) {
+		return MdFilter.json500(res, {message: "clearTicket", error});
+	}
+}
+exports.clearTicket = (req, res) => {
+	try {
+		tickets.splice(0,tickets.length);
+		return MdFilter.jsonSuccess(res, {message: "清除打印任务成功"})
+	} catch (error) {
+		return MdFilter.json500(res, {message: "clearTicket", error});
+	}
+}
+
+exports.printTicket = (req, res) => {
+	try {
+		let status = 400;
+		let message = "暂无数据";
+		let object = null;
+		if((tickets instanceof Array) && tickets.length > 0) {
+			object = tickets[0];
+			tickets.splice(0, 1);
+			status = 200;
+			message = "打印成功";
+		}
+		return MdFilter.jsonRes(res, {status, data: {object, count: tickets.length}, })
+	} catch (error) {
+		return MdFilter.json500(res, {message: "printTicket", error});
 	}
 }
