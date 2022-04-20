@@ -53,7 +53,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 			const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['nome']);
 			if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 		}
-		if(isNaN(obj.weight)) obj.weight = parseFloat(obj.weight);
+		if(!isNaN(obj.weight)) obj.weight = parseFloat(obj.weight);
 
 		if(isNaN(obj.price_cost)) obj.price_cost = 0;
 		obj.price_cost = parseFloat(obj.price_cost);
@@ -349,11 +349,15 @@ const Prod_path_Func = (pathObj, payload, queryObj) => {
 		pathObj["Categ"] = {$in: ids};
 	}
 }
-
+// let flag = 1;
 const dbProd = 'Prod';
 exports.Prods = async(req, res) => {
 	console.log("/prods");
-	try {		
+	try {
+		// if(flag === 1) {
+		// 	fNiu_zNiu();
+		// 	flag = 2;
+		// }
 		const payload = req.payload;
 		// console.log(payload)
 		const GetDB_Filter = {
@@ -364,12 +368,13 @@ exports.Prods = async(req, res) => {
 			dbName: dbProd,
 		};
 		const dbs_res = await GetDB.dbs(GetDB_Filter);
-		// console.log(dbs_res.data.objects)
+		console.log(dbs_res.data.objects)
 		return MdFilter.jsonSuccess(res, dbs_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Prods", error});
 	}
 }
+
 const fNiu_zNiu = async() => {
 	const nowDate = new Date();
 	const ps = await ProdDB.find();
@@ -391,7 +396,7 @@ const fNiu_zNiu = async() => {
 
 		if(!p.sort) p.sort = doc.weight || 0;
 		if(!p.price_cost) p.price_cost = doc.priceIn || doc.cost || 0;
-		console.log(i, doc.priceIn, p.price_cost);
+		// console.log(i, doc.priceIn, p.price_cost);
 
 		if(!p.quantity) p.quantity = doc.stock || 0;
 		if(!p.at_crt) p.at_crt = doc.ctAt || nowDate;
@@ -399,11 +404,15 @@ const fNiu_zNiu = async() => {
 
 		p.img_urls = [];
 		if(doc.photo) {
-			p.img_urls[0] = doc.photo;
-			const pv = await p.save();
+			const urls = doc.photo.split('product');
+			if(urls.length == 2) {
+				const img = urls[0] + 'Prod' + urls[1];
+				p.img_urls = [img]
+			}
 		}
+
+		const pv = await p.save();
 	}
-	flag = 2;
 	/* *
 	db.prods.update({}, {"$unset": {
 		'sales': '', 'posts': '', 
