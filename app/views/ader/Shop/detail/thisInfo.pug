@@ -1,0 +1,23 @@
+table.mt-3.table.table-hover
+	tr
+		td: strong 账号:
+		td #{Shop.code}
+	if Shop.Firm
+		- Firm = Shop.Firm;
+		tr
+			td: strong 公司:
+			td #{Firm.code} [#{Firm.nome}]
+	tr
+		td: strong 姓名:
+		td #{Shop.nome}
+	tr
+		td: strong 是否可用:
+		td
+			if Shop.is_usable
+				-a;
+				span 可用
+			else
+				span.text-warning 禁用
+	tr
+		td: strong createAt:
+		td #{moment(Shop.at_crt).format('DD/MM/YYYY HH:mm:ss')}

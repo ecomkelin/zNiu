@@ -1,5 +1,5 @@
 module.exports = {
-	role_Arrs: [1, 3, 5, 101, 105],
+	role_Arrs: [1, 3, 5, 100, 101, 105],
 	// role_Arrs: [1, 3, 4, 10, 20, 30, 40, 50, 101, 105],
 	role: {
 		"1": 	{val: 'ower', en: 'owner', cn: "拥有者"},

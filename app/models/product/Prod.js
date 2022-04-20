@@ -14,23 +14,12 @@ const dbSchema = new Schema({
 	/* 如果 Pd 不为空则 只读*/
 	code: String, 									// [if(Pd !== null)只读] 产品条形码
 	nome: String,									// [if(Pd !== null)只读] 产品名称
-	nomeTR: String,									// [if(Pd !== null)只读] 中文名称
+	nomeTR: String,									// [if(Pd !== null)只读] 其他名称
 	unit: String,									// [if(Pd !== null)只读] 产品名称
 	img_urls: [String], 							// [if(Pd !== null)只读] 产品图片
 	Brand: {type: ObjectId, ref: 'Brand'},			// [if(Pd !== null)只读] 产品品牌
 	Nation: {type: ObjectId, ref: 'Nation'},		// [if(Pd !== null)只读] 产品国家 比如 中国货 意大利货 日本货 韩国货
 	Categ: {type: ObjectId, ref: 'Categ'},			// [if(Pd !== null)只读] 
-
-	Map_sps: [{type: ObjectId, ref: 'Map_sp'}],
-
-	fixed_Prods: [{
-		Prod: {type: ObjectId, ref: 'Prod'},
-		quantity: Number,
-	}],
-	flow_Prods: [{
-		Prod: {type: ObjectId, ref: 'Prod'},
-		quantity: Number,
-	}],
 
 	weight: Float,
 	iva: Float, 									// [只读] 	税 意大利 默认 22

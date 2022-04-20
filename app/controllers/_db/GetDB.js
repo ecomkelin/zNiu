@@ -63,7 +63,7 @@ exports.dbs = (GetDB_Filter) => {
 			let objects = await objectDB.find(pathObj, selectObj)
 				.skip(skip).limit(pagesize)
 				.sort(sortObj)
-				.populate(populateObjs)
+				.populate(populateObjs);
 			let object = null;
 			let len_Objs = objects.length;
 			if(len_Objs > 0 && queryObj.search) {

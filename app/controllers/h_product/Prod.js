@@ -350,12 +350,12 @@ const Prod_path_Func = (pathObj, payload, queryObj) => {
 	}
 }
 
-
 const dbProd = 'Prod';
 exports.Prods = async(req, res) => {
 	console.log("/prods");
-	try {
+	try {		
 		const payload = req.payload;
+		// console.log(payload)
 		const GetDB_Filter = {
 			payload: payload,
 			queryObj: req.query,
@@ -364,10 +364,57 @@ exports.Prods = async(req, res) => {
 			dbName: dbProd,
 		};
 		const dbs_res = await GetDB.dbs(GetDB_Filter);
+		// console.log(dbs_res.data.objects)
 		return MdFilter.jsonSuccess(res, dbs_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Prods", error});
 	}
+}
+const fNiu_zNiu = () => {
+	const nowDate = new Date();
+	const ps = await ProdDB.find();
+	for(let i=0; i<ps.length; i++) {
+		const p = ps[i];
+
+		p.Firm = '625ec1649c05fb0cce340721';
+		p.Shop = '625edae70abb86142fb07bdb';
+		p.is_simple = true;
+		p.Attrs = [];
+		p.Skus = [];
+		p.is_controlStock = true;
+		p.quantity_alert = 0;
+		p.weight = 0;
+		p.allow_backorder = true;
+		
+		const doc = p._doc;
+		if(doc.price) p.price_regular = p.price_sale = doc.price;
+
+		if(!p.sort) p.sort = doc.weight || 0;
+		if(!p.price_cost) p.price_cost = doc.priceIn || doc.cost || 0;
+		console.log(i, doc.priceIn, p.price_cost);
+
+		if(!p.quantity) p.quantity = doc.stock || 0;
+		if(!p.at_crt) p.at_crt = doc.ctAt || nowDate;
+		if(!p.at_upd) p.at_upd = doc.upAt || nowDate;
+
+		p.img_urls = [];
+		if(doc.photo) {
+			p.img_urls[0] = doc.photo;
+			const pv = await p.save();
+		}
+	}
+	flag = 2;
+	/* *
+	db.prods.update({}, {"$unset": {
+		'sales': '', 'posts': '', 
+		'creater': '', 'firm': '', 
+		'rcmd': '', 'stock': '',
+		'price': '', 'material': '',
+		'ordfirs': '', 'cost': '',
+		'sizes': '', 'colors': '',
+		'photo': ''
+	}}, false, true);
+	*/
 }
 
 exports.Prod = async(req, res) => {

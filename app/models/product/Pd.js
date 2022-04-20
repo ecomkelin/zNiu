@@ -11,7 +11,7 @@ const dbSchema = new Schema({
 	/* 强制 完全相同 */
 	code: String, 								// 条形号码
 	nome: String,								// 产品名称
-	nomeTR: String,								// 中文名称
+	nomeTR: String,								// 其他名称
 	img_urls: [String], 						// imgs
 	Brand: {type: ObjectId, ref: 'Brand'},
 	Nation: {type: ObjectId, ref: 'Nation'},

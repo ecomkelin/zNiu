@@ -74,7 +74,7 @@ module.exports = (app) => {
 		try{
 			const curAder = req.session.curAder;
 			const Aders = await AderDB.find();
-			return res.render('./ader/Ader/list', {title: '用户列表', curAder, Aders });
+			return res.render('./ader/Ader/list', {title: 'Ader列表', curAder, Aders });
 		} catch(error) {
 			return res.redirect('/?error=查看adimn列表时,数据库查找错误 '+error+'&reUrl=/adHome');
 		}
@@ -544,8 +544,10 @@ module.exports = (app) => {
 		try{
 			const curAder = req.session.curAder;
 			const Firms = await FirmDB.find({'is_usable': true});
+			const Shops = await ShopDB.find({'is_usable': true});
 			if(!Firms || Firms.length == 0) return res.redirect('/?error=请先添加公司&reUrl=/adUsers');
-			return res.render('./ader/User/add', {title: 'Add 用户', curAder, Firms});
+			if(!Shops || Shops.length == 0) return res.redirect('/?error=请先添加商店&reUrl=/adUsers');
+			return res.render('./ader/User/add', {title: 'Add 用户', curAder, Firms, Shops});
 		} catch(error) {
 			return res.redirect('/?error=adUserAdd,Error: '+error+'&reUrl=/adUsers');
 		}
@@ -560,19 +562,19 @@ module.exports = (app) => {
 
 			obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 			obj.pwd = obj.pwd.replace(/^\s*/g,"").toUpperCase();
-			if(obj.phonePre && obj.phoneNum) {
-				obj.phonePre = obj.phonePre.replace(/^\s*/g,"").toUpperCase();
-				obj.phoneNum = obj.phoneNum.replace(/^\s*/g,"").toUpperCase();
-				obj.phone = String(obj.phonePre) + obj.phoneNum;
-				stints.push('phonePre')
-				stints.push('phoneNum')
-				same_param["$or"].push({'phone': String(obj.phonePre)+obj.phoneNum});
-			}
-			if(obj.email) {
-				obj.email = obj.email.replace(/^\s*/g,"").toUpperCase();
-				stints.push('email')
-				same_param["$or"].push({'email': obj.email});
-			}
+			// if(obj.phonePre && obj.phoneNum) {
+			// 	obj.phonePre = obj.phonePre.replace(/^\s*/g,"").toUpperCase();
+			// 	obj.phoneNum = obj.phoneNum.replace(/^\s*/g,"").toUpperCase();
+			// 	obj.phone = String(obj.phonePre) + obj.phoneNum;
+			// 	stints.push('phonePre')
+			// 	stints.push('phoneNum')
+			// 	same_param["$or"].push({'phone': String(obj.phonePre)+obj.phoneNum});
+			// }
+			// if(obj.email) {
+			// 	obj.email = obj.email.replace(/^\s*/g,"").toUpperCase();
+			// 	stints.push('email')
+			// 	same_param["$or"].push({'email': obj.email});
+			// }
 
 			const errorInfo = MdFilter.objMatchStint(Stint.User, obj, stints);
 			if(errorInfo) return res.redirect('/?error=没有找到此公司,请重新选择'+errorInfo+'&reUrl=/adUserAdd');
@@ -580,8 +582,8 @@ module.exports = (app) => {
 			obj.pwd = await MdFilter.encrypt_Prom(obj.pwd);
 			const Firm = await FirmDB.findOne({'_id': obj.Firm});
 			if(!Firm) return res.redirect('/?error=没有找到此公司,请重新选择&reUrl=/adUserAdd');
-			// if(!ConfUser.role_Arrs.includes(parseInt(obj.role))) return res.redirect('/?error=用户角色参数错误&reUrl=/adUserAdd');
-			obj.role = ConfUser.role_set.owner;
+			if(!ConfUser.role_Arrs.includes(parseInt(obj.role))) return res.redirect('/?error=用户角色参数错误&reUrl=/adUserAdd');
+			// obj.role = ConfUser.role_set.owner;
 			
 			const objSame = await UserDB.findOne(same_param);
 			if(objSame) {
@@ -628,10 +630,10 @@ module.exports = (app) => {
 				const errorInfo = MdFilter.objMatchStint(Stint.User, obj, ['code']);
 				if(errorInfo) return res.redirect('/?error=账号参数错误: '+errorInfo+'&reUrl=/adUser/'+id);
 
-				const objSame = await UserDB.findOne({'code': code})
+				const objSame = await UserDB.findOne({'code': obj.code})
 					.where('_id').ne(User._id);
 				if(objSame) return res.redirect('/?error=已有此账号&reUrl=/adUser/'+id);
-				User.code = code;
+				User.code = obj.code;
 				const objSave = await User.save();
 			} else if(obj.pwd) {
 				obj.pwd = obj.pwd.replace(/^\s*/g,"");
@@ -659,6 +661,116 @@ module.exports = (app) => {
 			return res.redirect('/?error=adUserDel,Error: '+error+'&reUrl=/adUsers');
 		}
 	});
+
+	/* ========================================== Shop ========================================== */
+	app.get('/adShops', AderIsLogin, async(req, res) => {
+		try{
+			const curAder = req.session.curAder;
+			const Shops = await ShopDB.find()
+				.populate('Firm', 'code nome')
+				.sort({'Frim': 1, 'is_usable': -1})
+			return res.render('./ader/Shop/list', {title: '商店列表', curAder, Shops });
+		} catch(error) {
+			return res.redirect('/?error=adShops,Error: '+error+'&reUrl=/adHome');
+		}
+	});
+
+	app.get('/adShopAdd', AderIsLogin, async(req, res) => {
+		try{
+			const curAder = req.session.curAder;
+			const Firms = await FirmDB.find({'is_usable': true});
+			if(!Firms || Firms.length == 0) return res.redirect('/?error=请先添加公司&reUrl=/adShops');
+			return res.render('./ader/Shop/add', {title: 'Add 商店', curAder, Firms});
+		} catch(error) {
+			return res.redirect('/?error=adShopAdd,Error: '+error+'&reUrl=/adShops');
+		}
+	})
+	app.post('/adShopPost', AderIsLogin, async(req, res) => {
+		try{
+			const obj = req.body.obj;
+
+			const same_param = {};
+			const stints = ['code'];
+
+			obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
+			same_param.code = obj.code;
+			const errorInfo = MdFilter.objMatchStint(Stint.Shop, obj, stints);
+			if(errorInfo) return res.redirect('/?error=没有找到此公司,请重新选择'+errorInfo+'&reUrl=/adShopAdd');
+					
+			const Firm = await FirmDB.findOne({'_id': obj.Firm});
+			if(!Firm) return res.redirect('/?error=没有找到此公司,请重新选择&reUrl=/adShopAdd');
+			// if(!ConfShop.role_Arrs.includes(parseInt(obj.role))) return res.redirect('/?error=商店角色参数错误&reUrl=/adShopAdd');
+			
+			const objSame = await ShopDB.findOne(same_param);
+			if(objSame) {
+				let errorInfo = '已有此账号，请重新注册';
+				return res.redirect('/?error='+errorInfo+'&reUrl=/adShopAdd');
+			}
+
+			const _object = new ShopDB(obj)
+			const objSave = await _object.save();
+			return res.redirect('/adShops')
+		} catch(error) {
+			return res.redirect('/?error=adShopPost,Error: '+error+'&reUrl=/adShopAdd')
+		}
+	})
+
+	app.get('/adShop/:id', AderIsLogin, async(req, res) => {
+		try{
+			const curAder = req.session.curAder;
+			const id = req.params.id;
+			const Shop = await ShopDB.findOne({_id: id}, {pwd: 0, refreshToken: 0})
+				.populate("Firm", "code nome")
+			if(!Shop) return res.redirect('/?error=没有找到此商店&reUrl=/adShops');
+			return res.render('./ader/Shop/detail', {title: '商店详情', curAder, Shop})
+		} catch(error) {
+			return res.redirect('/?error=adShop,Error: '+error+'&reUrl=/adShops')
+		}
+	})
+
+	app.post('/adShopPut/:id', AderIsLogin, async(req, res) => {
+		try{
+			const id = req.params.id
+			const Shop = await ShopDB.findOne({'_id': id});
+			if(!Shop) return res.redirect('/?error=没有找到此商店&reUrl=/adShops');
+			const obj = req.body.obj
+			if(obj.firm) return res.redirect('/?error=不允许修改公司&reUrl=/adShop/'+id);
+
+			if(obj.code) {
+				obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
+				const errorInfo = MdFilter.objMatchStint(Stint.Shop, obj, ['code']);
+				if(errorInfo) return res.redirect('/?error=账号参数错误: '+errorInfo+'&reUrl=/adShop/'+id);
+
+				const objSame = await ShopDB.findOne({'code': obj.code})
+					.where('_id').ne(Shop._id);
+
+				if(objSame) return res.redirect('/?error=已有此账号&reUrl=/adShop/'+id);
+				Shop.code = obj.code;
+				const objSave = await Shop.save();
+			} else {
+				const _object = _.extend(Shop, obj);
+				const objSave = await _object.save();
+			}
+			return res.redirect("/adShop/"+id)
+		} catch(error) {
+			console.log(error);
+			return res.redirect('/?error=adShopPut,Error: '+error+'&reUrl=/adShops');
+		}
+	});
+
+	app.get('/adShopDel/:id', AderIsLogin, async(req, res) => {
+		try{
+			const id = req.params.id;
+			const objDel = await ShopDB.deleteOne({'_id': id});
+			return res.redirect("/adShops");
+		} catch(error) {
+			return res.redirect('/?error=adShopDel,Error: '+error+'&reUrl=/adShops');
+		}
+	});
+
+
+
+
 
 	let BP_Nations = null;
 	app.post('/excel_Brand', postForm, async(req, res) => {

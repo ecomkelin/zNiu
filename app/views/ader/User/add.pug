@@ -43,6 +43,24 @@ block content
 							option(value=Firm._id) #{Firm.code}
 				.offset-4.offset-sm-2.col-8.col-sm-6#FirmOpt.text-danger(style="display:none") 请选择公司
 			.form-group.row
+				label.col-4.col-sm-2.col-form-label(for="roleIpt")#roleLabel.text-info 角色
+				.col-8.col-sm-6
+					select#roleIpt.form-control(name="obj[role]", data-style="btn-info")
+						//- option(value=0) 请选择
+						each key in Conf.User.role
+							-a;
+							option(value=Conf.User.role_set[key.en])  #{key.cn}
+				.offset-4.offset-sm-2.col-8.col-sm-6#roleOpt.text-danger(style="display:none") 请选择商店
+			.form-group.row
+				label.col-4.col-sm-2.col-form-label(for="ShopIpt")#ShopLabel.text-info 商店
+				.col-8.col-sm-6
+					select#ShopIpt.form-control(name="obj[Shop]", data-style="btn-info")
+						//- option(value=0) 请选择
+						each Shop in Shops
+							-a;
+							option(value=Shop._id) #{Shop.code}
+				.offset-4.offset-sm-2.col-8.col-sm-6#ShopOpt.text-danger(style="display:none") 请选择商店
+			.form-group.row
 				label.col-4.col-sm-2.col-form-label(for="is_usable")#is_usableLabel 是否可用
 				.col-8.col-sm-6
 					select#is_usable.form-control(name="obj[is_usable]", data-style="btn-info")
