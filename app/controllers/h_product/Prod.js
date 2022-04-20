@@ -370,7 +370,7 @@ exports.Prods = async(req, res) => {
 		return MdFilter.json500(res, {message: "Prods", error});
 	}
 }
-const fNiu_zNiu = () => {
+const fNiu_zNiu = async() => {
 	const nowDate = new Date();
 	const ps = await ProdDB.find();
 	for(let i=0; i<ps.length; i++) {

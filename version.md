@@ -1,3 +1,4 @@
+0.44	Ader 添加Shop 等
 0.43	打印任务 和 打印角色
 0.42	删除订单时 把OrderProd 和 OrderSku全部删掉
 0.41	小bug
