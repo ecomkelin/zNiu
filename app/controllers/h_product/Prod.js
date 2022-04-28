@@ -368,7 +368,7 @@ exports.Prods = async(req, res) => {
 			dbName: dbProd,
 		};
 		const dbs_res = await GetDB.dbs(GetDB_Filter);
-		console.log(dbs_res.data.objects)
+		// console.log(dbs_res.data.objects)
 		return MdFilter.jsonSuccess(res, dbs_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Prods", error});
