@@ -11,7 +11,7 @@ const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 
 module.exports = (app) => {
 	app.post('/api/b1/analys', MdAuth.path_User, analys);
-	app.post('/api/b1/ProdTotal', ProdTotal);
+	app.post('/api/b1/ProdTotal', MdAuth.path_User, ProdTotal);
 };
 const ProdTotal = async(req, res) => {
 	console.log("ProdTotal");
