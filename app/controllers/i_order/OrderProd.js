@@ -27,6 +27,11 @@ const OrderProd_path_Func = (pathObj, payload, queryObj) => {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Clients);
 		if(arrs.length > 0) pathObj.Client = {"$in": arrs};
 	}
+	if(queryObj.Suppliers) {
+		const arrs = MdFilter.stringToObjectIds(queryObj.Suppliers);
+		if(arrs.length > 0) pathObj.Supplier = {"$in": arrs};
+	}
+	
 	if(queryObj.Shops && payload.role < ConfUser.role_set.pter) {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Shops);
 		if(arrs.length > 0) pathObj.Shop = {"$in": arrs};
