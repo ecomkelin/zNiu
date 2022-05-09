@@ -258,13 +258,33 @@ exports.ProdPut = async(req, res) => {
 		if(obj.is_usable == 0 || obj.is_usable === false || obj.is_usable === 'false') Prod.is_usable = false;
 
 		if(!Prod.Pd) {	// 如果是单店 可以修改名称等 暂时没有做
-			if(obj.code) Prod.code = obj.code.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
-			if(obj.nome) Prod.nome = obj.nome.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
+			if(obj.code) obj.code.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
+			if(obj.code !== Prod.code) {
+				// 如果输入了 编号 则编号必须是唯一;  注意 Prod code 没有转大写
+				const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code']);
+				if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
+				const objSame = await ProdDB.findOne({
+					'code': obj.code,
+					Firm: payload.Firm,
+					_id: {'$ne': Prod._id}
+				});
+				if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
+				Prod.code = obj.code;
+			}
+
+			if(obj.nome) obj.nome = obj.nome.replace(/^\s*/g,"");	// 注意 Pd nome 没有转大写
+			if(obj.nome !== Prod.nome) {
+				// 如果输入了 编号 则编号必须是唯一;  注意 Prod nome 没有转大写
+				const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['nome']);
+				if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
+				Prod.nome = obj.nome;
+			}
+
 			Prod.nomeTR = obj.nomeTR;
-			if(Prod.nomeTR) Prod.nomeTR = Prod.nomeTR.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
-			if(obj.Nation) Prod.Nation = obj.Nation;	// 注意 Pd code 没有转大写
-			if(obj.Brand) Prod.Brand = obj.Brand;	// 注意 Pd code 没有转大写
-			if(obj.Categ) Prod.Categ = obj.Categ;	// 注意 Pd code 没有转大写
+			if(Prod.nomeTR) Prod.nomeTR = Prod.nomeTR.replace(/^\s*/g,"");	// 注意 Pd nomeTR 没有转大写
+			if(obj.Nation) Prod.Nation = obj.Nation;
+			if(obj.Brand) Prod.Brand = obj.Brand;
+			if(obj.Categ) Prod.Categ = obj.Categ;
 			if(obj.weight) {
 				obj.weight = parseFloat(obj.weight);
 				if(!isNaN(obj.weight)) Prod.weight = obj.weight;
