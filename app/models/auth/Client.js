@@ -13,6 +13,7 @@ const dbSchema = new Schema({
 	phonePre: String,
 	phoneNum: String,
 	phone: String,										// [只读 绝对]
+	contact: String,
 
 	pwd: String, 										// md5 加密
 

@@ -17,6 +17,7 @@ const dbSchema = new Schema({
 	phonePre: String,
 	phoneNum: String,
 	phone: String,										// [只读 绝对]
+	contact: String, 
 
 	Cita: {type: ObjectId, ref: 'Cita'},			// 所属城市	如果更换 需要检查服务城市列表是否有此城市
 

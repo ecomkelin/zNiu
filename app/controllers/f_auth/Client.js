@@ -204,6 +204,7 @@ exports.ClientPut = async(req, res) => {
 		if(obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') Client.is_usable = true;
 		if(obj.is_usable == 0 || obj.is_usable === false || obj.is_usable === 'false') Client.is_usable = false;
 
+		f(obj.contact) Client.contact = obj.contact;
 		if(obj.sort && !isNaN(parseInt(obj.sort))) Client.sort = parseInt(obj.sort);
 
 		const objSave = await Client.save();
