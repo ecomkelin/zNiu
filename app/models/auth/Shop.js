@@ -14,6 +14,10 @@ const dbSchema = new Schema({
 
 	img_url: String,								// 店铺logo
 
+	phonePre: String,
+	phoneNum: String,
+	phone: String,										// [只读 绝对]
+
 	Cita: {type: ObjectId, ref: 'Cita'},			// 所属城市	如果更换 需要检查服务城市列表是否有此城市
 
 	price_ship: Float,								// 本地运费
@@ -40,6 +44,8 @@ dbSchema.pre('save', function(next) {
 	} else {
 		this.at_upd = Date.now();
 	}
+	this.phone = (this.phonePre && this.phoneNum) ? (String(this.phonePre) + String(this.phoneNum)) : '';
+
 	next();
 });
 

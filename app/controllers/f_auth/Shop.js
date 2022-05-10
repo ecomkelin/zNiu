@@ -27,8 +27,23 @@ exports.ShopPost = async(req, res) => {
 			if(payload.role > ConfUser.role_set.manager) return MdFilter.jsonFailed(res, {message: "需要公司管理者权限"});
 			obj.Firm = payload.Firm;
 		}
+
+		const stints = ['code', 'nome'];
+		if(obj.phonePre && obj.phoneNum) {
+			obj.phonePre = obj.phonePre.replace(/^\s*/g,"");
+			obj.phoneNum = obj.phoneNum.replace(/^\s*/g,"");
+
+			obj.phonePre = MdFilter.format_phonePre(obj.phonePre);
+			if(!obj.phonePre) return MdFilter.jsonFailed(res, {message: "phonePre 错误"});
+			obj.phone = obj.phonePre+obj.phoneNum;
+			same_param["$or"].push({phone: obj.phone});
+
+			stints.push('phonePre');
+			stints.push('phoneNum');
+		}
+
 		// 判断参数是否符合要求
-		const errorInfo = MdFilter.objMatchStint(StintShop, obj, ['code', 'nome']);
+		const errorInfo = MdFilter.objMatchStint(StintShop, obj, stints);
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 

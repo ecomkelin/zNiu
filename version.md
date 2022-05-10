@@ -1,3 +1,4 @@
+0.48	Shop phone 的问题
 0.47	Prod code 限制 
 0.46	Prod 总价格分析
 0.45	小bug 如果重量不为数字 则不填
