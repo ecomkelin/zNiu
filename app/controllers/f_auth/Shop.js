@@ -28,7 +28,17 @@ exports.ShopPost = async(req, res) => {
 			obj.Firm = payload.Firm;
 		}
 
-		const stints = ['code', 'nome'];
+		// 判断参数是否符合要求
+		const errorInfo = MdFilter.objMatchStint(StintShop, obj, ['code', 'nome']);
+		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
+		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
+
+		if(!MdFilter.isObjectId(obj.Cita)) return MdFilter.jsonFailed(res, {message: '请输入商店所在城市'});
+		const Cita = await CitaDB.findOne({_id: obj.Cita});
+		if(!Cita) return MdFilter.jsonFailed(res, {message: '没有找到您选择的城市信息'});
+
+		console.log('post111', obj.phonePre)
+		console.log('post222', obj.phoneNum)
 		if(obj.phonePre && obj.phoneNum) {
 			obj.phonePre = obj.phonePre.replace(/^\s*/g,"");
 			obj.phoneNum = obj.phoneNum.replace(/^\s*/g,"");
@@ -36,20 +46,9 @@ exports.ShopPost = async(req, res) => {
 			obj.phonePre = MdFilter.format_phonePre(obj.phonePre);
 			if(!obj.phonePre) return MdFilter.jsonFailed(res, {message: "phonePre 错误"});
 			obj.phone = obj.phonePre+obj.phoneNum;
-			same_param["$or"].push({phone: obj.phone});
-
-			stints.push('phonePre');
-			stints.push('phoneNum');
 		}
+		console.log('post333', obj.phone)
 
-		// 判断参数是否符合要求
-		const errorInfo = MdFilter.objMatchStint(StintShop, obj, stints);
-		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
-		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
-
-		if(!MdFilter.isObjectId(obj.Cita)) return MdFilter.jsonFailed(res, {message: '请输入商店所在城市'});
-		const Cita = await CitaDB.findOne({_id: obj.Cita});
-		if(!Cita) return MdFilter.jsonFailed(res, {message: '没有找到您选择的城市信息'});
 		obj.User_crt = payload._id;
 		obj.price_ship = 0;
 		obj.serve_Citas = [];
@@ -185,6 +184,21 @@ const Shop_general = async(res, obj, Shop, payload) => {
 			if(!Cita) return MdFilter.jsonFailed(res, {message: '没有找到此城市信息'});
 			Shop.Cita = obj.Cita;
 		}
+
+		console.log('put111', obj.phonePre)
+		console.log('put222', obj.phoneNum)
+		if(obj.phonePre && obj.phoneNum) {
+			obj.phonePre = obj.phonePre.replace(/^\s*/g,"");
+			obj.phoneNum = obj.phoneNum.replace(/^\s*/g,"");
+
+			obj.phonePre = MdFilter.format_phonePre(obj.phonePre);
+			if(!obj.phonePre) return MdFilter.jsonFailed(res, {message: "phonePre 错误"});
+			obj.phone = obj.phonePre+obj.phoneNum;
+			Prod.phonePre = obj.phonePre
+			Prod.phoneNum = obj.phoneNum
+			Prod.phone = obj.phone
+		}
+		console.log('put333', Prod.phone)
 
 		if(obj.img_url && (obj.img_url != Shop.img_url) && Shop.img_url && Shop.img_url.split("Shop").length > 1){
 			await MdFiles.rmPicture(Shop.img_url);
