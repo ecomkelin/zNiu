@@ -7,6 +7,7 @@ const Float = require('mongoose-float').loadType(mongoose, 2);
 const colection = 'Paidtype';
 const dbSchema = new Schema({
 	code: String,								// 编号名称(唯一)
+	nome: String,
 	img_url: String,
 
 	is_cash: {type: Boolean, default: false}, 	// 是否为现金

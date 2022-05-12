@@ -1,3 +1,4 @@
+0.49	Paidtype nome
 0.48	Shop phone 的问题
 0.47	Prod code 限制 
 0.46	Prod 总价格分析
