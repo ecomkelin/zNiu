@@ -94,6 +94,7 @@ const dbSchema = new Schema({
 	price_paid: {type: Float, default: 0},				// 已付金额 如果没有填写 则与order_imp相同
 	price_noPay: {type: Float, default: 0},				// [只读 绝对] 	未付金额
 
+	isPaid: {type: Boolean, default: true}, 			// 是否支付的简易版本
 	is_paid: {type:Boolean, default: false},			// [只读 绝对] 	如果已付金额与应付金额相同 则为 true
 
 	Paidtype: {type: ObjectId, ref: "Paidtype"},		// 付款方式

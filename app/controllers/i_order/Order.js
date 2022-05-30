@@ -393,7 +393,27 @@ const recu_codeOrderSame_Prom = (codePre, codeNum) => {
 
 
 
+exports.OrderPutBack = async(req, res) => {
+	console.log("/OrderPutBack");
+	try{
+		const payload = req.payload;
+		const id = req.params.id;
+		const obj = req.body.obj;
 
+		const Order = await OrderDB.findOne({_id: id, Firm: payload.Firm});
+		if(!Order) return MdFilter.jsonFailed(res, {message: "没有找到此订单信息"});
+
+		Order.isPaid = (obj.isPaid == 1 || obj.isPaid == 'true') ? true : false;
+
+		const objSave = Order.save();
+		if(!objSave) return MdFilter.jsonFailed(res, {message: "订单修改存储错误"});
+
+		return MdFilter.jsonSuccess(res, {message: "OrderPutBack", data: {object: objSave}});
+	} catch(error) {
+		console.log("OrderPutBack Error: ", error);
+		return MdFilter.json500(res, {message: "OrderPutBack", error});
+	}
+}
 
 
 
