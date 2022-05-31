@@ -20,7 +20,7 @@ module.exports = (app) => {
 	app.post('/api/b1/Order', MdAuth.path_User, Order.OrderPost);
 	app.get('/api/b1/Orders', MdAuth.path_User, Order.Orders);
 	app.get('/api/b1/Order/:id', MdAuth.path_User, Order.Order);
-	app.put('/api/b1/Order/:id', MdAuth.path_User, Order.OrderPut);
+	app.put('/api/b1/Order/:id', MdAuth.path_User, Order.OrderPutBack);
 
 	app.get('/api/b1/addTicket/:id', MdAuth.path_User, Order.addTicket);
 	app.get('/api/b1/clearTicket', MdAuth.path_User, Order.clearTicket);

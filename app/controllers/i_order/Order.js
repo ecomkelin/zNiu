@@ -403,7 +403,14 @@ exports.OrderPutBack = async(req, res) => {
 		const Order = await OrderDB.findOne({_id: id, Firm: payload.Firm});
 		if(!Order) return MdFilter.jsonFailed(res, {message: "没有找到此订单信息"});
 
-		Order.isPaid = (obj.isPaid == 1 || obj.isPaid == 'true') ? true : false;
+		
+		if(obj.isPaid == 1 || obj.isPaid == 'true') {
+			Order.isPaid = true;
+		} else if(obj.isPaid == 0 || obj.isPaid == 'false') {
+			Order.isPaid = false;
+		} else {
+			return MdFilter.jsonFailed(res, {message: "isPaid 为Boolean"});
+		}
 
 		const objSave = Order.save();
 		if(!objSave) return MdFilter.jsonFailed(res, {message: "订单修改存储错误"});
