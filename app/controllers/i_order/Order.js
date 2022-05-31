@@ -399,7 +399,8 @@ exports.OrderPutBack = async(req, res) => {
 		const payload = req.payload;
 		const id = req.params.id;
 		const obj = req.body.obj;
-
+		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
+		
 		const Order = await OrderDB.findOne({_id: id, Firm: payload.Firm});
 		if(!Order) return MdFilter.jsonFailed(res, {message: "没有找到此订单信息"});
 

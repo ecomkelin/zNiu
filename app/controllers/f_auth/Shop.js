@@ -17,10 +17,11 @@ exports.ShopPost = async(req, res) => {
 	console.log("/ShopPost");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
+
 		let obj = req.body.obj;
 		if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Shop", field: "img_url"});
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
+
 		if(obj.Firm === 'Supplier') {
 			obj.Firm = null;
 		} else {
