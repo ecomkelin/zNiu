@@ -1,3 +1,4 @@
+0.51	Order is_tax | analys img_urls projects
 0.50	Order isPaid 增加一个简易版本
 0.49	Paidtype nome
 0.48	Shop phone 的问题

@@ -25,22 +25,18 @@ const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
 
 
-
-
-
-
 exports.OrderPost = async(req, res) => {
 	console.log("/OrderPost");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		// 判断 基本参数 是否正确
 		const obj_Order = req.body.obj;
 		if(!obj_Order) return MdFilter.jsonFailed(res, {message: "请传递正确的obj数据"});
 
-		// 判断是否为 其他订单重新下单的
+		// 判断是否删除旧订单 （比如 Client取消的订单重新下单， User订单修改）
 		const org_OrderId = req.body.Order ? req.body.Order : false;
+		const org_code = req.body.Order_code ? req.body.Order_code : false;
 		delete obj_Order._id;
 
 		// 确认订单所属 (Shop)
@@ -57,19 +53,7 @@ exports.OrderPost = async(req, res) => {
 		// 订单状态
 		obj_Order.status = ConfOrder.status_obj.placing.num;
 
-		// 支付方式及下单时汇率和币种
-		if(MdFilter.isObjectId(obj_Order.Paidtype)) {
-			const Paidtype = await PaidtypeDB.findOne({_id: obj_Order.Paidtype}).populate("Coin");
-			if(!Paidtype) return MdFilter.jsonFailed(res, {message: "没有找到此付款方式"});
-			if(!Paidtype.Coin) return MdFilter.jsonFailed(res, {message: "付款方式中的币种错误"});
-			obj_Order.Paidtype = Paidtype._id;
-			obj_Order.rate = Paidtype.Coin.rate;
-			obj_Order.symbol = Paidtype.Coin.symbol;
-			obj_Order.is_defCoin = Paidtype.Coin.is_defCoin;
-			if(!isNaN(obj_Order.price_coin)) obj_Order.price_coin = parseFloat(obj_Order.price_coin);
-		}
-
-		// 订单的送货方式
+		// Client 订单的送货方式
 		if(obj_Order.type_ship == ConfOrder.type_ship_obj.sClient.num) {
 			obj_Order.ship_info = null;
 		} else if(obj_Order.type_ship == ConfOrder.type_ship_obj.sShop.num) {
@@ -91,16 +75,39 @@ exports.OrderPost = async(req, res) => {
 			obj_Order.ship_info.city = Cita.code;
 		}
 
+		// 支付方式及下单时汇率和币种 只有员工才可以有支付方式 // 如果是客户端 则自动设置支付方式 wx zfb stripe paypal等
+		if(ConfUser.role_Arrs.includes(payload.role)) {
+			if(!MdFilter.isObjectId(obj_Order.Paidtype)) return MdFilter.jsonFailed(res, {message: "请传递支付方式"});
+			const Paidtype = await PaidtypeDB.findOne({_id: obj_Order.Paidtype}).populate("Coin");
+			if(!Paidtype) return MdFilter.jsonFailed(res, {message: "没有找到此付款方式"});
+			if(!Paidtype.Coin) return MdFilter.jsonFailed(res, {message: "付款方式中的币种错误"});
+			obj_Order.Paidtype = Paidtype._id;
+			obj_Order.is_defCoin = Paidtype.Coin.is_defCoin;	// 是否为默认币种
+			obj_Order.symbol = Paidtype.Coin.symbol;
+			obj_Order.rate = parseFloat((Paidtype.Coin.rate).toFixed(2));
+
+			// obj_Order.tax_rate = parseFloat((obj_Order.tax_rate).toFixed(2));
+			obj_Order.is_tax = (obj_Order.is_tax == 1 || obj_Order.is_tax == 'true') ? true: false;
+
+			obj_Order.ship_sale = parseFloat((obj_Order.ship_sale).toFixed(2));
+			obj_Order.ship_regular = obj_Order.ship_sale;
+			obj_Order.ship_discount = 0;
+
+			if(isNaN(obj_Order.price_coin)) return MdFilter.jsonFailed(res, {message: "请传递支付货币的金额"});
+			obj_Order.price_coin = parseFloat(obj_Order.price_coin);
+		}
 
 		// 基本信息赋值
-		const code_res = await generate_codeOrder_Prom(Shop._id, Shop.code);
-		if(code_res.status !== 200) return MdFilter.jsonRes(res, {message: code_res.message});
-		obj_Order.code = code_res.data.code;
-		// obj_Order.shop 已赋值
-		if(isNaN(obj_Order.price_paid)) obj_Order.price_paid = 0;
-		obj_Order.price_paid = parseFloat(obj_Order.price_paid);
-
-		if(!isNaN(obj_Order.order_imp)) obj_Order.order_imp = parseFloat(obj_Order.order_imp);
+		if(org_code) {
+			obj_Order.code = org_code;
+		} else {
+			const code_res = await generate_codeOrder_Prom(Shop._id, Shop.code);
+			if(code_res.status !== 200) return MdFilter.jsonRes(res, {message: code_res.message});
+			obj_Order.code = code_res.data.code;
+			// obj_Order.shop 已赋值
+			if(isNaN(obj_Order.price_paid)) obj_Order.price_paid = 0;
+			obj_Order.price_paid = parseFloat(obj_Order.price_paid);
+		}
 
 		obj_Order.Firm = Shop.Firm;
 
@@ -278,11 +285,14 @@ exports.OrderPost = async(req, res) => {
 		// 判断 如果订单 下没有采购商品 则错误
 		if(_Order.goods_quantity < 1) return MdFilter.jsonFailed(res, {message: "订单中没有产品"});
 
+		let tax = _Order.is_tax ? 1.22 : 1;
 		// 为 order_price 赋值
-		_Order.order_regular = _Order.goods_regular + ((_Order.ship_regular)?_Order.ship_regular:0);
-		_Order.order_sale = _Order.goods_sale + ((_Order.ship_sale)?_Order.ship_sale:0);
+		_Order.order_regular = _Order.goods_regular*tax + (_Order.ship_regular || 0);
+		_Order.order_sale = _Order.goods_sale*tax + (_Order.ship_sale || 0);
 		// 判断是客户下单 或者员工没有给order_imp 则 order_imp= goods_price+ship_sale
-		if(!ConfUser.role_Arrs.includes(payload.role) || isNaN(_Order.order_imp)) {
+		if(ConfUser.role_Arrs.includes(payload.role)) {
+			_Order.order_imp = _Order.price_coin / _Order.rate;
+		} else {
 			_Order.order_imp = _Order.goods_price + ((_Order.ship_sale)?_Order.ship_sale:0);
 		}
 

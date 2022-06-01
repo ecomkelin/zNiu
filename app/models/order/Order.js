@@ -79,29 +79,32 @@ const dbSchema = new Schema({
 	goods_price: {type: Float, default: 0},				// [只读 前台接收或Cupon的 单价]	货物最终费用
 	// Cupon_price: {type: Float, default: 0},			// [只读 Cupon] 	活动
 
+	is_tax: {type: Boolean, default: false},
+	// tax_rate: {type: Float, default: 0},				// [Client只读] 税率
+
 	ship_regular: {type: Float, default: 0},			// [只读 Shop.ship_regular]
 	ship_discount: {type: Float, default: 0},			// 前台接收
-	ship_sale: {type: Float, default: 0},				// [只读 绝对] 	运费 ship_regular - ship_discount (满减 一部分运费)
+	ship_sale: {type: Float, default: 0},				// [Client只读 绝对] 	运费 ship_regular - ship_discount (满减 一部分运费)
 
 	order_regular: {type: Float, default: 0},			// [只读 绝对] <goods_regular> + <ship_regular>
 	order_sale: {type: Float, default: 0},				// [只读 绝对] <goods_sale> + <ship_sale>
-	order_imp: {type: Float},							// 前台接收的订单价格
+	order_imp: {type: Float},							// [只读] 前台接收的订单价格 100
+
+	price_coin: {type: Float},							// 货币收费
+	Paidtype: {type: ObjectId, ref: "Paidtype"},		// 付款方式
+	rate: {type: Float, default: 1},					// [只读] 汇率
+	symbol: String, 									// [只读] 货币符号
+	is_defCoin: Boolean,								// [只读] 是否是默认币种
 
 	is_regular: Boolean,								// [只读 绝对] 	是否符合regular
 	is_sale: Boolean,									// [只读 绝对] 	是否符合sale
 	is_pass: {type: Boolean, default: false},
 
+	isPaid: {type: Boolean, default: true}, 			// 是否支付的简易版本
+
 	price_paid: {type: Float, default: 0},				// 已付金额 如果没有填写 则与order_imp相同
 	price_noPay: {type: Float, default: 0},				// [只读 绝对] 	未付金额
-
-	isPaid: {type: Boolean, default: true}, 			// 是否支付的简易版本
 	is_paid: {type:Boolean, default: false},			// [只读 绝对] 	如果已付金额与应付金额相同 则为 true
-
-	Paidtype: {type: ObjectId, ref: "Paidtype"},		// 付款方式
-	rate: {type: Float, default: 1},					// 汇率
-	price_coin: String,									// 货币收费
-	symbol: String, 									// 货币符号
-	is_defCoin: Boolean,								// 是否是默认币种
 
 	OrderProds: [{type: ObjectId, ref: 'OrderProd'}],
 
