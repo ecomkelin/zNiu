@@ -24,7 +24,6 @@ const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
 
 
-
 exports.OrderPost = async(req, res) => {
 	console.log("/OrderPost");
 	try{
@@ -89,7 +88,8 @@ exports.OrderPost = async(req, res) => {
 			// obj_Order.tax_rate = parseFloat((obj_Order.tax_rate).toFixed(2));
 			obj_Order.is_tax = (obj_Order.is_tax == 1 || obj_Order.is_tax == 'true') ? true: false;
 
-			obj_Order.ship_sale = parseFloat((obj_Order.ship_sale).toFixed(2));
+			let ship_sale = obj_Order.ship_sale || 0;
+			obj_Order.ship_sale = parseFloat(ship_sale.toFixed(2));
 			obj_Order.ship_regular = obj_Order.ship_sale;
 			obj_Order.ship_discount = 0;
 
