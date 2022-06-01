@@ -423,7 +423,7 @@ exports.OrderPutBack = async(req, res) => {
 			return MdFilter.jsonFailed(res, {message: "isPaid 为Boolean"});
 		}
 
-		const objSave = Order.save();
+		const objSave = await Order.save();
 		if(!objSave) return MdFilter.jsonFailed(res, {message: "订单修改存储错误"});
 
 		return MdFilter.jsonSuccess(res, {message: "OrderPutBack", data: {object: objSave}});
