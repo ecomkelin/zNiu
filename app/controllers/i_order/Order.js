@@ -426,7 +426,22 @@ exports.OrderPutBack = async(req, res) => {
 		const objSave = await Order.save();
 		if(!objSave) return MdFilter.jsonFailed(res, {message: "订单修改存储错误"});
 
-		return MdFilter.jsonSuccess(res, {message: "OrderPutBack", data: {object: objSave}});
+		if(req.query.populateObjs) {
+			const GetDB_Filter = {
+				id: objSave._id,
+				payload,
+				queryObj: req.query,
+				objectDB: OrderDB,
+				path_Callback: null,
+				dbName: dbOrder,
+			};
+			const db_res = await GetDB.db(GetDB_Filter);
+			console.log("post getDB");
+			return MdFilter.jsonSuccess(res, db_res);
+		} else {
+			return MdFilter.jsonSuccess(res, {message: "OrderPutBack", data: {object: objSave}});
+		}
+		
 	} catch(error) {
 		console.log("OrderPutBack Error: ", error);
 		return MdFilter.json500(res, {message: "OrderPutBack", error});
@@ -443,7 +458,6 @@ exports.OrderPut = async(req, res) => {
 	console.log("/OrderPut_ship");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Order的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
