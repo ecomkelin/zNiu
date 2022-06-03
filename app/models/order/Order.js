@@ -100,7 +100,7 @@ const dbSchema = new Schema({
 	is_sale: Boolean,									// [只读 绝对] 	是否符合sale
 	is_pass: {type: Boolean, default: false},
 
-	isPaid: {type: Boolean, default: true}, 			// 是否支付的简易版本
+	isPaid: {type: Boolean, default: false}, 			// 是否支付的简易版本
 
 	price_paid: {type: Float, default: 0},				// 已付金额 如果没有填写 则与order_imp相同
 	price_noPay: {type: Float, default: 0},				// [只读 绝对] 	未付金额
