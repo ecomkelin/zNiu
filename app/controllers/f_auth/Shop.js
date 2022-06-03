@@ -24,27 +24,28 @@ exports.ShopPost = async(req, res) => {
 
 		if(obj.Firm === 'Supplier') {
 			obj.Firm = null;
+			if(!MdFilter.isObjectId(obj.Cita)) obj.Cita = null;
 		} else {
 			if(payload.role > ConfUser.role_set.manager) return MdFilter.jsonFailed(res, {message: "需要公司管理者权限"});
 			obj.Firm = payload.Firm;
+
+			if(!MdFilter.isObjectId(obj.Cita)) return MdFilter.jsonFailed(res, {message: '请输入商店所在城市'});
+			const Cita = await CitaDB.findOne({_id: obj.Cita});
+			if(!Cita) return MdFilter.jsonFailed(res, {message: '没有找到您选择的城市信息'});
+
+			obj.User_crt = payload._id;
+			obj.price_ship = 0;
+			obj.serve_Citas = [];
+			const serve_Cita = {};
+			serve_Cita.Cita = Cita._id;
+			serve_Cita.price_ship = 0;
+			obj.serve_Citas.push(serve_Cita);
 		}
 
 		// 判断参数是否符合要求
 		const errorInfo = MdFilter.objMatchStint(StintShop, obj, ['code', 'nome']);
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
-
-		if(!MdFilter.isObjectId(obj.Cita)) return MdFilter.jsonFailed(res, {message: '请输入商店所在城市'});
-		const Cita = await CitaDB.findOne({_id: obj.Cita});
-		if(!Cita) return MdFilter.jsonFailed(res, {message: '没有找到您选择的城市信息'});
-
-		obj.User_crt = payload._id;
-		obj.price_ship = 0;
-		obj.serve_Citas = [];
-		const serve_Cita = {};
-		serve_Cita.Cita = Cita._id;
-		serve_Cita.price_ship = 0;
-		obj.serve_Citas.push(serve_Cita);
 
 		// 分店的编号或者名称是否相同
 		const objSame = await ShopDB.findOne({$or:[{'code': obj.code}, {'nome': obj.nome}], Firm: payload.Firm});
