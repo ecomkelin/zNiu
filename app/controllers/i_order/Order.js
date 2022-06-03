@@ -35,7 +35,6 @@ exports.OrderPost = async(req, res) => {
 
 		// 判断是否删除旧订单 （比如 Client取消的订单重新下单， User订单修改）
 		const org_OrderId = req.body.Order ? req.body.Order : false;
-		const org_code = req.body.Order_code ? req.body.Order_code : false;
 		delete obj_Order._id;
 
 		// 确认订单所属 (Shop)
@@ -100,8 +99,10 @@ exports.OrderPost = async(req, res) => {
 		}
 
 		// 基本信息赋值
-		if(org_code) {
-			obj_Order.code = org_code;
+		if(org_OrderId) {
+			const org_Order = await OrderDB.findOne({_id: org_OrderId});
+			if(!org_Order) return MdFilter.jsonRes(res, {message: "没有找到需要修改的订单"});
+			obj_Order.code = org_Order.code;
 		} else {
 			const code_res = await generate_codeOrder_Prom(Shop._id, Shop.code);
 			if(code_res.status !== 200) return MdFilter.jsonRes(res, {message: code_res.message});

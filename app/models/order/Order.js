@@ -119,12 +119,7 @@ const dbSchema = new Schema({
 });
 
 dbSchema.pre('save', function(next) {
-	if(this.isNew) {
-		if(!this.sort) this.sort = 0;
-		this.at_upd = this.at_crt = Date.now();
-	} else {
-		this.at_upd = Date.now();
-	}
+	this.at_upd = Date.now();
 
 	this.order_regular = this.goods_regular + this.ship_regular;
 	this.order_sale = this.goods_sale + this.ship_sale;
