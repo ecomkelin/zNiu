@@ -103,10 +103,13 @@ exports.OrderPost = async(req, res) => {
 			const org_Order = await OrderDB.findOne({_id: org_OrderId});
 			if(!org_Order) return MdFilter.jsonRes(res, {message: "没有找到需要修改的订单"});
 			obj_Order.code = org_Order.code;
+			obj_Order.at_crt = org_Order.at_crt;
 		} else {
 			const code_res = await generate_codeOrder_Prom(Shop._id, Shop.code);
 			if(code_res.status !== 200) return MdFilter.jsonRes(res, {message: code_res.message});
 			obj_Order.code = code_res.data.code;
+			obj_Order.at_crt = Date.now();
+
 			// obj_Order.shop 已赋值
 			if(isNaN(obj_Order.price_paid)) obj_Order.price_paid = 0;
 			obj_Order.price_paid = parseFloat(obj_Order.price_paid);
