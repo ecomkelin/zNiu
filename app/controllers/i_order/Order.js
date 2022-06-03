@@ -610,6 +610,7 @@ const Order_path_Func = (pathObj, payload, queryObj) => {
 	if(queryObj.Clients) {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Clients);
 		if(arrs.length > 0) pathObj.Client = {"$in": arrs};
+		if(queryObj.Clients === 'null') pathObj.Client = {"$eq": null};
 	}
 	if(queryObj.Paidtypes) {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Paidtypes);
