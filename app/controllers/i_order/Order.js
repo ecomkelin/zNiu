@@ -95,6 +95,8 @@ exports.OrderPost = async(req, res) => {
 
 			if(isNaN(obj_Order.price_coin)) return MdFilter.jsonFailed(res, {message: "请传递支付货币的金额"});
 			obj_Order.price_coin = parseFloat(obj_Order.price_coin);
+
+			obj_Order.isPaid = (obj_Order.isPaid == 1 || obj_Order.isPaid == 'true') ? true : false;
 		}
 
 		// 基本信息赋值
