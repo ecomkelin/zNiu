@@ -612,6 +612,11 @@ const Order_path_Func = (pathObj, payload, queryObj) => {
 		if(arrs.length > 0) pathObj.Client = {"$in": arrs};
 		if(queryObj.Clients === 'null') pathObj.Client = {"$eq": null};
 	}
+	if(queryObj.Suppliers) {
+		const arrs = MdFilter.stringToObjectIds(queryObj.Suppliers);
+		if(arrs.length > 0) pathObj.Supplier = {"$in": arrs};
+		if(queryObj.Suppliers === 'null') pathObj.Supplier = {"$eq": null};
+	}
 	if(queryObj.Paidtypes) {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Paidtypes);
 		if(arrs.length > 0) pathObj.Paidtype = {"$in": arrs};

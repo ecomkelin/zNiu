@@ -1,4 +1,4 @@
-0.54	Orders Clients = null
+0.54	Orders Clients = null Supplier
 0.53	OrderPost isPaid
 0.52	供应商可以不加Cita
 0.51	Order is_tax | analys img_urls projects
