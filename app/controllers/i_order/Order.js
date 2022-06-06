@@ -303,7 +303,7 @@ exports.OrderPost = async(req, res) => {
 		}
 
 		// 计算其他币种的支付方式
-		if(isNaN(_Order.price_coin) && _Order.rate) _Order.price_coin = _Order.order_imp * _Order.rate;
+		if(_Order.order_imp === _Order.order_sale) _Order.is_pass = true;
 
 		if(MdFilter.isObjectId(org_OrderId)) {
 			const res_del = await OrderDelete_Prom(payload, org_OrderId);

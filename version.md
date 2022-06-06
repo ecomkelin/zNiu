@@ -1,3 +1,4 @@
+0.57	Order if(order_imp == order_sale) is_pass = true
 0.57	Order is_pass
 0.56	Order is_tax 修复
 0.55	Order 修改
