@@ -293,8 +293,10 @@ exports.OrderPost = async(req, res) => {
 
 		let tax = _Order.is_tax ? 1.22 : 1;
 		// 为 order_price 赋值
+		console.log(111, 'tax', tax);
 		_Order.order_regular = _Order.goods_regular*tax + (_Order.ship_regular || 0);
 		_Order.order_sale = _Order.goods_sale*tax + (_Order.ship_sale || 0);
+		console.log(222, 'order_sale', _Order.order_sale);
 		// 判断是客户下单 或者员工没有给order_imp 则 order_imp= goods_price+ship_sale
 		if(ConfUser.role_Arrs.includes(payload.role)) {
 			_Order.order_imp = _Order.price_coin / _Order.rate;

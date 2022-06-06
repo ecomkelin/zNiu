@@ -1,3 +1,4 @@
+0.56	Order is_tax 修复
 0.55	Order 修改
 0.54	Orders Clients = null Supplier
 0.53	OrderPost isPaid
