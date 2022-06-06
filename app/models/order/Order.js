@@ -86,9 +86,9 @@ const dbSchema = new Schema({
 	ship_discount: {type: Float, default: 0},			// 前台接收
 	ship_sale: {type: Float, default: 0},				// [Client只读 绝对] 	运费 ship_regular - ship_discount (满减 一部分运费)
 
-	order_regular: {type: Float, default: 0},			// [只读 绝对] <goods_regular> + <ship_regular>
-	order_sale: {type: Float, default: 0},				// [只读 绝对] <goods_sale> + <ship_sale>
-	order_imp: {type: Float},							// [只读] 前台接收的订单价格 100
+	order_regular: {type: Float, default: 0},			// [Client只读 ] <goods_regular> + <ship_regular>
+	order_sale: {type: Float, default: 0},				// [Client只读 ] <goods_sale> + <ship_sale>
+	order_imp: {type: Float},							// [只读 绝对] 前台接收的订单价格 100
 
 	price_coin: {type: Float},							// 货币收费
 	Paidtype: {type: ObjectId, ref: "Paidtype"},		// 付款方式
@@ -120,9 +120,6 @@ const dbSchema = new Schema({
 
 dbSchema.pre('save', function(next) {
 	this.at_upd = Date.now();
-
-	this.order_regular = this.goods_regular + this.ship_regular;
-	this.order_sale = this.goods_sale + this.ship_sale;
 
 	this.is_regular = (this.order_imp === this.order_regular);
 	this.is_sale = (this.order_imp === this.order_sale);

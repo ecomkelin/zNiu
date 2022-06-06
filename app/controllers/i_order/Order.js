@@ -314,9 +314,8 @@ exports.OrderPost = async(req, res) => {
 
 		const OrderSame = await OrderDB.findOne({code: _Order.code, Firm: _Order.Firm, _id: {"$ne": _Order._id}});
 		if(OrderSame) return MdFilter.json500(res, {message: "下单错误 错误码 100101"});
-		console.log('111 _Order sale:', _Order.order_sale);
+
 		const OrderSave = await _Order.save();
-		console.log('222 Save sale:', OrderSave.order_sale);
 		if(!OrderSave) return MdFilter.json500(res, {message: "下单错误 错误码 100102"});
 		// 返回给前端，  如果不正确 可以尝试 放到 crt_OrderProds_Fucn 中。 如果正确 要删掉 res 参数
 		const OPinsertMany = await OrderProdDB.insertMany(obj_OrderProds);
@@ -648,7 +647,6 @@ exports.Orders = async(req, res) => {
 			dbName: dbOrder,
 		};
 		const dbs_res = await GetDB.dbs(GetDB_Filter);
-		// console.log("Orders: ", dbs_res.data.objects);
 		return MdFilter.jsonSuccess(res, dbs_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Orders", error});
