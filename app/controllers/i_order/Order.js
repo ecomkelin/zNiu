@@ -425,8 +425,12 @@ exports.OrderPutBack = async(req, res) => {
 			Order.isPaid = true;
 		} else if(obj.isPaid == 0 || obj.isPaid == 'false') {
 			Order.isPaid = false;
-		} else {
-			return MdFilter.jsonFailed(res, {message: "isPaid 为Boolean"});
+		}
+
+		if(obj.is_pass == 1 || obj.is_pass == 'true') {
+			Order.is_pass = true;
+		} else if(obj.is_pass == 0 || obj.is_pass == 'false') {
+			Order.is_pass = false;
 		}
 
 		const objSave = await Order.save();
