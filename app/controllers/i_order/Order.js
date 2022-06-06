@@ -647,6 +647,7 @@ exports.Orders = async(req, res) => {
 			dbName: dbOrder,
 		};
 		const dbs_res = await GetDB.dbs(GetDB_Filter);
+		console.log(333, db_res.data.objects);
 		return MdFilter.jsonSuccess(res, dbs_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Orders", error});
@@ -666,7 +667,6 @@ exports.Order = async(req, res) => {
 			dbName: dbOrder,
 		};
 		const db_res = await GetDB.db(GetDB_Filter);
-		console.log(333, db_res.data.object);
 		return MdFilter.jsonSuccess(res, db_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Orders", error});
