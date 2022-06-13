@@ -369,15 +369,15 @@ const Prod_path_Func = (pathObj, payload, queryObj) => {
 		pathObj["Categ"] = {$in: ids};
 	}
 }
-let flag = 1;
+// let flag = 1;
 const dbProd = 'Prod';
 exports.Prods = async(req, res) => {
 	console.log("/prods");
 	try {
-		if(flag === 1) {
-			fNiu_zNiu();
-			flag = 2;
-		}
+		// if(flag === 1) {
+		// 	fNiu_zNiu();
+		// 	flag = 2;
+		// }
 		const payload = req.payload;
 		// console.log(payload)
 		const GetDB_Filter = {
