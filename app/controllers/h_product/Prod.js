@@ -374,11 +374,12 @@ const dbProd = 'Prod';
 exports.Prods = async(req, res) => {
 	console.log("/prods");
 	try {
+		const payload = req.payload;
 		// if(flag === 1) {
-		// 	fNiu_zNiu();
+		// 	fNiu_zNiu(payload);
 		// 	flag = 2;
 		// }
-		const payload = req.payload;
+
 		// console.log(payload)
 		const GetDB_Filter = {
 			payload: payload,
@@ -395,16 +396,15 @@ exports.Prods = async(req, res) => {
 	}
 }
 
-const fNiu_zNiu = async() => {
+const fNiu_zNiu = async(payload) => {
+	console.log(111111)
 	const nowDate = new Date();
 	const ps = await ProdDB.find();
 	for(let i=0; i<ps.length; i++) {
 		const p = ps[i];
-		if(p.firm != '5c6e87ae06e0ad6803b2cf83') {
-			await ProdDB.deleteOne({_id: p._id});
-		}
-		p.Firm = '62a6fdf5c46c779acadd02ac';
-		p.Shop = '62a6fe1cc46c779acadd02b5';
+
+		p.Firm = payload.Firm;
+		p.Shop = payload.Shop;
 		p.is_simple = true;
 		p.Attrs = [];
 		p.Skus = [];
@@ -430,6 +430,7 @@ const fNiu_zNiu = async() => {
 			if(urls.length == 2) {
 				const img = urls[0] + 'Prod' + urls[1];
 				p.img_urls = [img]
+				console.log(p.img_urls)
 			}
 		}
 
@@ -445,14 +446,9 @@ const fNiu_zNiu = async() => {
 		'sizes': '', 'colors': '',
 		'photo': ''
 	}}, false, true);
+
 	db.prods.update({}, {"$unset": {
-		'sales': '', 'posts': '', 
-		'creater': '', 'firm': '', 
-		'rcmd': '', 'stock': '',
-		'price': '', 'material': '',
-		'ordfirs': '', 'cost': '',
-		'sizes': '', 'colors': '',
-		'photo': ''
+		'sells': ''
 	}}, false, true);
 	*/
 }
