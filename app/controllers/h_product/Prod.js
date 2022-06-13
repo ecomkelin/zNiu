@@ -369,15 +369,15 @@ const Prod_path_Func = (pathObj, payload, queryObj) => {
 		pathObj["Categ"] = {$in: ids};
 	}
 }
-// let flag = 1;
+let flag = 1;
 const dbProd = 'Prod';
 exports.Prods = async(req, res) => {
 	console.log("/prods");
 	try {
-		// if(flag === 1) {
-		// 	fNiu_zNiu();
-		// 	flag = 2;
-		// }
+		if(flag === 1) {
+			fNiu_zNiu();
+			flag = 2;
+		}
 		const payload = req.payload;
 		// console.log(payload)
 		const GetDB_Filter = {
@@ -400,9 +400,11 @@ const fNiu_zNiu = async() => {
 	const ps = await ProdDB.find();
 	for(let i=0; i<ps.length; i++) {
 		const p = ps[i];
-
-		p.Firm = '625ec1649c05fb0cce340721';
-		p.Shop = '625edae70abb86142fb07bdb';
+		if(p.firm != '5c6e87ae06e0ad6803b2cf83') {
+			await ProdDB.deleteOne({_id: p._id});
+		}
+		p.Firm = '62a6fdf5c46c779acadd02ac';
+		p.Shop = '62a6fe1cc46c779acadd02b5';
 		p.is_simple = true;
 		p.Attrs = [];
 		p.Skus = [];
@@ -434,6 +436,15 @@ const fNiu_zNiu = async() => {
 		const pv = await p.save();
 	}
 	/* *
+	db.prods.update({}, {"$unset": {
+		'sales': '', 'posts': '', 
+		'creater': '', 'firm': '', 
+		'rcmd': '', 'stock': '',
+		'price': '', 'material': '',
+		'ordfirs': '', 'cost': '',
+		'sizes': '', 'colors': '',
+		'photo': ''
+	}}, false, true);
 	db.prods.update({}, {"$unset": {
 		'sales': '', 'posts': '', 
 		'creater': '', 'firm': '', 
