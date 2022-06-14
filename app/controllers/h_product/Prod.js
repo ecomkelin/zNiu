@@ -444,7 +444,7 @@ const fNiu_zNiu = async(payload) => {
 		'price': '', 'material': '',
 		'ordfirs': '', 'cost': '',
 		'sizes': '', 'colors': '',
-		'photo': ''
+		'photo': '', 'sells': ''
 	}}, false, true);
 
 	db.prods.update({}, {"$unset": {

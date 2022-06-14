@@ -702,11 +702,11 @@ exports.addTicket = async(req, res) => {
 		const db_res = await GetDB.db(GetDB_Filter);
 		if(db_res.status !== 200) return MdFilter.jsonSuccess(res, db_res);
 		const object = db_res.data.object;
-		const index = indexOfArrayObject(tickets, '_id', object._id);
+		const index = indexOfArrayObject(tickets, 'id', object._id);
 
 		if(index < -1) return MdFilter.json500(res, {message: "addTicket tickets Error"});
 		if(index > -1) tickets.splice(index, 1);
-		tickets.push(object);
+		tickets.push({typePrint: req.query.typePrint, id: object._id, object});
 			
 		return MdFilter.jsonSuccess(res, db_res);
 	} catch(error) {
