@@ -69,6 +69,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 		if(!MdFilter.isObjectId(obj.Categ)) obj.Categ = null;
 
 		if(!isNaN(obj.limit_quantity)) obj.limit_quantity = parseInt(obj.limit_quantity);
+		if(!isNaN(obj.quantity_pack)) obj.quantity_pack = parseInt(obj.quantity_pack);
 		if(!isNaN(obj.quantity)) obj.quantity = parseInt(obj.quantity);
 		if(!isNaN(obj.quantity_alert)) obj.quantity_alert = parseInt(obj.quantity_alert);
 		obj.allow_backorder = (obj.allow_backorder == 1 || obj.allow_backorder === true || obj.allow_backorder === 'true') ? true : false; 
@@ -253,6 +254,11 @@ exports.ProdPut = async(req, res) => {
 			obj.quantity = parseInt(obj.quantity);
 			if(!isNaN(obj.quantity)) Prod.quantity = obj.quantity;
 		}
+		if(obj.quantity_pack) {
+			obj.quantity_pack = parseInt(obj.quantity_pack);
+			if(!isNaN(obj.quantity_pack)) Prod.quantity_pack = obj.quantity_pack;
+		}
+		if(obj.note_pack) Prod.note_pack = obj.note_pack;
 
 		if(obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') Prod.is_usable = true;
 		if(obj.is_usable == 0 || obj.is_usable === false || obj.is_usable === 'false') Prod.is_usable = false;

@@ -1,3 +1,4 @@
+0.61	商品整箱数
 0.60	智能打印
 0.57	Order if(order_imp == order_sale) is_pass = true
 0.57	Order is_pass

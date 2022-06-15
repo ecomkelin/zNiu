@@ -707,7 +707,8 @@ exports.addTicket = async(req, res) => {
 		if(index < -1) return MdFilter.json500(res, {message: "addTicket tickets Error"});
 		if(index > -1) tickets.splice(index, 1);
 		tickets.push({typePrint: req.query.typePrint, id: object._id, object});
-			
+		
+		db_res.message = "addTicket";
 		return MdFilter.jsonSuccess(res, db_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "addTicket", error});
@@ -715,7 +716,7 @@ exports.addTicket = async(req, res) => {
 }
 exports.getTickets = (req, res) => {
 	try {
-		return MdFilter.jsonSuccess(res, {data: {objects: tickets}})
+		return MdFilter.jsonSuccess(res, {message: "getTickets", data: {objects: tickets}})
 	} catch (error) {
 		return MdFilter.json500(res, {message: "clearTicket", error});
 	}
@@ -741,7 +742,7 @@ exports.printTicket = (req, res) => {
 			status = 200;
 			message = "打印成功";
 		}
-		return MdFilter.jsonRes(res, {status, data: {object, count}, })
+		return MdFilter.jsonRes(res, {status, message: "printTicket", data: {object, count}, })
 	} catch (error) {
 		return MdFilter.json500(res, {message: "printTicket", error});
 	}

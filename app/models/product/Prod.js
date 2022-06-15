@@ -58,6 +58,8 @@ const dbSchema = new Schema({
 	}],
 	is_controlStock: {type: Boolean, default: true},
 	quantity: {type:Number, default: 0},
+	quantity_pack: {type:Number, default: 1},
+	note_pack: String,
 	quantity_alert: {type: Number, default: 0},
 	allow_backorder: {type: Boolean, default: true},
 
