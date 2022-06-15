@@ -18,9 +18,14 @@ a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upInfo") 修改�
 									option(value="true") 可用
 									option(value="false", selected="selected") 禁用
 					.form-group.row
-						label.col-3.col-form-label(for="nomeIpt") 姓名
+						label.col-3.col-form-label(for="nomeIpt") 名称
 						.col-9
 							input#nomeIpt.form-control(type="text", name="obj[nome]" value=Shop.nome)
+						.offset-3.col-9.col-form-label.text-danger
+					.form-group.row
+						label.col-3.col-form-label(for="typeShopIpt") 商店类型
+						.col-9
+							input#typeShopIpt.form-control(type="text", name="obj[typeShop]" value=Shop.typeShop, placeholder="如果是limit则前端手机版 只显示管理 不显示销售和采购")
 						.offset-3.col-9.col-form-label.text-danger
 				.modal-footer
 					button.btn.btn-default(type="button" data-dismiss="modal") 取消
