@@ -1,7 +1,6 @@
 module.exports = {
-	code: {regexp: '^[a-zA-Z0-9]*$', min: 3, max: 13, errMsg: {
+	code: {min: 2, max: 13, errMsg: {
 		nullMsg: '产品条形码不能为空',
-		regexpMsg: '产品条形码只能由字母或数字组成',
 		minMsg: '产品条形码的位数不能小于: ',
 		maxMsg: '产品条形码的位数不能大于: '
 	}},
