@@ -1,6 +1,7 @@
 const path = require('path');
 const Brand = require(path.resolve(process.cwd(), 'app/controllers/g_complement/Brand'));
 const Categ = require(path.resolve(process.cwd(), 'app/controllers/g_complement/Categ'));
+const Pnome = require(path.resolve(process.cwd(), 'app/controllers/g_complement/Pnome'));
 const MdAuth = require(path.resolve(process.cwd(), 'app/middle/MdAuth'));
 
 module.exports = (app) => {
@@ -17,4 +18,9 @@ module.exports = (app) => {
 	app.put('/api/b1/Categ/:id', MdAuth.path_sfer, Categ.CategPut);
 	app.post('/api/b1/Categ', MdAuth.path_sfer, Categ.CategPost);
 	app.get('/api/b1/Categs', MdAuth.path_User, Categ.Categs);
+
+
+	/* ------------------------ Pnome ------------------------ */
+	app.get('/api/b1/PnomeRevise', MdAuth.path_User, Pnome.PnomeRevise);
+	app.get('/api/b1/Pnomes', MdAuth.path_User, Pnome.Pnomes);
 };

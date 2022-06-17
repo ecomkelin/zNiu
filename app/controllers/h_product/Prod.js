@@ -15,7 +15,7 @@ const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 const SkuDB = require(path.resolve(process.cwd(), 'app/models/product/Sku'));
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
-let cashProds = [];
+const PdnomeCT = require("../g_complement/Pnome");
 
 exports.ProdPost = async(req, res) => {
 	console.log("/ProdPost");
@@ -53,6 +53,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 			const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['nome']);
 			if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 		}
+		PdnomeCT.PnomePlus_prom(payload, obj.nome);
 		if(!isNaN(obj.weight)) obj.weight = parseFloat(obj.weight);
 
 		if(isNaN(obj.price_cost)) obj.price_cost = 0;
@@ -194,6 +195,7 @@ exports.ProdDelete = async(req, res) => {
 
 		const pathObj = {_id: id};
 		Prod_path_Func(pathObj, payload);
+		PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
 
 		const Prod = await ProdDB.findOne(pathObj);
 		if(!Prod) return MdFilter.jsonFailed(res, {message: "没有找到此商品信息,请刷新重试"});
@@ -280,6 +282,8 @@ exports.ProdPut = async(req, res) => {
 
 			if(obj.nome) obj.nome = obj.nome.replace(/^\s*/g,"");	// 注意 Pd nome 没有转大写
 			if(obj.nome !== Prod.nome) {
+				PdnomeCT.PnomePlus_prom(payload, obj.nome);
+				PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
 				// 如果输入了 编号 则编号必须是唯一;  注意 Prod nome 没有转大写
 				const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['nome']);
 				if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
