@@ -18,7 +18,6 @@ const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 const PdnomeCT = require("../g_complement/Pnome");
 
 
-const Shops = [];
 exports.ProdPost = async(req, res) => {
 	console.log("/ProdPost");
 	try{
@@ -39,31 +38,7 @@ exports.ProdPost = async(req, res) => {
 		return MdFilter.json500(res, {message: "ProdPost", error});
 	}
 }
-const obtain_Shop = (Shop_id) => new Promise(async(resolve, reject) => {
-	try {
-		// 通过Shop缓存 会更快
-		let Shop;
-		let i=0;
-		for(; i<Shops.length; i++) {
-			if(Shops[i]._id == Shop_id) {
-				Shop = Shops[i];
-				break;
-			}
-		}
-		if(i === Shops.length) {
-			Shop = await ShopDB.findOne({_id: Shop_id});
-			if(!Shop) return reject("没有此店铺");
-			Shops.push(Shop);
-		} else {
-			Shop = Shops[i];
-		}
-		if(!Shop) return reject("没有此店铺");
-		return resolve(Shop);
-		// 缓存过期
-	} catch(e) {
-		return reject(e);
-	}
-})
+
 const put_ProdMatch = (codeFlag, Shop_id) => new Promise(async(resolve, reject) => {
 	try {
 		const param = {codeFlag, Shop: Shop_id};
@@ -91,8 +66,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 
 
 		// 批发商
-		const Shop = await obtain_Shop(payload.Shop);
-		if(Shop.typeShop === "ws") {
+		if(payload.typeShop === "ws") {
 			obj.codeFlag = obj.code;
 			obj.codeLen = obj.code.length;
 			if(MdFilter.isObjectId(obj.Supplier)) {	// 如果有供应商
@@ -130,7 +104,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 		const save_res = await Prod_save_Prom(obj, payload, null);
 
 		// 如果是批发商 那么就把codeFlag相同的 匹配到一起
-		if(Shop.typeShop === "ws" && save_res.status === 200) {
+		if(payload.typeShop === "ws" && save_res.status === 200) {
 			await put_ProdMatch(obj.codeFlag, payload.Shop);
 		}
 
@@ -274,8 +248,7 @@ exports.ProdDelete = async(req, res) => {
 
 		const objDel = await ProdDB.deleteOne({_id: Prod._id});
 
-		const Shop = await obtain_Shop(payload.Shop);
-		if(Shop.typeShop === "ws") {
+		if(payload.typeShop === "ws") {
 			await put_ProdMatch(codeFlag, payload.Shop);
 		}
 
@@ -332,7 +305,6 @@ exports.ProdPut = async(req, res) => {
 		if(obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') Prod.is_usable = true;
 		if(obj.is_usable == 0 || obj.is_usable === false || obj.is_usable === 'false') Prod.is_usable = false;
 
-		const Shop = await obtain_Shop(payload.Shop);
 		let isWsChangeCodeFlag = false;
 		let orgCodeFlag = Prod.codeFlag;
 		let newCodeFlag = obj.code;
@@ -340,7 +312,7 @@ exports.ProdPut = async(req, res) => {
 		if(!Prod.Pd) {	// 如果是单店 可以修改名称等 暂时没有做
 			if(obj.code) obj.code.replace(/^\s*/g,"").toUpperCase();
 
-			if(Shop.typeShop === "ws"){
+			if(payload.typeShop === "ws"){
 				if(obj.Supplier !== Prod.Supplier || obj.code !== Prod.codeFlag) {
 					let SupplierCode = "";
 					if(MdFilter.isObjectId(obj.Supplier)) {
@@ -409,7 +381,7 @@ exports.ProdPut = async(req, res) => {
 
 		const objSave = await Prod.save();
 
-		if(Shop.typeShop === "ws" && isWsChangeCodeFlag) {
+		if(payload.typeShop === "ws" && isWsChangeCodeFlag) {
 			put_ProdMatch(orgCodeFlag, payload.Shop);
 			put_ProdMatch(newCodeFlag, payload.Shop);
 		}
