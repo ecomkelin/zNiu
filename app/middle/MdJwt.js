@@ -43,10 +43,7 @@ const generatePayload = (obj)=> {
 	const payload = {};
 	if(obj._id) payload._id = obj._id;
 	if(obj.Firm) payload.Firm = obj.Firm;
-	if(obj.Shop) {
-		payload.Shop = obj.Shop._id;
-		payload.typeShop = obj.Shop.typeShop;
-	}
+	if(obj.Shop) payload.Shop = obj.Shop;
 	if(obj.role) payload.role = obj.role;
 	if(obj.code) payload.code = obj.code;
 	if(obj.nome) payload.nome = obj.nome;

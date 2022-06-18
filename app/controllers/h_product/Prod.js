@@ -66,7 +66,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 
 
 		// 批发商
-		if(payload.typeShop === "ws") {
+		if(payload.Shop.typeShop === "ws") {
 			obj.codeFlag = obj.code;
 			obj.codeLen = obj.code.length;
 			if(MdFilter.isObjectId(obj.Supplier)) {	// 如果有供应商
@@ -104,7 +104,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 		const save_res = await Prod_save_Prom(obj, payload, null);
 
 		// 如果是批发商 那么就把codeFlag相同的 匹配到一起
-		if(payload.typeShop === "ws" && save_res.status === 200) {
+		if(payload.Shop.typeShop === "ws" && save_res.status === 200) {
 			await put_ProdMatch(obj.codeFlag, payload.Shop);
 		}
 
@@ -248,7 +248,7 @@ exports.ProdDelete = async(req, res) => {
 
 		const objDel = await ProdDB.deleteOne({_id: Prod._id});
 
-		if(payload.typeShop === "ws") {
+		if(payload.Shop.typeShop === "ws") {
 			await put_ProdMatch(codeFlag, payload.Shop);
 		}
 
@@ -312,7 +312,7 @@ exports.ProdPut = async(req, res) => {
 		if(!Prod.Pd) {	// 如果是单店 可以修改名称等 暂时没有做
 			if(obj.code) obj.code.replace(/^\s*/g,"").toUpperCase();
 
-			if(payload.typeShop === "ws"){
+			if(payload.Shop.typeShop === "ws"){
 				if(obj.Supplier !== Prod.Supplier || obj.code !== Prod.codeFlag) {
 					let SupplierCode = "";
 					if(MdFilter.isObjectId(obj.Supplier)) {
@@ -381,7 +381,7 @@ exports.ProdPut = async(req, res) => {
 
 		const objSave = await Prod.save();
 
-		if(payload.typeShop === "ws" && isWsChangeCodeFlag) {
+		if(payload.Shop.typeShop === "ws" && isWsChangeCodeFlag) {
 			put_ProdMatch(orgCodeFlag, payload.Shop);
 			put_ProdMatch(newCodeFlag, payload.Shop);
 		}

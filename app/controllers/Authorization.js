@@ -16,7 +16,6 @@ exports.refreshtoken = async(req, res, objectDB) => {
 		const reToken = refresh_res.data.token;
 		const object = await objectDB.findOne({_id: payload._id})
 			.populate({path: "Shop", select: "typeShop"});
-		console.log('refreshToken 1', object);
 		if(!object) return MdFilter.jsonFailed(res, {message: "授权错误, 请重新登录"});
 		// const match_res = await MdFilter.matchBcryptProm(reToken, object.refreshToken);
 		// if(match_res.status != 200) return MdFilter.jsonFailed(res, {message: "refreshToken 不匹配"});
@@ -27,7 +26,6 @@ exports.refreshtoken = async(req, res, objectDB) => {
 		object.at_last_login = Date.now();
 		object.refreshToken = await MdFilter.encrypt_Prom(refreshToken);
 		await object.save();
-		console.log('refreshToken', payload);
 		return MdFilter.jsonSuccess(res, {
 			message: "refreshtoken 刷新token成功",
 			data: {accessToken, refreshToken, payload},
@@ -67,7 +65,6 @@ exports.login = async(req, res, objectDB) => {
 		const Obj_res = await obtain_payload(req.body.system, req.body.social, objectDB);
 		if(Obj_res.status !== 200) return MdFilter.jsonRes(res, Obj_res);
 		const payload = Obj_res.data.object;
-		console.log('login2, object', payload);
 		if(!payload) return MdFilter.jsonFailed(res, {message: "登陆失败"});
 		const accessToken = MdJwt.generateToken(payload);
 		const refreshToken = MdJwt.generateToken(payload, true);
@@ -76,7 +73,6 @@ exports.login = async(req, res, objectDB) => {
 		payload.refreshToken = refreshToken;
 		const objSave = await payload.save();
 
-		console.log('login3', payload);
 		return MdFilter.jsonSuccess(res, {
 			message: "login 登录成功",
 			data: {
@@ -114,7 +110,6 @@ const obtain_payload = (system_obj, social_obj, objectDB) => {
 				if(!object) return resolve({status: 400, message: "登录失败"});
 				const pwd_match_res = await MdFilter.matchBcryptProm(system_obj.pwd, object.pwd);
 				if(pwd_match_res.status != 200) return resolve({status: 400, message: "登录失败"});
-				console.log('login 1, object', object);
 				return resolve({status: 200, data: {object}});
 			} else if(social_obj) {
 				/* ==================== 检查第三方登录是否成功 ==================== */
