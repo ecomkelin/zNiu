@@ -17,11 +17,12 @@ const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
 const PdnomeCT = require("../g_complement/Pnome");
 
+
+const Shops = [];
 exports.ProdPost = async(req, res) => {
 	console.log("/ProdPost");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 		if(payload.role < ConfUser.role_set.boss || !payload.Shop) return MdFilter.jsonFailed(res, {message: "您没有所属商店"});
 
 		if(req.body.Pd) {		// 从总公司同步
@@ -38,21 +39,73 @@ exports.ProdPost = async(req, res) => {
 		return MdFilter.json500(res, {message: "ProdPost", error});
 	}
 }
-
+const obtain_Shop = (Shop_id) => new Promise(async(resolve, reject) => {
+	try {
+		// 通过Shop缓存 会更快
+		let Shop;
+		let i=0;
+		for(; i<Shops.length; i++) {
+			if(Shops[i]._id == Shop_id) {
+				Shop = Shops[i];
+				break;
+			}
+		}
+		if(i === Shops.length) {
+			Shop = await ShopDB.findOne({_id: Shop_id});
+			if(!Shop) return reject("没有此店铺");
+			Shops.push(Shop);
+		} else {
+			Shop = Shops[i];
+		}
+		if(!Shop) return reject("没有此店铺");
+		return resolve(Shop);
+		// 缓存过期
+	} catch(e) {
+		return reject(e);
+	}
+})
+const put_ProdMatch = (codeFlag, Shop_id) => new Promise(async(resolve, reject) => {
+	try {
+		const param = {codeFlag, Shop: Shop_id};
+		const Prods = await ProdDB.find(param);
+		if(Prods.length > 0) {
+			const codeMatchs = [];
+			Prods.forEach(item => codeMatchs.push(item._id));
+			await ProdDB.updateMany(param, {codeMatchs});
+		}
+		return resolve('success');
+	} catch(e) {
+		return reject(e);
+	}
+})
+// 自己添加
 const Prod_PdNull = async(res, obj, payload) => {
 	console.log("/Prod_PdNull")
 	try {
 		obj.Pd = null;
-		if(obj.code) {
-			// 如果输入了 编号 则编号必须是唯一;  注意 Prod code 没有转大写
-			const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code', 'nome']);
-			if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
-			const objSame = await ProdDB.findOne({'code': obj.code, Firm: payload.Firm});
-			if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
-		} else {
-			const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['nome']);
-			if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
+
+		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
+		obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();
+		const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code', 'nome']);
+		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
+
+
+		// 批发商
+		const Shop = await obtain_Shop(payload.Shop);
+		if(Shop.typeShop === "ws") {
+			obj.codeFlag = obj.code;
+			obj.codeLen = obj.code.length;
+			if(MdFilter.isObjectId(obj.Supplier)) {	// 如果有供应商
+				const Supplier = await ShopDB.findOne({_id: obj.Supplier});
+				if(!Supplier) return MdFilter.jsonFailed(res, {message: "没有找到供应商信息"});
+				obj.code = obj.code+'-'+Supplier.code;
+			}
 		}
+
+		const objSame = await ProdDB.findOne({'code': obj.code, Shop: payload.Shop});
+		if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
+
+
 		PdnomeCT.PnomePlus_prom(payload, obj.nome);
 		if(!isNaN(obj.weight)) obj.weight = parseFloat(obj.weight);
 
@@ -75,11 +128,18 @@ const Prod_PdNull = async(res, obj, payload) => {
 		if(!isNaN(obj.quantity_alert)) obj.quantity_alert = parseInt(obj.quantity_alert);
 		obj.allow_backorder = (obj.allow_backorder == 1 || obj.allow_backorder === true || obj.allow_backorder === 'true') ? true : false; 
 		const save_res = await Prod_save_Prom(obj, payload, null);
+
+		// 如果是批发商 那么就把codeFlag相同的 匹配到一起
+		if(Shop.typeShop === "ws" && save_res.status === 200) {
+			await put_ProdMatch(obj.codeFlag, payload.Shop);
+		}
+
 		return MdFilter.jsonSuccess(res, save_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Prod_PdNull", error});
 	}
 }
+// 从公司同步
 const Prod_PdSynchronize = async(res, Pd_id, payload) => {
 	try {
 		if(!MdFilter.isObjectId(Pd_id)) return MdFilter.jsonFailed(res, {message: "请输入需要同步的产品_id"});
@@ -95,6 +155,7 @@ const Prod_PdSynchronize = async(res, Pd_id, payload) => {
 		return MdFilter.json500(res, {message: "Prod_PdSynchronize", error});
 	}
 }
+// 从公司批量同步
 const Prods_PdSynchronize = async(res, Pds, payload) => {
 	try {
 		if(!MdFilter.ArrIsObjectId(Pds)) return MdFilter.jsonFailed(res, {message: "输入需要同步的产品 Pds 的 _id"});
@@ -199,6 +260,8 @@ exports.ProdDelete = async(req, res) => {
 
 		const Prod = await ProdDB.findOne(pathObj);
 		if(!Prod) return MdFilter.jsonFailed(res, {message: "没有找到此商品信息,请刷新重试"});
+		
+		const codeFlag = Prod.codeFlag;
 
 		const Skus = await SkuDB.find({Prod: Prod._id});
 		if(Skus && Skus.length > 0) return MdFilter.jsonFailed(res, {message: "请先删除商品中的,非默认Sku"});
@@ -210,6 +273,12 @@ exports.ProdDelete = async(req, res) => {
 		}
 
 		const objDel = await ProdDB.deleteOne({_id: Prod._id});
+
+		const Shop = await obtain_Shop(payload.Shop);
+		if(Shop.typeShop === "ws") {
+			await put_ProdMatch(codeFlag, payload.Shop);
+		}
+
 		return MdFilter.jsonSuccess(res, {message: "ProdDelete"});
 	} catch(error) {
 		return MdFilter.json500(res, {message: "ProdDelete", error});
@@ -221,8 +290,6 @@ exports.ProdPut = async(req, res) => {
 	console.log("/ProdPut");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
-
 		const id = req.params.id;
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 		const pathObj = {_id: id};
@@ -265,22 +332,47 @@ exports.ProdPut = async(req, res) => {
 		if(obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') Prod.is_usable = true;
 		if(obj.is_usable == 0 || obj.is_usable === false || obj.is_usable === 'false') Prod.is_usable = false;
 
+		const Shop = await obtain_Shop(payload.Shop);
+		let isWsChangeCodeFlag = false;
+		let orgCodeFlag = Prod.codeFlag;
+		let newCodeFlag = obj.code;
+
 		if(!Prod.Pd) {	// 如果是单店 可以修改名称等 暂时没有做
-			if(obj.code) obj.code.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
-			if(obj.code !== Prod.code) {
-				// 如果输入了 编号 则编号必须是唯一;  注意 Prod code 没有转大写
-				const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code']);
-				if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
-				const objSame = await ProdDB.findOne({
-					'code': obj.code,
-					Firm: payload.Firm,
-					_id: {'$ne': Prod._id}
-				});
-				if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
-				Prod.code = obj.code;
+			if(obj.code) obj.code.replace(/^\s*/g,"").toUpperCase();
+
+			if(Shop.typeShop === "ws"){
+				if(obj.Supplier !== Prod.Supplier || obj.code !== Prod.codeFlag) {
+					let SupplierCode = "";
+					if(MdFilter.isObjectId(obj.Supplier)) {
+						const Supplier = await ShopDB.findOne({_id: obj.Supplier});
+						if(!Supplier) return MdFilter.jsonFailed(res, {message: "没有找到供应商信息"});
+						SupplierCode = "-"+Supplier.code;
+					}
+					if(obj.code !== Prod.codeFlag) {
+						isWsChangeCodeFlag = true;
+						Prod.codeFlag = obj.code;
+						Prod.codeLen = obj.code.length;					
+					}
+					Prod.code = Prod.codeFlag+SupplierCode;
+				}
+			} else {
+				if(obj.code !== Prod.code) {
+					// 如果输入了 编号 则编号必须是唯一;  注意 Prod code 没有转大写
+					const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code']);
+					if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
+					const objSame = await ProdDB.findOne({
+						'code': obj.code,
+						Shop: payload.Shop,
+						_id: {'$ne': Prod._id}
+					});
+					if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
+					Prod.code = obj.code;
+				}
 			}
 
-			if(obj.nome) obj.nome = obj.nome.replace(/^\s*/g,"");	// 注意 Pd nome 没有转大写
+			
+
+			if(obj.nome) obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();	// 注意 Pd nome 没有转大写
 			if(obj.nome !== Prod.nome) {
 				PdnomeCT.PnomePlus_prom(payload, obj.nome);
 				PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
@@ -316,6 +408,12 @@ exports.ProdPut = async(req, res) => {
 		Prod.User_upd = payload._id;
 
 		const objSave = await Prod.save();
+
+		if(Shop.typeShop === "ws" && isWsChangeCodeFlag) {
+			put_ProdMatch(orgCodeFlag, payload.Shop);
+			put_ProdMatch(newCodeFlag, payload.Shop);
+		}
+
 		return MdFilter.jsonSuccess(res, {message: "ProdPut", data: {object: objSave}});
 	} catch(error) {
 		return MdFilter.json500(res, {message: "ProdPut", error});

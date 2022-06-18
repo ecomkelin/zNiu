@@ -94,7 +94,6 @@ exports.PnomeRevise = async(req, res) => {
 	} catch(e) {
 		return MdFilter.json500(res, {message: "PnomeRevise", e});
 	}
-	
 }
 const setPnomes = async(req, res, Prods, n) => {
 	try {

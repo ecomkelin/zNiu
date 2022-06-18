@@ -51,16 +51,14 @@ exports.PdPost = async(req, res) => {
 		const obj = await MdFiles.mkPicture_prom(req, {img_Dir:"/Pd", field: "img_urls", is_Array: true});
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 
-		if(obj.code) {
-			// 如果输入了 编号 则编号必须是唯一;  注意 Pd code 没有转大写
-			const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code', 'nome']);
-			if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
-			const objSame = await PdDB.findOne({'code': obj.code, Firm: payload.Firm});
-			if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
-		} else {
-			const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['nome']);
-			if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
-		}
+
+		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
+		obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();
+		const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code', 'nome']);
+		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
+		const objSame = await PdDB.findOne({'code': obj.code, Firm: payload.Firm});
+		if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
+
 
 		if(isNaN(obj.weight)) obj.weight = parseFloat(obj.weight)
 
@@ -156,7 +154,7 @@ const Pd_general = async(res, obj, Pd, payload) => {
 		}
 
 		if(obj.code) {
-			obj.code = obj.code.replace(/^\s*/g,"");	// 注意 Pd code 没有转大写
+			obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();;	// 注意 Pd code 没有转大写
 			if(obj.code && (obj.code != Pd.code)) {
 				const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code']);
 				if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
@@ -167,7 +165,7 @@ const Pd_general = async(res, obj, Pd, payload) => {
 			}
 		}
 		if(obj.nome) {
-			obj.nome = obj.nome.replace(/^\s*/g,"");	// 注意 Pd nome 没有转大写
+			obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();
 			const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['nome']);
 			if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 			if(obj.nome != Pd.nome) {

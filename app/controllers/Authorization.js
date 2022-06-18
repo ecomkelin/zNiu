@@ -19,7 +19,7 @@ exports.refreshtoken = async(req, res, objectDB) => {
 		// const match_res = await MdFilter.matchBcryptProm(reToken, object.refreshToken);
 		// if(match_res.status != 200) return MdFilter.jsonFailed(res, {message: "refreshToken 不匹配"});
 
-		const accessToken = MdJwt.generateToken(payload);
+		const accessToken = MdJwt.generateToken(object);
 		const refreshToken = MdJwt.generateToken(object, true);
 
 		object.at_last_login = Date.now();
@@ -104,7 +104,8 @@ const obtain_payload = (system_obj, social_obj, objectDB) => {
 					param.phone = system_obj.phonePre+system_obj.phoneNum;
 				}
 
-				let object = await objectDB.findOne(param);
+				let object = await objectDB.findOne(param)
+					.populate({path: "Shop", select: "typeShop"});
 				if(!object) return resolve({status: 400, message: "登录失败"});
 				const pwd_match_res = await MdFilter.matchBcryptProm(system_obj.pwd, object.pwd);
 				if(pwd_match_res.status != 200) return resolve({status: 400, message: "登录失败"});
@@ -133,7 +134,8 @@ const obtain_payload = (system_obj, social_obj, objectDB) => {
 				/* ==================== 如果第三方授权成功 ==================== */
 				// 查看是否已登录过系统
 				// 如果已经登录 则找到此系统账号
-				let object = await objectDB.findOne({socials: { $elemMatch: {social_type: login_type, social_id: user_id}} });
+				let object = await objectDB.findOne({socials: { $elemMatch: {social_type: login_type, social_id: user_id}} })
+					.populate({path: "Shop", select: "typeShop"});
 
 				// 如果此第三方账号 不在系统中 则为其创建一个 系统账号
 				if(!object) {
@@ -155,8 +157,8 @@ const obtain_payload = (system_obj, social_obj, objectDB) => {
 			}
 			return resolve({status: 400, message: "请传入正确的登陆参数"});
 		} catch(error) {
-			console.log("[resolve obtain_payload]", error);
-			return resolve({status: 400, message: "[resolve obtain_payload]"});
+			console.log("[resolve]", error);
+			return resolve({status: 400, message: "[resolve]"});
 		}
 	})
 }

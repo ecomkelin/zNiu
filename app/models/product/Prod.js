@@ -11,6 +11,12 @@ const dbSchema = new Schema({
 	Shop: {type: ObjectId, ref: 'Shop'},			// [post写, put只读] 不可修改 商品所属店铺 
 	Pd: {type: ObjectId, ref: 'Pd'},				// [post写, put只读] 不可修改 商品所属产品
 
+	/* 为批发商做的 */
+	Supplier: {type: ObjectId, ref: 'Shop'},		// 产品所属供应商
+	codeFlag: String,								// codeFlag 所属供应商唯一
+	codeLen: Number,								// codeFlag 的长度
+	codeMatchs: [{type: ObjectId, ref: 'Prod'}], 	// 相关同codeFlag的产品，为了前端缓存
+
 	/* 如果 Pd 不为空则 只读*/
 	code: String, 									// [if(Pd !== null)只读] 产品条形码
 	nome: String,									// [if(Pd !== null)只读] 产品名称
