@@ -5,6 +5,8 @@ const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
 const PnomeDB = require(path.resolve(process.cwd(), 'app/models/complement/Pnome'));
 const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 
+const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
+
 
 exports.PnomePlus_prom = (payload, code) => new Promise(async(resolve, reject) => {
 	try {
