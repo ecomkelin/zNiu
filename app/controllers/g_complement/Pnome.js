@@ -92,7 +92,7 @@ exports.PnomeRevise = async(req, res) => {
 		await PnomeDB.deleteMany({Firm: payload.Firm});
 
 		setPnomes(req, res, Prods, 0)
-
+		return MdFilter.jsonSuccess(res, {status: 200, message: "success"});
 	} catch(e) {
 		return MdFilter.json500(res, {message: "PnomeRevise", e});
 	}
@@ -118,16 +118,17 @@ const setPnomes = async(req, res, Prods, n) => {
 		if(Pnome) {
 			Pnome.sort += 1;
 			await Pnome.save()
-			return setPnomes(req, res, Prods, n+1);
 		} else {
 			let _Pnome = new PnomeDB();	// 创建nome
 			_Pnome.code = pnome;
 			_Pnome.sort = 1;
 			_Pnome.Firm = payload.Firm;
 			await _Pnome.save();
-			return setPnomes(req, res, Prods, n+1);
 		}
+		return setPnomes(req, res, Prods, n+1);
+
 	} catch(e) {
+		console.log("eeee:", e)
 		return setPnomes(req, res, Prods, n+1);
 	}
 }
