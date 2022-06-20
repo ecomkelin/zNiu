@@ -13,6 +13,8 @@ const CategDB = require(path.resolve(process.cwd(), 'app/models/complement/Categ
 const PdDB = require(path.resolve(process.cwd(), 'app/models/product/Pd'));
 const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 const SkuDB = require(path.resolve(process.cwd(), 'app/models/product/Sku'));
+const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
+
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
 const PdnomeCT = require("../g_complement/Pnome");
