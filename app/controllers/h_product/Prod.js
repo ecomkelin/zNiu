@@ -61,6 +61,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 	try {
 		obj.Pd = null;
 
+		if(obj.codeFlag) obj.code = obj.codeFlag;		// 石山 如果是批发商加
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();
 		const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code', 'nome']);
@@ -69,13 +70,16 @@ const Prod_PdNull = async(res, obj, payload) => {
 
 		// 批发商
 		if(payload.Shop.typeShop === "ws") {
-			obj.codeFlag = obj.code;
-			obj.codeLen = obj.code.length;
+			let SupplierCode = "";
+			obj.codeFlag = obj.codeFlag.replace(/^\s*/g,"").toUpperCase();
+			obj.codeLen = obj.codeFlag.length;
 			if(MdFilter.isObjectId(obj.Supplier)) {	// 如果有供应商
 				const Supplier = await ShopDB.findOne({_id: obj.Supplier});
 				if(!Supplier) return MdFilter.jsonFailed(res, {message: "没有找到供应商信息"});
-				obj.code = obj.code+'-'+Supplier.code;
+				SupplierCode = '-'+Supplier.code;
 			}
+			obj.code = obj.codeFlag+SupplierCode;
+
 		}
 
 		const objSame = await ProdDB.findOne({'code': obj.code, Shop: payload.Shop});
@@ -315,17 +319,18 @@ exports.ProdPut = async(req, res) => {
 			if(obj.code) obj.code.replace(/^\s*/g,"").toUpperCase();
 
 			if(payload.Shop.typeShop === "ws"){
-				if(obj.Supplier !== Prod.Supplier || obj.code !== Prod.codeFlag) {
+				obj.codeFlag = obj.codeFlag.replace(/^\s*/g,"").toUpperCase();
+				if(obj.Supplier !== Prod.Supplier || obj.codeFlag !== Prod.codeFlag) {
 					let SupplierCode = "";
 					if(MdFilter.isObjectId(obj.Supplier)) {
 						const Supplier = await ShopDB.findOne({_id: obj.Supplier});
 						if(!Supplier) return MdFilter.jsonFailed(res, {message: "没有找到供应商信息"});
 						SupplierCode = "-"+Supplier.code;
 					}
-					if(obj.code !== Prod.codeFlag) {
+					if(obj.codeFlag !== Prod.codeFlag) {
 						isWsChangeCodeFlag = true;
-						Prod.codeFlag = obj.code;
-						Prod.codeLen = obj.code.length;					
+						Prod.codeFlag = obj.codeFlag;
+						Prod.codeLen = obj.codeFlag.length;		
 					}
 					Prod.code = Prod.codeFlag+SupplierCode;
 				}
