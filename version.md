@@ -1,3 +1,4 @@
+0.67	产品图片及压缩图
 0.66	Pnomes
 0.65	Prod 增加所属供应商 及 payload.typeShop
 0.64	增加了 产品名称数据库 Pnome
