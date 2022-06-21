@@ -8,6 +8,70 @@ const uploadPath = publicPath+'/upload';
 	field: 		图片 属于数据库中的哪个 field (比如 "img_url" "img_urls" "img" "imgUrl");
 	is_Array: 	上传的图片是单张还是多张
 */
+exports.PdImg_sm = async(req, img_Dir) => {
+	return new Promise((resolve, reject) => {
+		try {
+			console.log("PdImg_sm")
+			let payload = req.payload;
+			let img_abs = uploadPath+img_Dir;
+			let form = formidable({ multiples: true, uploadDir: img_abs});
+			console.log(1111)
+			form.parse(req, (err, fields, files) => {
+				console.log(222)
+				if (err) return reject(err);
+				console.log(333, JSON.parse(fields.obj));
+				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
+				let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
+				console.log(444, obj)
+				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
+				if(!files.img_url || !files.img_sim) return resolve({status: 400, message: "请传递files.img_url和files.img_sim"});
+
+				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
+
+				let imgUrl = files.img_url;
+				let imgSim = files.img_sim;
+				var orgUrlPath = imgUrl.path;
+				var orgSimPath = imgSim.path;
+				// 接收 图片的路由信息 以便分类存储图片， 如果路由信息不存在, 则放入默认文件夹
+				let imgUrl_Type = imgUrl.type.split('/')[1];
+				let imgSim_Type = imgSim.type.split('/')[1];
+				if(!imgArrs.includes(imgUrl_Type) || !imgArrs.includes(imgSim_Type)) {
+					this.rmPicture();
+					return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
+				}
+				var img_url = "/upload"+img_Dir+"/" + obj.code + '-' + payload._id + '.' + imgUrl_Type;
+				var img_sim = "/upload"+img_Dir+"/" + obj.code + '_sm-' + payload._id + '.' + imgSim_Type;
+				var newUrlPath = publicPath + img_url;
+				var newSimPath = publicPath + img_sim;
+				console.log(newUrlPath)
+				console.log(newSimPath)
+				fs.rename(orgUrlPath, newUrlPath, err => {
+					if(err) {
+						console.log("img_url", err)
+						return resolve({status: 400, message: "您传递的 img_url 错误"});
+					}
+					obj.img_url = img_url;
+					fs.rename(orgSimPath, newSimPath, err => {
+						if(err) {
+							console.log("img_sim", err)
+							return resolve({status: 400, message: "您传递的 img_sim 错误"});
+						}
+						obj.img_sim = img_sim;
+						return resolve({status: 200, data: {obj}})
+					})
+				})
+			})
+		} catch(error) {
+			console.log("PdImg_sm", error)
+			return reject(error);
+		}
+	})
+}
+
+
+
+
+
 exports.mkPicture_prom = async(req, {img_Dir, field, is_Array}) => {
 	return new Promise((resolve, reject) => {
 		try {

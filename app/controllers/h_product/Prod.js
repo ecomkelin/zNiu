@@ -32,7 +32,11 @@ exports.ProdPost = async(req, res) => {
 			Prods_PdSynchronize(res, req.body.Pds, payload);
 		} else {
 			let obj = req.body.obj;
-			if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir:"/Prod", field: "img_urls", is_Array: true});
+			if(!obj) {
+				res_PdImg = await MdFiles.PdImg_sm(req, "/Prod");
+				if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
+				obj = res_PdImg.data.obj;
+			}
 			if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 			Prod_PdNull(res, obj, payload);
 		}
@@ -281,7 +285,10 @@ exports.ProdPut = async(req, res) => {
 		if(req.body.general) {
 			obj = req.body.general;
 		} else {
-			obj = await MdFiles.mkPicture_prom(req, {img_Dir:"/Prod", field: "img_urls", is_Array: true});
+			res_PdImg = await MdFiles.PdImg_sm(req, "/Prod");
+			if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
+			obj = res_PdImg.data.obj;
+
 			if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 			if(obj.img_urls && obj.img_urls.length > 0) {
 				if(Prod.img_urls && Prod.img_urls.length > 0) {

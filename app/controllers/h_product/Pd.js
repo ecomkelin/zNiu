@@ -48,7 +48,14 @@ exports.PdPost = async(req, res) => {
 	try{
 		const payload = req.payload;
 		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
-		const obj = await MdFiles.mkPicture_prom(req, {img_Dir:"/Pd", field: "img_urls", is_Array: true});
+		let obj = req.body.obj;
+		if(!obj) {
+			console.log('111, PdPost')
+			res_PdImg = await MdFiles.PdImg_sm(req, "/Pd");
+			console.log('222, res_PdImg', res_PdImg)
+			if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
+			obj = res_PdImg.data.obj;
+		}
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 
 
@@ -105,7 +112,10 @@ exports.PdPut = async(req, res) => {
 			Pd_delete_img_urls(res, req.body.delete_img_urls, Pd, payload);
 		} else {
 			// 判断是否用上传文件的形式 传递了数据
-			const obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Pd", field: "img_urls", is_Array: true});
+			res_PdImg = await MdFiles.PdImg_sm(req, "/Pd");
+			if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
+			obj = res_PdImg.data.obj;
+
 			if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 			Pd_ImgPost(res, obj, Pd, payload);
 		}
