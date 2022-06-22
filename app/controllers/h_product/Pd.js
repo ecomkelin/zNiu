@@ -50,9 +50,7 @@ exports.PdPost = async(req, res) => {
 		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 		let obj = req.body.obj;
 		if(!obj) {
-			console.log('111, PdPost')
 			res_PdImg = await MdFiles.PdImg_sm(req, "/Pd");
-			console.log('222, res_PdImg', res_PdImg)
 			if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
 			obj = res_PdImg.data.obj;
 		}

@@ -12,7 +12,7 @@ const dbSchema = new Schema({
 	code: String, 								// 条形号码
 	nome: String,								// 产品名称
 	nomeTR: String,								// 其他名称
-	img_sm: String, 							// [if(Pd !== null)只读] 产品图片
+	img_xs: String, 							// [if(Pd !== null)只读] 产品图片
 	img_url: String, 							// [if(Pd !== null)只读] 产品图片
 	img_urls: [String], 						// imgs
 	Brand: {type: ObjectId, ref: 'Brand'},

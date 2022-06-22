@@ -11,7 +11,7 @@ const uploadPath = publicPath+'/upload';
 exports.PdImg_sm = async(req, img_Dir) => {
 	return new Promise((resolve, reject) => {
 		try {
-			console.log("PdImg_sm")
+			console.log("PdImg_sm", img_Dir)
 			let payload = req.payload;
 			let img_abs = uploadPath+img_Dir;
 			let form = formidable({ multiples: true, uploadDir: img_abs});
@@ -19,16 +19,13 @@ exports.PdImg_sm = async(req, img_Dir) => {
 				if (err) return reject(err);
 				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
 				let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
-				console.log(111, files)
 				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
-				console.log(222, files.img_url)
-				console.log(333, files.img_sm)
-				if(!files.img_url || !files.img_sm) return resolve({status: 400, message: "请传递files.img_url和files.img_sm"});
+				if(!files.img_url || !files.img_xs) return resolve({status: 400, message: "请传递files.img_url和files.img_xs"});
 
 				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
 
 				let imgUrl = files.img_url;
-				let imgSim = files.img_sm;
+				let imgSim = files.img_xs;
 				var orgUrlPath = imgUrl.path;
 				var orgSimPath = imgSim.path;
 				// 接收 图片的路由信息 以便分类存储图片， 如果路由信息不存在, 则放入默认文件夹
@@ -39,9 +36,9 @@ exports.PdImg_sm = async(req, img_Dir) => {
 					return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
 				}
 				var img_url = "/upload"+img_Dir+"/" + obj.code + '-' + payload._id + '.' + imgUrl_Type;
-				var img_sm = "/upload"+img_Dir+"/" + obj.code + '_sm-' + payload._id + '.' + imgSim_Type;
+				var img_xs = "/upload"+img_Dir+"/" + obj.code + '_sm-' + payload._id + '.' + imgSim_Type;
 				var newUrlPath = publicPath + img_url;
-				var newSimPath = publicPath + img_sm;
+				var newSimPath = publicPath + img_xs;
 
 				fs.rename(orgUrlPath, newUrlPath, err => {
 					if(err) {
@@ -51,10 +48,10 @@ exports.PdImg_sm = async(req, img_Dir) => {
 					obj.img_url = img_url;
 					fs.rename(orgSimPath, newSimPath, err => {
 						if(err) {
-							console.log("img_sm", err)
-							return resolve({status: 400, message: "您传递的 img_sm 错误"});
+							console.log("img_xs", err)
+							return resolve({status: 400, message: "您传递的 img_xs 错误"});
 						}
-						obj.img_sm = img_sm;
+						obj.img_xs = img_xs;
 						return resolve({status: 200, data: {obj}})
 					})
 				})
