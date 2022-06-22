@@ -87,7 +87,13 @@ const Prod_PdNull = async(res, obj, payload) => {
 		}
 
 		const objSame = await ProdDB.findOne({'code': obj.code, Shop: payload.Shop});
-		if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
+		if(objSame) {
+			if(obj.Supplier) {
+				return MdFilter.jsonFailed(res, {message: "供应商下 已经有此编号"});
+			} else {
+				return MdFilter.jsonFailed(res, {message: "产品编号相同"});
+			}
+		}
 
 
 		PdnomeCT.PnomePlus_prom(payload, obj.nome);
