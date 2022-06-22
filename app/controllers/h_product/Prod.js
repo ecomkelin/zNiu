@@ -400,6 +400,16 @@ exports.ProdPut = async(req, res) => {
 				if(!isNaN(obj.price_cost)) Prod.price_cost = obj.price_cost;
 			}
 			if(obj.price_cost == 0) Prod.price_cost = 0;
+
+			if(obj.img_url && (obj.img_url != Prod.img_url) && Prod.img_url && Prod.img_url.split("Prod").length > 1){
+				await MdFiles.rmPicture(Prod.img_url);
+				Prod.img_url = obj.img_url;
+			}
+			if(obj.img_xs && (obj.img_xs != Prod.img_xs) && Prod.img_xs && Prod.img_xs.split("Prod").length > 1){
+				await MdFiles.rmPicture(Prod.img_xs);
+				Prod.img_xs = obj.img_xs;
+			}
+
 		}
 		Prod.User_upd = payload._id;
 

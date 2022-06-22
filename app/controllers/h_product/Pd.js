@@ -233,6 +233,15 @@ const Pd_general = async(res, obj, Pd, payload) => {
 			}
 		}
 
+		if(obj.img_url && (obj.img_url != Pd.img_url) && Pd.img_url && Pd.img_url.split("Pd").length > 1){
+			await MdFiles.rmPicture(Pd.img_url);
+			Pd.img_url = obj.img_url;
+		}
+		if(obj.img_xs && (obj.img_xs != Pd.img_xs) && Pd.img_xs && Pd.img_xs.split("Pd").length > 1){
+			await MdFiles.rmPicture(Pd.img_xs);
+			Pd.img_xs = obj.img_xs;
+		}
+
 		Pd.User_upd = payload._id;
 
 		const objSave = await Pd.save();
