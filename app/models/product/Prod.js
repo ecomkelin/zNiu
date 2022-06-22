@@ -22,7 +22,7 @@ const dbSchema = new Schema({
 	nome: String,									// [if(Pd !== null)只读] 产品名称
 	nomeTR: String,									// [if(Pd !== null)只读] 其他名称
 	unit: String,									// [if(Pd !== null)只读] 产品名称
-	img_sim: String, 								// [if(Pd !== null)只读] 产品图片
+	img_sm: String, 								// [if(Pd !== null)只读] 产品图片
 	img_url: String, 								// [if(Pd !== null)只读] 产品图片
 	img_urls: [String], 							// [if(Pd !== null)只读] 产品图片
 	Brand: {type: ObjectId, ref: 'Brand'},			// [if(Pd !== null)只读] 产品品牌

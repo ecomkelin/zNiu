@@ -24,12 +24,12 @@ exports.PdImg_sm = async(req, img_Dir) => {
 				let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
 				console.log(444, obj)
 				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
-				if(!files.img_url || !files.img_sim) return resolve({status: 400, message: "请传递files.img_url和files.img_sim"});
+				if(!files.img_url || !files.img_sm) return resolve({status: 400, message: "请传递files.img_url和files.img_sm"});
 
 				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
 
 				let imgUrl = files.img_url;
-				let imgSim = files.img_sim;
+				let imgSim = files.img_sm;
 				var orgUrlPath = imgUrl.path;
 				var orgSimPath = imgSim.path;
 				// 接收 图片的路由信息 以便分类存储图片， 如果路由信息不存在, 则放入默认文件夹
@@ -40,9 +40,9 @@ exports.PdImg_sm = async(req, img_Dir) => {
 					return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
 				}
 				var img_url = "/upload"+img_Dir+"/" + obj.code + '-' + payload._id + '.' + imgUrl_Type;
-				var img_sim = "/upload"+img_Dir+"/" + obj.code + '_sm-' + payload._id + '.' + imgSim_Type;
+				var img_sm = "/upload"+img_Dir+"/" + obj.code + '_sm-' + payload._id + '.' + imgSim_Type;
 				var newUrlPath = publicPath + img_url;
-				var newSimPath = publicPath + img_sim;
+				var newSimPath = publicPath + img_sm;
 				console.log(newUrlPath)
 				console.log(newSimPath)
 				fs.rename(orgUrlPath, newUrlPath, err => {
@@ -53,10 +53,10 @@ exports.PdImg_sm = async(req, img_Dir) => {
 					obj.img_url = img_url;
 					fs.rename(orgSimPath, newSimPath, err => {
 						if(err) {
-							console.log("img_sim", err)
-							return resolve({status: 400, message: "您传递的 img_sim 错误"});
+							console.log("img_sm", err)
+							return resolve({status: 400, message: "您传递的 img_sm 错误"});
 						}
-						obj.img_sim = img_sim;
+						obj.img_sm = img_sm;
 						return resolve({status: 200, data: {obj}})
 					})
 				})
