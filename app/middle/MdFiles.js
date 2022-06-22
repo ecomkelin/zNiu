@@ -19,11 +19,7 @@ exports.PdImg_sm = async(req, img_Dir) => {
 				if (err) return reject(err);
 				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
 				let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
-				console.log(100, fields.obj)
-				console.log(111)
 				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
-				console.log(333, files.img_url)
-				console.log(444, files.img_xs)
 				if(!files.img_url || !files.img_xs) return resolve({status: 400, message: "请传递files.img_url和files.img_xs"});
 
 				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
