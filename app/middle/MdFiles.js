@@ -35,8 +35,9 @@ exports.PdImg_sm = async(req, img_Dir) => {
 					this.rmPicture();
 					return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
 				}
-				var img_url = "/upload"+img_Dir+"/" + obj.code + '-' + payload._id + '.' + imgUrl_Type;
-				var img_xs = "/upload"+img_Dir+"/" + obj.code + '_sm-' + payload._id + '.' + imgSim_Type;
+				var dateNow = Date.now();
+				var img_url = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '-' + payload._id + '.' + imgUrl_Type;
+				var img_xs = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '_sm-' + payload._id + '.' + imgSim_Type;
 				var newUrlPath = publicPath + img_url;
 				var newSimPath = publicPath + img_xs;
 
