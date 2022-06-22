@@ -240,11 +240,12 @@ exports.ProdDelete = async(req, res) => {
 
 		const pathObj = {_id: id};
 		Prod_path_Func(pathObj, payload);
-		PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
 
 		const Prod = await ProdDB.findOne(pathObj);
 		if(!Prod) return MdFilter.jsonFailed(res, {message: "没有找到此商品信息,请刷新重试"});
 		
+		PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
+
 		const codeFlag = Prod.codeFlag;
 
 		const Skus = await SkuDB.find({Prod: Prod._id});
