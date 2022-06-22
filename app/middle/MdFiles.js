@@ -15,15 +15,14 @@ exports.PdImg_sm = async(req, img_Dir) => {
 			let payload = req.payload;
 			let img_abs = uploadPath+img_Dir;
 			let form = formidable({ multiples: true, uploadDir: img_abs});
-			console.log(1111)
 			form.parse(req, (err, fields, files) => {
-				console.log(222)
 				if (err) return reject(err);
-				console.log(333, JSON.parse(fields.obj));
 				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
 				let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
-				console.log(444, obj)
+				console.log(111, files)
 				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
+				console.log(222, files.img_url)
+				console.log(333, files.img_sm)
 				if(!files.img_url || !files.img_sm) return resolve({status: 400, message: "请传递files.img_url和files.img_sm"});
 
 				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
@@ -43,8 +42,7 @@ exports.PdImg_sm = async(req, img_Dir) => {
 				var img_sm = "/upload"+img_Dir+"/" + obj.code + '_sm-' + payload._id + '.' + imgSim_Type;
 				var newUrlPath = publicPath + img_url;
 				var newSimPath = publicPath + img_sm;
-				console.log(newUrlPath)
-				console.log(newSimPath)
+
 				fs.rename(orgUrlPath, newUrlPath, err => {
 					if(err) {
 						console.log("img_url", err)
