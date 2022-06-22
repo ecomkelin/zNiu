@@ -37,6 +37,9 @@ exports.PdDelete = async(req, res) => {
 		}
 
 		const objDel = await PdDB.deleteOne({_id: Pd._id});
+		if(Pd.img_url && Pd.img_url.split("Pd").length > 1) await MdFiles.rmPicture(Pd.img_url);
+		if(Pd.img_xs && Pd.img_xs.split("Pd").length > 1) await MdFiles.rmPicture(Pd.img_xs);
+
 		return MdFilter.jsonSuccess(res, {message: "PdDelete"});
 	} catch(error) {
 		return MdFilter.json500(res, {message: "PdDelete", error});

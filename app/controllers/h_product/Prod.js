@@ -269,6 +269,9 @@ exports.ProdDelete = async(req, res) => {
 			await put_ProdMatch(codeFlag, payload.Shop);
 		}
 
+		if(Prod.img_url && Prod.img_url.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_url);
+		if(Prod.img_xs && Prod.img_xs.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_xs);
+
 		return MdFilter.jsonSuccess(res, {message: "ProdDelete"});
 	} catch(error) {
 		return MdFilter.json500(res, {message: "ProdDelete", error});
