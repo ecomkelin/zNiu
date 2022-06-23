@@ -212,7 +212,7 @@ const get_joinDB = (dbName, field) => {
 	lookup.localField = field;
 	lookup.foreignField = "_id";
 	lookup.as = field;
-	lookup.pipeline = [{$project: {code: 1, nome: 1, img_urls: 1}} ];
+	lookup.pipeline = [{$project: {code: 1, nome: 1, img_url: 1}} ];
 	return lookup;
 }
 const get_DB = (dbName) => {
