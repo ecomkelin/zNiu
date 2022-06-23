@@ -86,7 +86,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 
 		}
 
-		const objSame = await ProdDB.findOne({'code': obj.code, Shop: payload.Shop});
+		const objSame = await ProdDB.findOne({'code': obj.code, Shop: payload.Shop._id});
 		if(objSame) {
 			if(obj.Supplier) {
 				return MdFilter.jsonFailed(res, {message: "供应商下 已经有此编号"});
@@ -121,7 +121,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 
 		// 如果是批发商 那么就把codeFlag相同的 匹配到一起
 		if(payload.Shop.typeShop === "ws" && save_res.status === 200) {
-			await put_ProdMatch(obj.codeFlag, payload.Shop);
+			await put_ProdMatch(obj.codeFlag, payload.Shop._id);
 		}
 
 		return MdFilter.jsonSuccess(res, save_res);
@@ -136,7 +136,7 @@ const Prod_PdSynchronize = async(res, Pd_id, payload) => {
 		Pd = await PdDB.findOne({_id: Pd_id, Firm: payload.Firm});
 		if(!Pd) return MdFilter.jsonFailed(res, {message: "没有找到此同步产品信息"});
 
-		const objSame = await ProdDB.findOne({Pd: Pd_id, Shop: payload.Shop, Firm: payload.Firm});
+		const objSame = await ProdDB.findOne({Pd: Pd_id, Shop: payload.Shop._id, Firm: payload.Firm});
 		if(objSame) return MdFilter.jsonFailed(res, {message: '此商品之前已经被同步', data: {object: objSame}});
 		const obj = Pd_to_Prod(Pd);
 		const save_res = await Prod_save_Prom(obj, payload, Pd);
@@ -162,7 +162,7 @@ const Prods_PdSynchronize = async(res, Pds, payload) => {
 				continue;
 			}
 
-			const objSame = await ProdDB.findOne({Pd: Pd_id, Shop: payload.Shop, Firm: payload.Firm});
+			const objSame = await ProdDB.findOne({Pd: Pd_id, Shop: payload.Shop._id, Firm: payload.Firm});
 			if(objSame) {
 				console.log('Prods_PdSynchronize: ['+Pd_id+'] 此商品之前已经被同步');
 				continue;
@@ -206,7 +206,7 @@ const Prod_save_Prom = async(obj, payload, Pd) => {
 			obj.Skus = [];
 			obj.is_usable = (obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') ? true: false;
 			obj.Firm = payload.Firm;
-			obj.Shop = payload.Shop;
+			obj.Shop = payload.Shop._id;
 			obj.User_crt = obj.User_upd = payload._id;
 			const _object = new ProdDB(obj);
 
@@ -266,7 +266,7 @@ exports.ProdDelete = async(req, res) => {
 		const objDel = await ProdDB.deleteOne({_id: Prod._id});
 
 		if(payload.Shop.typeShop === "ws") {
-			await put_ProdMatch(codeFlag, payload.Shop);
+			await put_ProdMatch(codeFlag, payload.Shop._id);
 		}
 
 		if(Prod.img_url && Prod.img_url.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_url);
@@ -358,7 +358,7 @@ exports.ProdPut = async(req, res) => {
 					if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 					const objSame = await ProdDB.findOne({
 						'code': obj.code,
-						Shop: payload.Shop,
+						Shop: payload.Shop._id,
 						_id: {'$ne': Prod._id}
 					});
 					if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
@@ -416,8 +416,8 @@ exports.ProdPut = async(req, res) => {
 		const objSave = await Prod.save();
 
 		if(payload.Shop.typeShop === "ws" && isWsChangeCodeFlag) {
-			put_ProdMatch(orgCodeFlag, payload.Shop);
-			put_ProdMatch(newCodeFlag, payload.Shop);
+			put_ProdMatch(orgCodeFlag, payload.Shop._id);
+			put_ProdMatch(newCodeFlag, payload.Shop._id);
 		}
 
 		return MdFilter.jsonSuccess(res, {message: "ProdPut", data: {object: objSave}});
@@ -454,7 +454,7 @@ const Prod_path_Func = (pathObj, payload, queryObj) => {
 		pathObj.Firm = payload.Firm;
 
 		if(payload.role >= ConfUser.role_set.boss) {
-			pathObj.Shop = payload.Shop;
+			pathObj.Shop = payload.Shop._id;
 		} else {
 			if(queryObj && queryObj.Shops) {
 				const ids = MdFilter.stringToObjectIds(queryObj.Shops);
@@ -518,7 +518,7 @@ const fNiu_zNiu = async(payload) => {
 		const p = ps[i];
 
 		p.Firm = payload.Firm;
-		p.Shop = payload.Shop;
+		p.Shop = payload.Shop._id;
 		p.is_simple = true;
 		p.Attrs = [];
 		p.Skus = [];

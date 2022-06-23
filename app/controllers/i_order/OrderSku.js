@@ -250,7 +250,7 @@ exports.OrderSkuPut = async(req, res) => {
 
 const vOrderSku_path_Func = (pathObj, payload, queryObj) => {
 	pathObj.Firm = payload.Firm;
-	if(payload.role > ConfUser.role_set.staff) pathObj.Shop = payload.Shop;
+	if(payload.role > ConfUser.role_set.staff) pathObj.Shop = payload.Shop._id;
 
 	if(!queryObj) return;
 	if(MdFilter.isObjectId(queryObj.Order) ) pathObj["Order"] = queryObj.Order;

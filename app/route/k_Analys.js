@@ -228,7 +228,7 @@ const judge_field = (dbName, field) => {
 const path_match = (dbName, match, payload) => {
 	if(!match) match = {};
 	match.Firm = payload.Firm;
-	if(payload.Shop) match.Shop = payload.Shop;
+	if(payload.Shop) match.Shop = payload.Shop._id;
 	if(dbName === 'Order' || dbName === 'OrderProd') match.type_Order = (match.type_Order === 1) ? 1: -1;
 	if(match.crt_after ) {
 		let crt_after = new Date(match.crt_after);

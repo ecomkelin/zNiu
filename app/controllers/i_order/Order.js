@@ -40,7 +40,7 @@ exports.OrderPost = async(req, res) => {
 		// 确认订单所属 (Shop)
 		if(ConfUser.role_Arrs.includes(payload.role)) {
 			if(payload.role < ConfUser.role_set.boss) return MdFilter.jsonFailed(res, {message: "您的身份不是店铺工作人员"});
-			obj_Order.Shop = payload.Shop;
+			obj_Order.Shop = payload.Shop._id;
 		} else {
 			if(!MdFilter.isObjectId(obj_Order.Shop)) return MdFilter.jsonFailed(res, {message: "请传递正确的Shop_id信息"});
 		}
@@ -554,7 +554,7 @@ const OrderDelete_Prom = (payload, id) => {
 				Firm: payload.Firm,
 				// is_hide_client: true,
 			};
-			if(payload.Shop) pathObj.Shop = payload.Shop;
+			if(payload.Shop) pathObj.Shop = payload.Shop._id;
 
 			const Order = await OrderDB.findOne(pathObj, {OrderProds: 1, type_Order: 1})
 				.populate({
@@ -602,7 +602,7 @@ const Order_path_Func = (pathObj, payload, queryObj) => {
 	if(payload.Firm) {
 		pathObj.Firm = payload.Firm;
 		if(payload.role >= ConfUser.role_set.pter) {
-			pathObj.Shop = payload.Shop;
+			pathObj.Shop = payload.Shop._id;
 		}
 	} else {
 		pathObj.is_hide_client = false;

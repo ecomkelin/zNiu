@@ -11,7 +11,7 @@ const OrderProd_path_Func = (pathObj, payload, queryObj) => {
 	if(payload.Firm) {
 		pathObj.Firm = payload.Firm;
 		if(payload.role >= ConfUser.role_set.pter) {
-			pathObj.Shop = payload.Shop;
+			pathObj.Shop = payload.Shop._id;
 		}
 	} else {
 		pathObj.is_hide_client = false;

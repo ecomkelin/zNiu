@@ -54,7 +54,7 @@ exports.UserPost = async(req, res) => {
 		}
 
 		if(payload.role === ConfUser.role_set.boss) {
-			obj.Shop = payload.Shop;
+			obj.Shop = payload.Shop._id;
 			obj.role = ConfUser.role_set.worker;
 		}
 		if(!obj.role) return MdFilter.jsonFailed(res, {message: "请选择用户权限"});
@@ -305,7 +305,7 @@ const obtFilterObj = (req, id) => {
 const User_path_Func = (pathObj, payload, queryObj) => {
 	pathObj.Firm = payload.Firm;
 	pathObj.role = {$gte: payload.role};
-	if(payload.Shop) pathObj.Shop = payload.Shop;
+	if(payload.Shop) pathObj.Shop = payload.Shop._id;
 	if(payload.role == ConfUser.role_set.staff || payload.role == ConfUser.role_set.worker) pathObj._id = payload._id;
 
 	if(!queryObj) return;
