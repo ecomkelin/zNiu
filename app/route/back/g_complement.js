@@ -21,6 +21,6 @@ module.exports = (app) => {
 
 
 	/* ------------------------ Pnome ------------------------ */
-	app.get('/api/b1/PnomeRevise', Pnome.PnomeRevise);
+	app.get('/api/b1/PnomeRevise', MdAuth.path_User, Pnome.PnomeRevise);
 	app.get('/api/b1/Pnomes', MdAuth.path_User, Pnome.Pnomes);
 };
