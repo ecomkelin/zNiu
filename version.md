@@ -1,3 +1,4 @@
+0.68	订单数字错误 则不能添加
 0.67	产品图片及压缩图
 0.66	Pnomes
 0.65	Prod 增加所属供应商 及 payload.typeShop
