@@ -69,7 +69,8 @@ exports.dbs = (GetDB_Filter) => {
 			let len_Objs = objects.length;
 			if(len_Objs > 0 && queryObj.search) {
 				pathObj.code = queryObj.search.replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase();
-				object = await objectDB.findOne(pathObj, selectObj);
+				object = await objectDB.findOne(pathObj, selectObj)
+					.populate(populateObjs);
 				if(object && object._id) {
 					let i=0;
 					for(;i<len_Objs; i++) {
@@ -77,7 +78,7 @@ exports.dbs = (GetDB_Filter) => {
 					}
 					if(i === len_Objs) i--;
 					objects.splice(i, 1);
-					objects = [object, ...objects];
+					objects.unshift(object);
 				}
 			}
 			// console.log('obj', count)
