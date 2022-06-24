@@ -54,6 +54,7 @@ exports.dbs = (GetDB_Filter) => {
 			const selectObj = MdFilter.select_Func(queryObj.selects, queryObj.selectVal, dbName, payload);
 
 			const populateObjs = dbFilter.limitPopulate(queryObj.populateObjs, payload);
+			console.log("/dbs populateObjs", populateObjs);
 
 			if(queryObj.sortKeys) queryObj.sortKey = queryObj.sortKeys[queryObj.sortKeys.length -1];
 			if(queryObj.sortVals) queryObj.sortVal = queryObj.sortVals[queryObj.sortVals.length -1];
