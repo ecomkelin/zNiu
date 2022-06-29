@@ -1,3 +1,4 @@
+0.70	Sku price_cost
 0.69	object populate
 0.68	订单数字错误 则不能添加
 0.67	产品图片及压缩图

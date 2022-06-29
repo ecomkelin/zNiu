@@ -86,6 +86,12 @@ exports.SkuPost = async(req, res) => {
 		obj.price_sale = isNaN(parseFloat(obj.price_sale)) ? Prod.price_sale : parseFloat(obj.price_sale);
 		obj.limit_quantity = isNaN(parseInt(obj.limit_quantity)) ? 0 : parseInt(obj.limit_quantity);
 
+		if(isNaN(obj.price_cost)) {
+			obj.price_cost = Prod.price_cost;
+		} else {
+			obj.price_cost = parseFloat(obj.price_cost);
+		}
+
 		if(obj.is_controlStock == 1 || obj.is_controlStock === 'true') {
 			obj.is_controlStock = true;
 		} else if(obj.is_controlStock == 0 || obj.is_controlStock == "false") {
@@ -201,6 +207,13 @@ exports.SkuPut = async(req, res) => {
 		if(obj.quantity && !isNaN(parseInt(obj.quantity))) Sku.quantity =parseInt(obj.quantity);
 		if(obj.quantity_alert && !isNaN(parseInt(obj.quantity_alert))) Sku.quantity_alert =parseInt(obj.quantity_alert);
 		if(obj.purchase_note) Sku.purchase_note = obj.purchase_note;
+
+		if(obj.price_cost) {
+			obj.price_cost = parseFloat(obj.price_cost);
+			if(!isNaN(obj.price_cost)) Sku.price_cost = obj.price_cost;
+		}
+		if(obj.price_cost == 0) Sku.price_cost = 0;
+
 		Sku.is_controlStock = (obj.is_controlStock == 1 || obj.is_controlStock === 'true') ? true : false;
 
 		Sku.allow_backorder = (obj.allow_backorder == 1 || obj.allow_backorder === 'true') ? true : false;
