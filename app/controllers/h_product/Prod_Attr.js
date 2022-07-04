@@ -147,6 +147,15 @@ const Attr_optionPut = async(res, objs, Attr) => {
 
 			const options = [...Attr.options];
 
+			if(obj.optionPut !== obj.option) {
+				if(options.includes(obj.optionPut)) return MdFilter.jsonFailed(res, {message: "此属性值中, 已有此值"});
+				const option_UpdMany = await SkuDB.updateMany(
+					{Prod: Attr.Prod, attrs: { $elemMatch: {nome: Attr.nome, option: obj.option}}},
+					{ $set: { "attrs.$[elem].option" : obj.optionPut } },
+					{ arrayFilters: [ { "elem.option": obj.option } ], "multi": true }
+				)
+			}
+
 			if(obj.sort) {
 				obj.sort = parseInt(obj.sort);
 				if(isNaN(obj.sort)) obj.sort = index;
@@ -160,16 +169,7 @@ const Attr_optionPut = async(res, objs, Attr) => {
 			} else {
 				options[index] = obj.optionPut;
 			}
-			if(obj.optionPut !== obj.option) {
-				console.log(options)
-				console.log(obj.optionPut)
-				if(options.includes(obj.optionPut)) return MdFilter.jsonFailed(res, {message: "此属性值中, 已有此值"});
-				const option_UpdMany = await SkuDB.updateMany(
-					{Prod: Attr.Prod, attrs: { $elemMatch: {nome: Attr.nome, option: obj.option}}},
-					{ $set: { "attrs.$[elem].option" : obj.optionPut } },
-					{ arrayFilters: [ { "elem.option": obj.option } ], "multi": true }
-				)
-			}
+
 			Attr.options = options
 		}
 		// await AttrDB.updateOne({_id: Attr._id}, { options });
