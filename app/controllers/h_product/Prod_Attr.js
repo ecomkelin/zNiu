@@ -139,8 +139,8 @@ const Attr_optionPut = async(res, objs, Attr) => {
 			if(!obj.option) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 			// 新的 option 为 optionPut
 			if(!obj.optionPut) obj.optionPut = obj.option;
-			obj.option = obj.option.toUpperCase();
-			obj.optionPut = obj.optionPut.toUpperCase();
+			obj.option = obj.option.toUpperCase();	// 原option的值
+			obj.optionPut = obj.optionPut.toUpperCase();	// 要修改的值
 
 			const index = MdFilter.indexOfArray(Attr.options, obj.option);	// 获取原属性值的位置
 			if(index < 0) return MdFilter.jsonFailed(res, {message: "要修改的产品属性值 不存在"});
@@ -149,10 +149,10 @@ const Attr_optionPut = async(res, objs, Attr) => {
 
 			if(obj.sort) {
 				obj.sort = parseInt(obj.sort);
+				if(isNaN(obj.sort)) obj.sort = index;
 			} else {
 				obj.sort = index;
 			}
-			if(isNaN(obj.sort)) obj.sort = index;
 
 			if(obj.sort !== index) {
 				options.splice(index, 1);
@@ -160,7 +160,8 @@ const Attr_optionPut = async(res, objs, Attr) => {
 			} else {
 				options[index] = obj.optionPut;
 			}
-			if(obj.optionPut != obj.option) {
+			if(obj.optionPut !== obj.option) {
+				if(options.includes(obj.optionPut)) return MdFilter.jsonFailed(res, {message: "此属性值中, 已有此值"});
 				const option_UpdMany = await SkuDB.updateMany(
 					{Prod: Attr.Prod, attrs: { $elemMatch: {nome: Attr.nome, option: obj.option}}},
 					{ $set: { "attrs.$[elem].option" : obj.optionPut } },
