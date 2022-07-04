@@ -161,6 +161,8 @@ const Attr_optionPut = async(res, objs, Attr) => {
 				options[index] = obj.optionPut;
 			}
 			if(obj.optionPut !== obj.option) {
+				console.log(options)
+				console.log(obj.optionPut)
 				if(options.includes(obj.optionPut)) return MdFilter.jsonFailed(res, {message: "此属性值中, 已有此值"});
 				const option_UpdMany = await SkuDB.updateMany(
 					{Prod: Attr.Prod, attrs: { $elemMatch: {nome: Attr.nome, option: obj.option}}},
