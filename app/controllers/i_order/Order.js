@@ -180,7 +180,7 @@ exports.OrderPost = async(req, res) => {
 			if(Prod.is_simple === true) {
 				if(isNaN(obj_OrderProd.quantity)) continue;
 				// 简单的更改库存
-				let quantity = obj_Order.type_Order * obj_OrderProd.quantity
+				let quantity = parseInt(obj_Order.type_Order * obj_OrderProd.quantity);
 				await ProdDB.update({"_id" : Prod._id},{$inc: {quantity}} );
 				// await Prod.save();	// 为了更新其他数据
 
@@ -242,7 +242,7 @@ exports.OrderPost = async(req, res) => {
 
 					obj_OrderSku.quantity = parseInt(obj_OrderSku.quantity);
 					if(isNaN(obj_OrderSku.quantity) || obj_OrderSku.quantity < 1) continue;
-					let quantity = obj_Order.type_Order * obj_OrderSku.quantity;
+					let quantity = parseInt(obj_Order.type_Order * obj_OrderSku.quantity);
 					await SkuDB.update({"_id" : Sku._id},{$inc: {quantity}} );
 					obj_OrderSku.weight = Sku.weight || 0;
 					// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格

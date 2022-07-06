@@ -249,11 +249,34 @@ exports.OrderSkuPut = async(req, res) => {
 
 
 const vOrderSku_path_Func = (pathObj, payload, queryObj) => {
-	pathObj.Firm = payload.Firm;
-	if(payload.role > ConfUser.role_set.staff) pathObj.Shop = payload.Shop._id;
+	if(payload.Firm) {
+		pathObj.Firm = payload.Firm;
+		if(payload.role >= ConfUser.role_set.pter) {
+			pathObj.Shop = payload.Shop._id;
+		}
+	} else {
+		pathObj.is_hide_client = false;
+		pathObj.Client = payload._id;
+	}
 
 	if(!queryObj) return;
 	if(MdFilter.isObjectId(queryObj.Order) ) pathObj["Order"] = queryObj.Order;
+	if(MdFilter.isObjectId(queryObj.Prod) ) pathObj.Prod = queryObj.Prod; 
+	if(MdFilter.isObjectId(queryObj.Sku) ) pathObj.Sku = queryObj.Sku; 
+	if(queryObj.Clients) {
+		const arrs = MdFilter.stringToObjectIds(queryObj.Clients);
+		if(arrs.length > 0) pathObj.Client = {"$in": arrs};
+	}
+	if(queryObj.Suppliers) {
+		const arrs = MdFilter.stringToObjectIds(queryObj.Suppliers);
+		if(arrs.length > 0) pathObj.Supplier = {"$in": arrs};
+	}
+
+	if(queryObj.Shops && payload.role < ConfUser.role_set.pter) {
+		const arrs = MdFilter.stringToObjectIds(queryObj.Shops);
+		if(arrs.length > 0) pathObj.Shop = {"$in": arrs};
+	}
+	pathObj.type_Order = (queryObj.type_Order == 1) ? 1 : -1;
 }
 const dbOrderSku = 'OrderSku';
 
