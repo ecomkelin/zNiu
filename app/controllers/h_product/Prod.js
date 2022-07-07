@@ -420,7 +420,22 @@ exports.ProdPut = async(req, res) => {
 			put_ProdMatch(newCodeFlag, payload.Shop._id);
 		}
 
-		return MdFilter.jsonSuccess(res, {message: "ProdPut", data: {object: objSave}});
+		if(req.query.populateObjs) {
+			const GetDB_Filter = {
+				id: objSave._id,
+				payload,
+				queryObj: req.query,
+				objectDB: ProdDB,
+				path_Callback: Prod_path_Func,
+				dbName: dbProd,
+			};
+			const db_res = await GetDB.db(GetDB_Filter);
+			console.log("post getDB");
+			return MdFilter.jsonSuccess(res, db_res);
+		} else {
+			return MdFilter.jsonSuccess(res, {message: "ProdPut", data: {object: objSave}});
+		}
+		
 	} catch(error) {
 		return MdFilter.json500(res, {message: "ProdPut", error});
 	}
