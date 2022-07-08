@@ -99,7 +99,8 @@ exports.SkuPost = async(req, res) => {
 		} else {
 			obj.is_controlStock = true;
 		}
-		obj.quantity = (obj.quantity) ? parseInt(obj.quantity) : 0;
+		obj.quantity = parseInt(obj.quantity);
+		if(isNaN(obj.quantity)) obj.quantity = 0;
 		obj.quantity_alert = (obj.quantity_alert) ? parseInt(obj.quantity_alert) : 0;
 
 		if(obj.allow_backorder == 1 || obj.allow_backorder === 'true') {

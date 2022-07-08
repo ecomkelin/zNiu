@@ -178,14 +178,16 @@ exports.OrderPost = async(req, res) => {
 
 			let _OrderProd
 			if(Prod.is_simple === true) {
-				if(isNaN(obj_OrderProd.quantity)) continue;
-				// 简单的更改库存
-				let quantity = parseInt(obj_Order.type_Order * obj_OrderProd.quantity);
-				await ProdDB.update({"_id" : Prod._id},{$inc: {quantity}} );
-				// await Prod.save();	// 为了更新其他数据
-
 				obj_OrderProd.quantity = parseInt(obj_OrderProd.quantity);
 				obj_OrderProd.weight = Prod.weight || 0;
+
+				if(isNaN(obj_OrderProd.quantity)) continue;
+
+				// 简单的更改库存
+				let quantity = parseInt(obj_Order.type_Order) * obj_OrderProd.quantity;
+				if(isNaN(quantity)) continue;
+
+				await ProdDB.update({"_id" : Prod._id},{$inc: {quantity}} );
 
 				// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
 				obj_OrderProd.price_regular = (type_Order === 1) ? Prod.price_cost : Prod.price_regular;
@@ -241,7 +243,7 @@ exports.OrderPost = async(req, res) => {
 					if(Sku.attrs) Sku.attrs.forEach(attr => obj_OrderSku.attrs += `${attr.nome}:${attr.option},`);
 
 					obj_OrderSku.quantity = parseInt(obj_OrderSku.quantity);
-					if(isNaN(obj_OrderSku.quantity) || obj_OrderSku.quantity < 1) continue;
+					if(isNaN(obj_OrderSku.quantity)) continue;
 					let quantity = parseInt(obj_Order.type_Order * obj_OrderSku.quantity);
 					await SkuDB.update({"_id" : Sku._id},{$inc: {quantity}} );
 					obj_OrderSku.weight = Sku.weight || 0;
@@ -452,7 +454,7 @@ exports.OrderPutBack = async(req, res) => {
 				dbName: dbOrder,
 			};
 			const db_res = await GetDB.db(GetDB_Filter);
-			console.log("post getDB");
+
 			return MdFilter.jsonSuccess(res, db_res);
 		} else {
 			return MdFilter.jsonSuccess(res, {message: "OrderPutBack", data: {object: objSave}});
@@ -570,17 +572,19 @@ const OrderDelete_Prom = (payload, id) => {
 				});
 			if(!Order) return resolve({status: 400, message: "没有找到此订单信息"});
 			// console.log(Order)
-			let quantity = parseInt(Order.type_Order);
+			let sign = -parseInt(Order.type_Order);
 			for(let i=0; i<Order.OrderProds.length; i++) {
 				const OrderProd = Order.OrderProds[i];
 				// console.log(OrderProd)
 				if(OrderProd.is_simple === true) {
-					quantity = -(quantity * OrderProd.quantity);
+					let quantity = parseInt(sign * OrderProd.quantity);
+					if(isNaN(quantity)) return resolve({status: 500, message: "OrderDelete isNaN(quantity)"});
 					await ProdDB.update({"_id" : OrderProd.Prod},{$inc: {quantity}} );
 				} else {
 					for(let j=0; j<OrderProd.OrderSkus.length; j++) {
 						const OrderSku = OrderProd.OrderSkus[j];
-						quantity = -(quantity* OrderSku.quantity);
+						let quantity = parseInt(sign* OrderSku.quantity);
+						if(isNaN(quantity)) return resolve({status: 500, message: "OrderDelete isNaN(quantity)"});
 						await SkuDB.update({"_id": OrderSku.Sku}, {$inc: {quantity}});
 					}
 				}

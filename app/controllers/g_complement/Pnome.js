@@ -107,7 +107,7 @@ const setPnomes = async(req, res, Prods, n) => {
 		// 如果Prod 没有名称就跳过
 		if(!Prod.nome || Prod.nome.length == 0) return setPnomes(req, res, Prods, n+1);
 
-		// 统一名称
+		// 统一名称 如果名称不统一则修改产品名称并保存
 		pnome = Prod.nome.replace(/\s+/g,"").toUpperCase();
 		if(pnome != Prod.nome) {
 			Prod.nome = pnome;

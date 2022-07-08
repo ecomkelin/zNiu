@@ -430,7 +430,7 @@ exports.ProdPut = async(req, res) => {
 				dbName: dbProd,
 			};
 			const db_res = await GetDB.db(GetDB_Filter);
-			console.log("post getDB");
+			db_res.message = "Prod 修改成功"
 			return MdFilter.jsonSuccess(res, db_res);
 		} else {
 			return MdFilter.jsonSuccess(res, {message: "ProdPut", data: {object: objSave}});
