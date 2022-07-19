@@ -62,8 +62,8 @@ exports.dbs = (GetDB_Filter) => {
 			// console.log('dbs pathObj: ', pathObj)
 			const count = await objectDB.countDocuments(pathObj);
 			let objects = await objectDB.find(pathObj, selectObj)
-				.skip(skip).limit(pagesize)
 				.sort(sortObj)
+				.skip(skip).limit(pagesize)
 				.populate(populateObjs);
 			let object = null;
 			let len_Objs = objects.length;
