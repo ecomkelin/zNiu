@@ -187,7 +187,7 @@ exports.OrderPost = async(req, res) => {
 				let quantity = parseInt(obj_Order.type_Order) * obj_OrderProd.quantity;
 				if(isNaN(quantity)) continue;
 
-				await ProdDB.update({"_id" : Prod._id},{$inc: {quantity}} );
+				await ProdDB.updateOne({"_id" : Prod._id},{$inc: {quantity}} );
 
 				// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
 				obj_OrderProd.price_regular = (type_Order === 1) ? Prod.price_cost : Prod.price_regular;
@@ -245,7 +245,7 @@ exports.OrderPost = async(req, res) => {
 					obj_OrderSku.quantity = parseInt(obj_OrderSku.quantity);
 					if(isNaN(obj_OrderSku.quantity)) continue;
 					let quantity = parseInt(obj_Order.type_Order * obj_OrderSku.quantity);
-					await SkuDB.update({"_id" : Sku._id},{$inc: {quantity}} );
+					await SkuDB.updateOne({"_id" : Sku._id},{$inc: {quantity}} );
 					obj_OrderSku.weight = Sku.weight || 0;
 					// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
 					obj_OrderSku.price_regular = (type_Order === 1) ? Sku.price_cost : Sku.price_regular;
@@ -579,13 +579,13 @@ const OrderDelete_Prom = (payload, id) => {
 				if(OrderProd.is_simple === true) {
 					let quantity = parseInt(sign * OrderProd.quantity);
 					if(isNaN(quantity)) return resolve({status: 500, message: "OrderDelete isNaN(quantity)"});
-					await ProdDB.update({"_id" : OrderProd.Prod},{$inc: {quantity}} );
+					await ProdDB.updateOne({"_id" : OrderProd.Prod},{$inc: {quantity}} );
 				} else {
 					for(let j=0; j<OrderProd.OrderSkus.length; j++) {
 						const OrderSku = OrderProd.OrderSkus[j];
 						let quantity = parseInt(sign* OrderSku.quantity);
 						if(isNaN(quantity)) return resolve({status: 500, message: "OrderDelete isNaN(quantity)"});
-						await SkuDB.update({"_id": OrderSku.Sku}, {$inc: {quantity}});
+						await SkuDB.updateOne({"_id": OrderSku.Sku}, {$inc: {quantity}});
 					}
 				}
 			}
