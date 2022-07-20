@@ -15,14 +15,13 @@ exports.CategPost = async(req, res) => {
 	try{
 		const payload = req.payload;
 
-		const obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Categ", field: "img_url"});
+		let obj = req.body.obj;
+		if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Categ", field: "img_url"});
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
-
 		obj.code = obj.nome;
 		const errorInfo = MdFilter.objMatchStint(StintCateg, obj, ['code']);
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 		obj.nome = obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
-
 		obj.Firm = payload.Firm;
 		if(payload.Shop) obj.Shop = payload.Shop;
 		obj.User_crt = payload._id;
@@ -32,11 +31,9 @@ exports.CategPost = async(req, res) => {
 		if(payload.Shop) match.Shop = payload.Shop;
 		const objSame = await CategDB.findOne(match);
 		if(objSame) return MdFilter.jsonFailed(res, {message: '分类编号或名称相同'});
-
 		const _object = new CategDB(obj);
 
 		let object = await _object.save();
-
 		return MdFilter.jsonSuccess(res, {message: "创建成功", data: {object}});
 	} catch(error) {
 		return MdFilter.json500(res, {message: "CategPost", error});
