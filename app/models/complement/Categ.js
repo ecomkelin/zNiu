@@ -5,12 +5,8 @@ const ObjectId = Schema.Types.ObjectId;
 
 const colection = 'Categ';
 const dbSchema = new Schema({
-	type: Number,									// [只读 绝对] 	enum: [1, 2];
-	level: Number, 									// [只读 绝对]	enum: [1, 2, 3];
-	Categ_far: {type: ObjectId, ref: 'Categ'},
-	Categ_sons: [{type: ObjectId, ref: 'Categ'}],	// [只读 绝对]
-
 	code: String,
+	nome: String,
 
 	img_url: String,
 
@@ -27,6 +23,7 @@ const dbSchema = new Schema({
 	at_upd: Date,									// [只读 绝对]
 	at_crt: Date,									// [只读 绝对]
 	Firm: {type: ObjectId, ref: 'Firm'},			// [只读 绝对]
+	Shop: {type: ObjectId, ref: 'Shop'},			// [只读 绝对]
 });
 
 dbSchema.pre('save', function(next) {

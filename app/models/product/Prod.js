@@ -27,7 +27,7 @@ const dbSchema = new Schema({
 	img_urls: [String], 							// [if(Pd !== null)只读] 产品图片
 	Brand: {type: ObjectId, ref: 'Brand'},			// [if(Pd !== null)只读] 产品品牌
 	Nation: {type: ObjectId, ref: 'Nation'},		// [if(Pd !== null)只读] 产品国家 比如 中国货 意大利货 日本货 韩国货
-	Categ: {type: ObjectId, ref: 'Categ'},			// [if(Pd !== null)只读] 
+	Categs: [{type: ObjectId, ref: 'Categ'}],			// [if(Pd !== null)只读] 
 
 	weight: Float,
 	iva: Float, 									// [只读] 	税 意大利 默认 22

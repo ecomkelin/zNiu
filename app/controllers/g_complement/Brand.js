@@ -24,7 +24,9 @@ exports.BrandPost = async(req, res) => {
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 
-		const objSame = await BrandDB.findOne({$or:[{'code': obj.code}, {'nome': obj.nome}], Firm: payload.Firm});
+		let match = {$or:[{'code': obj.code}, {'nome': obj.nome}], Firm: payload.Firm};
+		if(payload.Shop) match.Shop = payload.Shop;
+		const objSame = await BrandDB.findOne(match);
 		if(objSame) return MdFilter.jsonFailed(res, {message: '品牌编号或名称相同'});
 
 		// if(!MdFilter.isObjectId(obj.Nation)) return MdFilter.jsonFailed(res, {message: '请输入品牌所属国家'});
@@ -32,6 +34,7 @@ exports.BrandPost = async(req, res) => {
 		// if(!Nation) return MdFilter.jsonFailed(res, {message: '没有找到您选择的国家信息'});
 
 		obj.Firm = payload.Firm;
+		if(payload.Shop) obj.Shop = payload.Shop;
 		obj.User_crt = payload._id;
 		const _object = new BrandDB(obj);
 		const objSave = await _object.save();
@@ -96,7 +99,9 @@ exports.BrandPut = async(req, res) => {
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 
 		if(obj.code !== Brand.code || obj.nome !== Brand.nome) {
-			const objSame = await BrandDB.findOne({_id: {$ne: Brand._id}, $or:[{'code': obj.code}, {'nome': obj.nome}], Firm: payload.Firm});
+			let match = {_id: {$ne: Brand._id}, $or:[{'code': obj.code}, {'nome': obj.nome}], Firm: payload.Firm};
+			if(payload.Shop) match.Shop = payload.Shop;
+			const objSame = await BrandDB.findOne(match);
 			if(objSame) return MdFilter.jsonFailed(res, {message: '此品牌编号已被占用, 请查看'});
 		}
 
@@ -131,6 +136,7 @@ exports.BrandPut = async(req, res) => {
 const Brand_path_Func = (pathObj, payload, queryObj) => {
 	if(payload.Firm) {
 		pathObj.Firm = payload.Firm;
+		if(payload.Shop) pathObj.Shop = payload.Shop;
 		if(payload.role > ConfUser.role_set.manager) {
 			pathObj.is_usable = 1;
 		}

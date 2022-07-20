@@ -25,6 +25,7 @@ const dbSchema = new Schema({
 	at_upd: Date,								// [只读 自动]
 	at_crt: Date,								// [只读 绝对]
 	Firm: {type: ObjectId, ref: 'Firm'},		// [只读 绝对]
+	Shop: {type: ObjectId, ref: 'Shop'},		// [只读 绝对]
 });
 
 dbSchema.pre('save', function(next) {

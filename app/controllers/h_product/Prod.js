@@ -110,7 +110,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 
 		if(!MdFilter.isObjectId(obj.Brand)) obj.Brand = null;
 		if(!MdFilter.isObjectId(obj.Nation)) obj.Nation = null;
-		if(!MdFilter.isObjectId(obj.Categ)) obj.Categ = null;
+		if(!MdFilter.isObjectId(obj.Categs)) obj.Categs = [];
 
 		if(!isNaN(obj.limit_quantity)) obj.limit_quantity = parseInt(obj.limit_quantity);
 		if(!isNaN(obj.quantity_pack)) obj.quantity_pack = parseInt(obj.quantity_pack);
@@ -179,7 +179,6 @@ const Prods_PdSynchronize = async(res, Pds, payload) => {
 const Pd_to_Prod = (Pd) => {
 	const obj = {};
 	obj.Pd = Pd._id;
-	if(Pd.Categ) obj.Categ = Pd.Categ;
 	obj.sort = Pd.sort;
 
 	obj.code = Pd.code;
@@ -382,7 +381,7 @@ exports.ProdPut = async(req, res) => {
 			if(Prod.nomeTR) Prod.nomeTR = Prod.nomeTR.replace(/^\s*/g,"");	// 注意 Pd nomeTR 没有转大写
 			if(obj.Nation) Prod.Nation = obj.Nation;
 			if(obj.Brand) Prod.Brand = obj.Brand;
-			if(obj.Categ) Prod.Categ = obj.Categ;
+			if(obj.Categs) Prod.Categs = obj.Categs;
 			if(obj.weight) {
 				obj.weight = parseFloat(obj.weight);
 				if(!isNaN(obj.weight)) Prod.weight = obj.weight;
@@ -495,7 +494,7 @@ const Prod_path_Func = (pathObj, payload, queryObj) => {
 	}
 	if(queryObj.Categs) {
 		const ids = MdFilter.stringToObjectIds(queryObj.Categs);
-		pathObj["Categ"] = {$in: ids};
+		pathObj["Categs"] = {$in: ids};
 	}
 }
 // let flag = 1;
