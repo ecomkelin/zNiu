@@ -78,7 +78,7 @@ exports.PdPost = async(req, res) => {
 
 		if(!MdFilter.isObjectId(obj.Brand)) obj.Brand = null;
 		if(!MdFilter.isObjectId(obj.Nation)) obj.Nation = null;
-		if(!MdFilter.isObjectId(obj.Categ)) obj.Categ = null;
+		if(!MdFilter.ArrIsObjectId(obj.Categs)) obj.Categs = null;
 
 		obj.Firm = payload.Firm;
 		obj.User_crt = payload._id;
@@ -208,29 +208,18 @@ const Pd_general = async(res, obj, Pd, payload) => {
 			}
 		}
 
-		if(obj.Nation && (obj.Nation != Pd.Nation)) {
-			if(!MdFilter.isObjectId(obj.Nation)) return MdFilter.jsonFailed(res, {message: '国家数据需要为 _id 格式'});
-			const Nation = await NationDB.findOne({_id: obj.Nation});
-			if(!Nation) return MdFilter.jsonFailed(res, {message: '没有找到此国家信息'});
+		if(MdFilter.isObjectId(obj.Nation) && (obj.Nation != Pd.Nation)) {
 			updManyProdObj.Nation = obj.Nation;
 			Pd.Nation = obj.Nation;
 		}
-		if(obj.Brand && (obj.Brand != Pd.Brand)) {
-			if(!MdFilter.isObjectId(obj.Brand)) return MdFilter.jsonFailed(res, {message: '品牌数据需要为 _id 格式'});
-			const Brand = await BrandDB.findOne({_id: obj.Brand});
-			if(!Brand) return MdFilter.jsonFailed(res, {message: '没有找到此品牌信息'});
+		if(MdFilter.isObjectId(obj.Brand) && (obj.Brand != Pd.Brand)) {
 			updManyProdObj.Brand = obj.Brand;
 			Pd.Brand = obj.Brand;
 		}
 
-		if(obj.Categ) {
-			if(!MdFilter.isObjectId(obj.Categ)) return MdFilter.jsonFailed(res, {message: '请输入正确的分类'});
-			if(String(obj.Categ) !== String(Pd.Categ) ) {
-				const Categ = await CategDB.findOne({_id: obj.Categ, Firm: payload.Firm, level: 2});
-				if(!Categ) return MdFilter.jsonFailed(res, {message: "您的二级分类不正确, 请输入正确的二级分类"});
-				updManyProdObj.Categ = obj.Categ;
-				Pd.Categ = obj.Categ;
-			}
+		if(MdFilter.ArrIsObjectId(obj.Categs)) {
+			updManyProdObj.Categs = obj.Categs;
+			Pd.Categs = obj.Categs;
 		}
 
 		if(obj.img_url && (obj.img_url != Pd.img_url) && Pd.img_url && Pd.img_url.split("Pd").length > 1){
@@ -336,11 +325,17 @@ const Pd_path_Func = (pathObj, payload, queryObj) => {
 	}
 
 	if(!queryObj) return;
-	if(MdFilter.isObjectId(queryObj.Brand) ) pathObj["Brand"] = queryObj.Brand;
-	if(MdFilter.isObjectId(queryObj.Nation) ) pathObj["Nation"] = queryObj.Nation;
+	if(queryObj.Brands) {
+		let ids = MdFilter.stringToObjectIds(queryObj.Brands);
+		pathObj["Brand"] = {$in: ids};
+	}
+	if(queryObj.Nations) {
+		let ids = MdFilter.stringToObjectIds(queryObj.Nations);
+		pathObj["Nation"] = {$in: ids};
+	}
 	if(queryObj.Categs) {
-		const ids = MdFilter.stringToObjectIds(queryObj.Categs);
-		pathObj["Categ"] = {$in: ids};
+		let ids = MdFilter.stringToObjectIds(queryObj.Categs);
+		pathObj["Categs"] = {$in: ids};
 	}
 }
 

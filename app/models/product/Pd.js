@@ -17,7 +17,7 @@ const dbSchema = new Schema({
 	img_urls: [String], 						// imgs
 	Brand: {type: ObjectId, ref: 'Brand'},
 	Nation: {type: ObjectId, ref: 'Nation'},
-	Categ: {type: ObjectId, ref: 'Categ'},
+	Categs: [{type: ObjectId, ref: 'Categ'}],
 
 	/* 同步 可修改 */
 	desp: String,

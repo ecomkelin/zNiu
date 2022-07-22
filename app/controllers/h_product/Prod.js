@@ -110,7 +110,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 
 		if(!MdFilter.isObjectId(obj.Brand)) obj.Brand = null;
 		if(!MdFilter.isObjectId(obj.Nation)) obj.Nation = null;
-		if(!MdFilter.isObjectId(obj.Categs)) obj.Categs = [];
+		if(!MdFilter.ArrIsObjectId(obj.Categs)) obj.Categs = [];
 
 		if(!isNaN(obj.limit_quantity)) obj.limit_quantity = parseInt(obj.limit_quantity);
 		if(!isNaN(obj.quantity_pack)) obj.quantity_pack = parseInt(obj.quantity_pack);
@@ -191,6 +191,7 @@ const Pd_to_Prod = (Pd) => {
 	obj.img_urls = Pd.img_urls;
 	obj.Brand = Pd.Brand;
 	obj.Nation = Pd.Nation;
+	obj.Categs = Pd.Categs;
 
 	obj.desp = Pd.desp;
 	obj.unit = Pd.unit;
@@ -379,9 +380,9 @@ exports.ProdPut = async(req, res) => {
 
 			Prod.nomeTR = obj.nomeTR;
 			if(Prod.nomeTR) Prod.nomeTR = Prod.nomeTR.replace(/^\s*/g,"");	// 注意 Pd nomeTR 没有转大写
-			if(obj.Nation) Prod.Nation = obj.Nation;
-			if(obj.Brand) Prod.Brand = obj.Brand;
-			if(obj.Categs) Prod.Categs = obj.Categs;
+			if(MdFilter.isObjectId(obj.Nation)) Prod.Nation = obj.Nation;
+			if(MdFilter.isObjectId(obj.Brand)) Prod.Brand = obj.Brand;
+			if(MdFilter.ArrIsObjectId(obj.Categs)) Prod.Categs = obj.Categs;
 			if(obj.weight) {
 				obj.weight = parseFloat(obj.weight);
 				if(!isNaN(obj.weight)) Prod.weight = obj.weight;
