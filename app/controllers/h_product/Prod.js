@@ -21,10 +21,13 @@ const PdnomeCT = require("../g_complement/Pnome");
 
 const modify_Prods = [];
 
-const setModify_Prods = (Prod) => {
+const setModify_Prods = (Prod, isDel) => {
 	const modify_Prod = {
 		at_upd: Date.now(),
 		Prod
+	}
+	if(isDel) {
+		modify_Prod.isDel = isDel;
 	}
 
 	const index = MdFilter.indexOfArrayObject(modify_Prods, "Prod", Prod);
@@ -45,15 +48,22 @@ exports.modifyProds = (req, res) => {
 	let timestamp = parseInt(req.query.timestamp);
 	if(isNaN(timestamp)) return MdFilter.jsonFailed(res, {message: "请传递正确的时间戳 query.timestamp"});
 	const mProds = [];
+	const dProds = [];
+	let is_modify = false;
 	for(let i=modify_Prods.length-1; i>=0; i--) {
-		if(timestamp - modify_Prods[i].at_upd < 0) {
-			mProds.push(modify_Prods[i].Prod);
+		let mdProd = modify_Prods[i];
+		if(timestamp - mdProd.at_upd < 0) {
+			is_modify = true;
+			if(mdProd.isDel) {
+				dProds.push(mdProd.Prod);
+			} else {
+				mProds.push(mdProd.Prod);
+			}
 		} else {
 			break;
 		}
 	}
 	console.log("end", mProds);
-	let is_modify = (mProds.length > 0) ? true : false;
 	return MdFilter.jsonSuccess(res, {data: {is_modify, mProds}});
 }
 
@@ -302,7 +312,7 @@ exports.ProdDelete = async(req, res) => {
 		const objDel = await ProdDB.deleteOne({_id: Prod._id});
 
 
-		setModify_Prods(Prod._id);
+		setModify_Prods(Prod._id, true);
 
 
 		if(payload.Shop.typeShop === "ws") {
