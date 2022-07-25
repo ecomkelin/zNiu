@@ -46,12 +46,15 @@ exports.modifyProds = (req, res) => {
 	if(isNaN(timestamp)) return MdFilter.jsonFailed(res, {message: "请传递正确的时间戳 query.timestamp"});
 
 	const mProds = [];
-	for(let i=0; i<modify_Prods.length; i++) {
+	for(let i=modify_Prods.length-1; i>=0; i--) {
 		if(timestamp - modify_Prods[i].at_upd < 0) {
 			mProds.push(modify_Prods[i].Prod);
-		};
+		} else {
+			break;
+		}
 	}
-	return MdFilter.jsonSuccess(res, {data: {mProds}});
+	let is_modify = (mProds.length > 0) ? true : false;
+	return MdFilter.jsonSuccess(res, {data: {is_modify, mProds}});
 }
 
 exports.ProdPost = async(req, res) => {
