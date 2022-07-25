@@ -19,6 +19,40 @@ const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
 const PdnomeCT = require("../g_complement/Pnome");
 
+const modify_Prods = [];
+
+const setModify_Prods = (Prod) => {
+	const modify_Prod = {
+		at_upd: Date.now(),
+		Prod
+	}
+
+	const index = MdFilter.indexOfArrayObject(modify_Prods, "Prod", Prod);
+	if(index < -1) {
+		return MdFilter.jsonFailed(res, {message: "modify_Prods 数据错误 请联系管理员"});
+	} else if(index > -1) {
+		modify_Prods.splice(index, 1);	// 删除
+	}
+	modify_Prods.push(modify_Prod);
+
+	let i=0;
+	for(; i<modify_Prods.length; i++) {
+		if(Date.now() - modify_Prods[i].at_upd < 7*24*60*60*1000) break;
+	}
+	modify_Prods.splice(0, i);
+}
+exports.modifyProds = (req, res) => {
+	let timestamp = parseInt(req.query.timestamp);
+	if(isNaN(timestamp)) return MdFilter.jsonFailed(res, {message: "请传递正确的时间戳 query.timestamp"});
+
+	const mProds = [];
+	for(let i=0; i<modify_Prods.length; i++) {
+		if(timestamp - modify_Prods[i].at_upd < 0) {
+			mProds.push(modify_Prods[i].Prod);
+		};
+	}
+	return MdFilter.jsonSuccess(res, {data: {mProds}});
+}
 
 exports.ProdPost = async(req, res) => {
 	console.log("/ProdPost");
@@ -94,7 +128,6 @@ const Prod_PdNull = async(res, obj, payload) => {
 				return MdFilter.jsonFailed(res, {message: "产品编号相同"});
 			}
 		}
-
 
 		PdnomeCT.PnomePlus_prom(payload, obj.nome);
 		if(!isNaN(obj.weight)) obj.weight = parseFloat(obj.weight);
@@ -265,6 +298,10 @@ exports.ProdDelete = async(req, res) => {
 
 		const objDel = await ProdDB.deleteOne({_id: Prod._id});
 
+
+		setModify_Prods(Prod._id);
+
+
 		if(payload.Shop.typeShop === "ws") {
 			await put_ProdMatch(codeFlag, payload.Shop._id);
 		}
@@ -414,6 +451,10 @@ exports.ProdPut = async(req, res) => {
 		Prod.User_upd = payload._id;
 
 		const objSave = await Prod.save();
+
+
+		setModify_Prods(Prod._id);
+
 
 		if(payload.Shop.typeShop === "ws" && isWsChangeCodeFlag) {
 			put_ProdMatch(orgCodeFlag, payload.Shop._id);

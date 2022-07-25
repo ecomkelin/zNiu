@@ -280,8 +280,8 @@ const Pd_put_img_url = async(res, obj, Pd, payload) => {
 		const index = MdFilter.indexOfArray(Pd.img_urls, img_url);
 		if(index < 0) return MdFilter.jsonFailed(res, {message: "没有此图片"});
 		if(index == obj.sort) return MdFilter.jsonFailed(res, {message: "您没有改动位置"});
-		Pd.img_urls.splice(index, 1);
-		Pd.img_urls.splice(obj.sort, 0, img_url);
+		Pd.img_urls.splice(index, 1);	// 删除
+		Pd.img_urls.splice(obj.sort, 0, img_url);	// 插入
 
 		const ProdUpdMany = await ProdDB.updateMany({Pd: Pd._id}, {img_urls: Pd.img_urls});
 
