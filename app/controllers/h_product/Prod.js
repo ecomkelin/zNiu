@@ -40,6 +40,7 @@ const setModify_Prods = (Prod) => {
 		if(Date.now() - modify_Prods[i].at_upd < 7*24*60*60*1000) break;
 	}
 	modify_Prods.splice(0, i);
+	console.log(333, modify_Prods);
 }
 exports.modifyProds = (req, res) => {
 	let timestamp = parseInt(req.query.timestamp);
