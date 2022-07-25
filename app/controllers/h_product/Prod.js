@@ -45,16 +45,16 @@ const setModify_Prods = (Prod) => {
 exports.modifyProds = (req, res) => {
 	let timestamp = parseInt(req.query.timestamp);
 	if(isNaN(timestamp)) return MdFilter.jsonFailed(res, {message: "请传递正确的时间戳 query.timestamp"});
-	console.log(111, timestamp);
-	console.log(222, modify_Prods);
 	const mProds = [];
 	for(let i=modify_Prods.length-1; i>=0; i--) {
+		console.log(timestamp - modify_Prods[i].at_upd);
 		if(timestamp - modify_Prods[i].at_upd < 0) {
 			mProds.push(modify_Prods[i].Prod);
 		} else {
 			break;
 		}
 	}
+	console.log("end", mProds);
 	let is_modify = (mProds.length > 0) ? true : false;
 	return MdFilter.jsonSuccess(res, {data: {is_modify, mProds}});
 }
