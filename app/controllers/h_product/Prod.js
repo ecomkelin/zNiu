@@ -392,8 +392,9 @@ exports.ProdPut = async(req, res) => {
 			if(obj.code) obj.code.replace(/^\s*/g,"").toUpperCase();
 
 			if(payload.Shop.typeShop === "ws"){
+				console.log(111, obj.Su)
 				obj.codeFlag = obj.codeFlag.replace(/^\s*/g,"").toUpperCase();
-				if((obj.Suppler && obj.Supplier !== Prod.Supplier) || (obj.codeFlag && obj.codeFlag !== Prod.codeFlag)) {
+				if((obj.Supplier && obj.Supplier !== Prod.Supplier) || (obj.codeFlag && obj.codeFlag !== Prod.codeFlag)) {
 					let SupplierCode = "";
 					if(MdFilter.isObjectId(obj.Supplier) && obj.Supplier !== Prod.Supplier) {
 						const Supplier = await ShopDB.findOne({_id: obj.Supplier});
