@@ -1,3 +1,4 @@
+0.80	分店打印
 0.79	Prod修改缓存
 0.78	产品分类
 0.77	订单post Prod.updateOne

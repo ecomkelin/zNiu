@@ -26,9 +26,7 @@ const setModify_Prods = (Prod, isDel) => {
 		at_upd: Date.now(),
 		Prod
 	}
-	if(isDel) {
-		modify_Prod.isDel = isDel;
-	}
+	if(isDel) modify_Prod.isDel = isDel;
 
 	const index = MdFilter.indexOfArrayObject(modify_Prods, "Prod", Prod);
 	if(index < -1) {
@@ -66,6 +64,14 @@ exports.modifyProds = (req, res) => {
 	console.log("end", mProds);
 	return MdFilter.jsonSuccess(res, {data: {is_modify, mProds}});
 }
+
+
+
+
+
+
+
+
 
 exports.ProdPost = async(req, res) => {
 	console.log("/ProdPost");
@@ -264,7 +270,7 @@ const Prod_save_Prom = async(obj, payload, Pd) => {
 				Pd.Prods.push(objSave._id);
 				await Pd.save();
 			}
-
+			setModify_Prods(objSave._id);
 			return resolve({status: 200, message: "Prod_save_Prom", data: {object: objSave}});
 		} catch(error) {
 			console.log("[resolve Prod_save_Prom]", error);
