@@ -10,12 +10,15 @@ const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
 exports.PnomePlus_prom = (payload, code) => new Promise(async(resolve, reject) => {
 	try {
-		if(code) {
+		if(code && payload.Firm) {
+			let Firm = payload.Firm;
+			if(Firm._id) Firm = Firm._id;
+
 			code = code.replace(/^\s*/g,"").toUpperCase();
 			if(code) {
-				let Pnome = await ProdDB.findOne({code, Firm: payload.Firm});
+				let Pnome = await ProdDB.findOne({code, Firm});
 				if(!Pnome) {
-					const _object = new PnomeDB({code, sort: 1, Firm: payload.Firm});
+					const _object = new PnomeDB({code, sort: 1, Firm});
 					_object.save();
 				} else {
 					Pnome.sort += 1;
@@ -30,10 +33,12 @@ exports.PnomePlus_prom = (payload, code) => new Promise(async(resolve, reject) =
 });
 exports.PnomeMenus_prom = (payload, code) => new Promise(async(resolve, reject) => {
 	try {
-		if(code) {
+		if(code && payload.Firm) {
+			let Firm = payload.Firm;
+			if(Firm._id) Firm = Firm._id;
 			code = code.replace(/^\s*/g,"").toUpperCase();
 			if(code) {
-				let Pnome = await ProdDB.findOne({code, Firm: payload.Firm});
+				let Pnome = await ProdDB.findOne({code, Firm});
 				if(Pnome) {
 					Pnome.sort -= 1;
 					if(Pnome.sort > 0) {
