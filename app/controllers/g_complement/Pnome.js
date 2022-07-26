@@ -16,13 +16,16 @@ exports.PnomePlus_prom = (payload, code) => new Promise(async(resolve, reject) =
 
 			code = code.replace(/^\s*/g,"").toUpperCase();
 			if(code) {
+				console.log(111, code, Firm);
 				let Pnome = await ProdDB.findOne({code, Firm});
 				if(!Pnome) {
+					console.log(111, '新增');
 					const _object = new PnomeDB({code, sort: 1, Firm});
 					_object.save();
 				} else {
 					Pnome.sort += 1;
 					Pnome.save(); 
+					console.log(111, 'sort+1', Pnome);
 				}
 			}
 			return resolve();
@@ -38,12 +41,16 @@ exports.PnomeMenus_prom = (payload, code) => new Promise(async(resolve, reject) 
 			if(Firm._id) Firm = Firm._id;
 			code = code.replace(/^\s*/g,"").toUpperCase();
 			if(code) {
+				console.log(222, code, Firm);
 				let Pnome = await ProdDB.findOne({code, Firm});
 				if(Pnome) {
 					Pnome.sort -= 1;
+					console.log(222, Pnome);
 					if(Pnome.sort > 0) {
+						console.log(222, 'sort-1', Pnome);
 						Pnome.save();
 					} else {
+						console.log(222, '减少')
 						ProdDB.deleteOne({_id: Pnome._id});
 					}
 				}
