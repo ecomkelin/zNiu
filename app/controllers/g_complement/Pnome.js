@@ -92,6 +92,8 @@ exports.Pnomes = async(req, res) => {
 exports.PnomeRevise = async(req, res) => {
 	try {
 		const payload = req.payload;
+		let Firm = payload.Firm;
+		if(Firm._id) Firm = Firm._id;
 		const Prods = await ProdDB.find({Firm: payload.Firm },{nome: 1});
 
 		await PnomeDB.deleteMany({Firm: payload.Firm});
