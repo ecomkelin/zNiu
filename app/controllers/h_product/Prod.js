@@ -392,7 +392,6 @@ exports.ProdPut = async(req, res) => {
 			if(obj.code) obj.code.replace(/^\s*/g,"").toUpperCase();
 
 			if(payload.Shop.typeShop === "ws"){
-				console.log(111, obj.Su)
 				obj.codeFlag = obj.codeFlag.replace(/^\s*/g,"").toUpperCase();
 				if((obj.Supplier && obj.Supplier !== Prod.Supplier) || (obj.codeFlag && obj.codeFlag !== Prod.codeFlag)) {
 					let SupplierCode = "";
@@ -400,6 +399,7 @@ exports.ProdPut = async(req, res) => {
 						const Supplier = await ShopDB.findOne({_id: obj.Supplier});
 						if(!Supplier) return MdFilter.jsonFailed(res, {message: "没有找到供应商信息"});
 						SupplierCode = "-"+Supplier.code;
+						Prod.Supplier = obj.Supplier;
 					}
 					if(obj.codeFlag && obj.codeFlag !== Prod.codeFlag) {
 						isWsChangeCodeFlag = true;
