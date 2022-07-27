@@ -16,6 +16,7 @@ exports.PaidtypePost = async(req, res) => {
 		let obj = req.body.obj;
 		if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Paidtype", field: "img_url"});
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
+		obj.Firm = Firm;
 
 		if(obj.code) obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(!obj.code) return MdFilter.jsonFailed(res, {message: '请输入支付方式的名称代号'});

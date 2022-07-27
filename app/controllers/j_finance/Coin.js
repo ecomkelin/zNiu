@@ -18,6 +18,7 @@ exports.CoinPost = async(req, res) => {
 		let obj = req.body.obj;
 		if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Coin", field: "img_url"});
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
+		obj.Firm = Firm;
 
 		if(obj.code) obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(obj.nome) obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();
