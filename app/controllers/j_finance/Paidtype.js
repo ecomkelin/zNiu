@@ -10,17 +10,34 @@ exports.PaidtypePost = async(req, res) => {
 	console.log('/PaidtypePost');
 	try {
 		const payload = req.payload;
+		let Firm = payload.Firm;
+		if(Firm._id) Firm = Firm._id;
+
 		let obj = req.body.obj;
 		if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Paidtype", field: "img_url"});
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 
 		if(obj.code) obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		if(!obj.code) return MdFilter.jsonFailed(res, {message: '请输入支付方式的名称代号'});
-		const objSame = await PaidtypeDB.findOne({'code': obj.code});
+
+		let objSame = await PaidtypeDB.findOne({'code': obj.code, Firm});
 		if(objSame) return MdFilter.jsonFailed(res, {message: '支付方式代号或名称相同'});
+
+		if((obj.is_default == 1) || (obj.is_default === 'true')) obj.is_default = true;
+		if(obj.is_default) {
+			objSame = await PaidtypeDB.findOne({Firm, is_default: true});
+			if(objSame) return MdFilter.jsonFailed(res, {message: '支付方式代号或名称相同'});
+
+			obj.sort = 1000;
+		} else {
+			obj.sort = parseInt(obj.sort);
+			if(isNaN(obj.sort)) obj.sort = 0;
+			if(obj.sort > 100) obj.sort = 100;
+		}
 
 		if((obj.is_cash == 1) || (obj.is_cash === 'true')) obj.is_cash = true;
 		if(!MdFilter.isObjectId(obj.Coin)) return MdFilter.jsonFailed(res, {message: '请输入支付方式的币种'});
+
 
 		const _object = new PaidtypeDB(obj);
 		const objSave = await _object.save();
@@ -35,6 +52,8 @@ exports.PaidtypePut = async(req, res) => {
 	console.log('/PaidtypePut');
 	try {
 		const payload = req.payload;
+		let Firm = payload.Firm;
+		if(Firm._id) Firm = Firm._id;
 
 		const id = req.params.id;		// 所要更改的Paidtype的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
@@ -52,11 +71,30 @@ exports.PaidtypePut = async(req, res) => {
 		if(MdFilter.isObjectId(obj.Coin) && obj.Coin != Paidtype.Coin) Paidtype.Coin = obj.Coin;
 
 		if(obj.code !== Paidtype.code) {
-			const objSame = await PaidtypeDB.findOne({_id: {$ne: Paidtype._id}, code: obj.code});
+			const objSame = await PaidtypeDB.findOne({_id: {$ne: Paidtype._id}, code: obj.code, Firm});
 			if(objSame) return MdFilter.jsonFailed(res, {message: '此支付方式编号已被占用, 请查看'});
 		}
-		if(obj.is_cash && (obj.is_cash == 1) || (obj.is_cash === 'true')) obj.is_cash = true;
+		if(obj.is_cash) {
+			if((obj.is_cash == 1) || (obj.is_cash === 'true')) {
+				obj.is_cash = true;
+			} else if((obj.is_cash == 0) || (obj.is_cash === 'false')) {
+				obj.is_cash = false;
+			} else {
+				return MdFilter.jsonFailed(res, {message: "is_cash 为Boolen"});
+			}
+		}
 
+		if(obj.sort) {
+			obj.sort = parseInt(obj.sort);
+			if(isNaN(obj.sort)) obj.sort = 0;
+			if(obj.sort > 100) obj.sort = 100;
+		}
+
+		if((obj.is_default == 1 || obj.is_default === 'true') && (Paidtype.is_default === false)) {
+			notDefault_sort = obj.sort || 0;
+			default_Paidtype = await PaidtypeDB.update({Firm, is_default: true}, {is_default: false, sort: notDefault_sort});
+			obj.sort = 1000;
+		}
 		const _object = _.extend(Paidtype, obj);
 
 		const objSave = await _object.save();
@@ -73,8 +111,8 @@ exports.PaidtypeDelete = async(req, res) => {
 		const id = req.params.id;		// 所要更改的Paidtype的id
 		const queryObj = req.query;
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {status: "请传递正确的数据_id"});
-		const Paidtype = await PaidtypeDB.findOne({_id: id});
-		if(!Paidtype) return MdFilter.jsonFailed(res, {status: "没有找到此支付方式"});
+		const Paidtype = await PaidtypeDB.findOne({_id: id, is_default: false});
+		if(!Paidtype) return MdFilter.jsonFailed(res, {status: "没有找到此支付方式 或者 不能删除默认支付方式"});
 
 		if(Paidtype.img_url && Paidtype.img_url.split("Paidtype").length > 1) await MdFiles.rmPicture(Paidtype.img_url);
 		const objDel = await PaidtypeDB.deleteOne({_id: id});

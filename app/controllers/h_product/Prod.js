@@ -20,7 +20,6 @@ const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 const PdnomeCT = require("../g_complement/Pnome");
 
 const modify_Prods = [];
-
 const setModify_Prods = (Prod, isDel) => {
 	const modify_Prod = {
 		at_upd: Date.now(),
@@ -42,6 +41,60 @@ const setModify_Prods = (Prod, isDel) => {
 	}
 	modify_Prods.splice(0, i);
 }
+// 改变Sku的时候 保存Prod用的
+exports.ProdUpd_fromSku_Prom = (id) => {
+	// price_unit: Float,								// 只读 [由 Skus 决定] 产品价格
+	// price_min: Float,								// 只读 [由 Skus 决定]
+	// price_max: Float,								// 只读 [由 Skus 决定]
+	// is_discount: Boolean, 							// 只读 [由 Skus 决定] 根据 product 中的 is_discount
+	// is_sell: Boolean,								// 只读 [由 Skus 决定] 根据 Skus 决定
+	return new Promise(async(resolve) => {
+		try {
+			const Prod = await ProdDB.findOne({_id: id})
+				.populate("Skus");
+			if(!Prod) return resolve({status: 400, message: "没有找到此商品信息"});
+
+			const Skus = Prod.Skus;
+			if(!Skus || Skus.length === 0) return resolve({status: 400, message: "商品Sku错误"});
+			let price_min,price_max,is_discount, is_sell, is_usable, is_alert;
+			for(let i=0; i<Skus.length; i++) {
+				const sku = Skus[i];
+				if(i==0) {
+					price_min = sku.price_sale;
+					price_max = sku.price_sale;
+					is_discount = sku.is_discount;
+					is_sell = sku.is_sell;
+					is_usable = sku.is_usable;
+					is_alert = sku.is_alert;
+				} else {
+					if(price_min>sku.price_sale) price_min = sku.price_sale;
+					if(price_max<sku.price_sale) price_max = sku.price_sale;
+					is_discount += sku.is_discount;
+					is_sell += sku.is_sell;
+					is_usable += sku.is_usable;
+					is_alert += sku.is_alert;
+				}
+			}
+
+			Prod.price_min = price_min;
+			Prod.price_max = price_max;
+			Prod.is_discount = is_discount ? true: false;
+			Prod.is_sell = is_sell ? true: false;
+			Prod.is_usable = is_usable ? true: false;
+			Prod.is_alert = is_alert ? true: false;
+
+			const ProdSave = await Prod.save();
+			setModify_Prods(ProdSave._id);
+			resolve({status: 200, data: {object: ProdSave}});
+
+		} catch(error) {
+			console.log(".ProdUpd-fromSku-Prom", error);
+			resolve({status: 400, message: "ProdUpd-fromSku-Prom error"});
+		}
+	})
+}
+
+// 查看后台数据是否变化的 接口
 exports.modifyProds = (req, res) => {
 	let timestamp = parseInt(req.query.timestamp);
 	if(isNaN(timestamp)) return MdFilter.jsonFailed(res, {message: "请传递正确的时间戳 query.timestamp"});

@@ -1,5 +1,7 @@
 const _ = require('underscore');
 
+const {ProdUpd_fromSku_Prom} = require("./Prod")
+
 const path = require('path');
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
@@ -235,56 +237,7 @@ exports.SkuPut = async(req, res) => {
 }
 
 
-const ProdUpd_fromSku_Prom = (id) => {
-	// price_unit: Float,								// 只读 [由 Skus 决定] 产品价格
-	// price_min: Float,								// 只读 [由 Skus 决定]
-	// price_max: Float,								// 只读 [由 Skus 决定]
-	// is_discount: Boolean, 							// 只读 [由 Skus 决定] 根据 product 中的 is_discount
-	// is_sell: Boolean,								// 只读 [由 Skus 决定] 根据 Skus 决定
-	return new Promise(async(resolve) => {
-		try {
-			const Prod = await ProdDB.findOne({_id: id})
-				.populate("Skus");
-			if(!Prod) return resolve({status: 400, message: "没有找到此商品信息"});
 
-			const Skus = Prod.Skus;
-			if(!Skus || Skus.length === 0) return resolve({status: 400, message: "商品Sku错误"});
-			let price_min,price_max,is_discount, is_sell, is_usable, is_alert;
-			for(let i=0; i<Skus.length; i++) {
-				const sku = Skus[i];
-				if(i==0) {
-					price_min = sku.price_sale;
-					price_max = sku.price_sale;
-					is_discount = sku.is_discount;
-					is_sell = sku.is_sell;
-					is_usable = sku.is_usable;
-					is_alert = sku.is_alert;
-				} else {
-					if(price_min>sku.price_sale) price_min = sku.price_sale;
-					if(price_max<sku.price_sale) price_max = sku.price_sale;
-					is_discount += sku.is_discount;
-					is_sell += sku.is_sell;
-					is_usable += sku.is_usable;
-					is_alert += sku.is_alert;
-				}
-			}
-
-			Prod.price_min = price_min;
-			Prod.price_max = price_max;
-			Prod.is_discount = is_discount ? true: false;
-			Prod.is_sell = is_sell ? true: false;
-			Prod.is_usable = is_usable ? true: false;
-			Prod.is_alert = is_alert ? true: false;
-
-			const ProdSave = await Prod.save();
-			resolve({status: 200, data: {object: ProdSave}});
-
-		} catch(error) {
-			console.log(".ProdUpd-fromSku-Prom", error);
-			resolve({status: 400, message: "ProdUpd-fromSku-Prom error"});
-		}
-	})
-}
 
 
 

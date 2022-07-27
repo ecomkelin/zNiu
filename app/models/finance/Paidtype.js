@@ -13,6 +13,8 @@ const dbSchema = new Schema({
 	is_cash: {type: Boolean, default: false}, 	// 是否为现金
 	Coin: {type: ObjectId, ref: 'Coin'},
 
+	is_default: {type: Boolean, default: false},
+
 	sort: {type: Number, default: 0},
 	Firm: {type: ObjectId, ref: 'Firm'},		// [只读 绝对]
 });
