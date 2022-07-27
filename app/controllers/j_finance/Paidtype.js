@@ -170,6 +170,7 @@ const obtFilterObj = (req, id) => {
 
 
 const Paidtype_path_Func = (pathObj, payload, queryObj) => {
+	pathObj.Firm = payload.Firm._id || payload.Firm;
 	if(!queryObj) return;
 	if(queryObj.is_cash) {
 		const is_cash = (queryObj.is_cash == 1 || queryObj.is_cash === 'true') ? 1 :  0;

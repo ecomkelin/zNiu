@@ -12,6 +12,9 @@ exports.CoinPost = async(req, res) => {
 	console.log('/CoinPost');
 	try {
 		const payload = req.payload;
+		let Firm = payload.Firm;
+		if(Firm._id) Firm = Firm._id;
+
 		let obj = req.body.obj;
 		if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Coin", field: "img_url"});
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
@@ -25,7 +28,7 @@ exports.CoinPost = async(req, res) => {
 		obj.is_defCoin = (obj.is_defCoin == 1 || obj.is_defCoin == 'true') ? true : false;
 		obj.rate = parseFloat(obj.rate);
 
-		const objSame = await CoinDB.findOne({$or:[{'code': obj.code}, {'nome': obj.nome}]});
+		const objSame = await CoinDB.findOne({$or:[{'code': obj.code}, {'nome': obj.nome}], Firm});
 		if(objSame) return MdFilter.jsonFailed(res, {message: '币种代号或名称相同'});
 		const _object = new CoinDB(obj);
 		const objSave = await _object.save();
@@ -39,6 +42,8 @@ exports.CoinPut = async(req, res) => {
 	console.log('/CoinPut');
 	try {
 		const payload = req.payload;
+		let Firm = payload.Firm;
+		if(Firm._id) Firm = Firm._id;
 
 		const id = req.params.id;		// 所要更改的Coin的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
@@ -56,7 +61,7 @@ exports.CoinPut = async(req, res) => {
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 
 		if(obj.code !== Coin.code || obj.nome !== Coin.nome) {
-			const objSame = await CoinDB.findOne({_id: {$ne: Coin._id}, $or: [{code: obj.code},{nome: obj.nome}]});
+			const objSame = await CoinDB.findOne({_id: {$ne: Coin._id}, Firm, $or: [{code: obj.code},{nome: obj.nome}]});
 			if(objSame) return MdFilter.jsonFailed(res, {message: '此币种编号已被占用, 请查看'});
 		}
 
@@ -69,7 +74,7 @@ exports.CoinPut = async(req, res) => {
 			obj.is_defCoin = (obj.is_defCoin == 1 || obj.is_defCoin === 'true') ? true : false;
 			// 如果修改为默认币种 则其他的默认币种设为false
 			if(obj.is_defCoin === true && obj.is_defCoin != Coin.is_defCoin) {
-				const defExist = await CoinDB.findOne({is_defCoin: true});
+				const defExist = await CoinDB.findOne({is_defCoin: true, Firm});
 				if(defExist) return MdFilter.jsonFailed(res, {message: defExist.code+' 币种, 为default. 请将其取消'});
 			}
 			Coin.is_defCoin = obj.is_defCoin;
@@ -87,9 +92,12 @@ exports.CoinDelete = async(req, res) => {
 	console.log("/CoinDelete");
 	try {
 		const payload = req.payload;
+		let Firm = payload.Firm;
+		if(Firm._id) Firm = Firm._id;
+
 		const id = req.params.id;		// 所要更改的Coin的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {status: "请传递正确的数据_id"});
-		const Coin = await CoinDB.findOne({_id: id});
+		const Coin = await CoinDB.findOne({_id: id, Firm});
 		if(!Coin) return MdFilter.jsonFailed(res, {status: "没有找到此币种"});
 
 		const Paidtype = await PaidtypeDB.findOne({Coin: id});
@@ -146,5 +154,6 @@ const obtFilterObj = (req, id) => {
 
 
 const Coin_path_Func = (pathObj, payload, queryObj) => {
+	pathObj.Firm = payload.Firm._id || payload.Firm;
 	if(!queryObj) return;
 }
