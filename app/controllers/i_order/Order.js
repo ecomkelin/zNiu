@@ -865,25 +865,33 @@ exports.printTicket = (req, res) => {
 		let count = 0;
 		
 		if((tickets instanceof Array) && tickets.length > 0) {
+			let tk_ids = []
+			tickets.forEach(item => tk_ids.push(item.id));
+			console.log(111, tk_ids.length, tk_ids);
+
 
 			let objects = [];
 			tickets.forEach(item => {
-				if(item.Shop === Shop) objects.push(item);
+				if(item.Shop === Shop) {
+					console.log(222, item.id);
+					objects.push(item);
+				}
 			})
 			count = objects.length;
 			object = objects[0];
+			console.log(333, objects.length);
+			console.log(444, object);
 
 			let index = indexOfArrayObject(tickets, 'id', object._id);
 			if(index < -1) return MdFilter.json500(res, {message: "printTicket Error"});
 			if(index > -1) tickets.splice(index, 1);
-
+			console.log(555, tickets);
 			index = indexOfArrayObject(objects, 'id', object._id);
 			if(index < -1) return MdFilter.json500(res, {message: "printTicket Error"});
 			if(index > -1) objects.splice(index, 1);
 			status = 200;
 			message = "打印成功";
 		}
-		console.log(112, tickets, object);
 		return MdFilter.jsonRes(res, {status, message: "printTicket", data: {object, count}, })
 	} catch (error) {
 		return MdFilter.json500(res, {message: "printTicket", error});
