@@ -783,6 +783,9 @@ indexOfArrayObject = (arrs, field, str) => {
 	if(!(arrs instanceof Array)) return -2;
 	let index=0;
 	for(;index<arrs.length; index++) {
+		console.log('aaa111', String(arrs[index][field]));
+		console.log('aaa222', String(str));
+		console.log('aaa333', String(arrs[index][field]) == String(str));
 		if(String(arrs[index][field]) == String(str)) break;
 	}
 	if(index == arrs.length) return -1;
