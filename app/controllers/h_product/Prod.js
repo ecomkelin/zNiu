@@ -61,7 +61,6 @@ exports.modifyProds = (req, res) => {
 			break;
 		}
 	}
-	console.log("end", mProds);
 	return MdFilter.jsonSuccess(res, {data: {is_modify, mProds, dProds}});
 }
 

@@ -793,6 +793,8 @@ exports.addTicket = async(req, res) => {
 	try {
 		let payload = req.payload;
 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
+		let Shop = payload.Shop;
+		if(Shop._id) Shop = Shop._id;
 		let typePrint = req.query.typePrint;	// 什么类型的打印
 
 		let GetDB_Filter = {
@@ -810,7 +812,7 @@ exports.addTicket = async(req, res) => {
 		let index = indexOfArrayObject(tickets, 'id', object._id);
 		if(index < -1) return MdFilter.json500(res, {message: "addTicket tickets Error"});
 		if(index > -1) tickets.splice(index, 1);
-		tickets.push({id: object._id, object, typePrint, Shop: payload.Shop});
+		tickets.push({id: object._id, object, typePrint, Shop});
 		console.log(111, tickets);
 		db_res.message = "addTicket";
 		return MdFilter.jsonSuccess(res, db_res);
@@ -822,9 +824,12 @@ exports.getTickets = (req, res) => {
 	try {
 		let payload = req.payload;
 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
+		let Shop = payload.Shop;
+		if(Shop._id) Shop = Shop._id;
+
 		let objects = [];
 		tickets.forEach(item => {
-			if(item.Shop === payload.Shop) objects.push(item);
+			if(item.Shop === Shop) objects.push(item);
 		})
 		return MdFilter.jsonSuccess(res, {message: "getTickets", data: {objects}})
 	} catch (error) {
@@ -835,10 +840,11 @@ exports.clearTicket = (req, res) => {
 	try {
 		let payload = req.payload;
 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
-
+		let Shop = payload.Shop;
+		if(Shop._id) Shop = Shop._id;
 		let objects = [];
 		tickets.forEach(item => {
-			if(item.Shop !== payload.Shop) objects.push(item);
+			if(item.Shop !== Shop) objects.push(item);
 		})
 		tickets = objects;
 		return MdFilter.jsonSuccess(res, {message: "清除打印任务成功"})
@@ -851,6 +857,8 @@ exports.printTicket = (req, res) => {
 	try {
 		let payload = req.payload;
 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
+		let Shop = payload.Shop;
+		if(Shop._id) Shop = Shop._id;
 
 		let status = 400;
 		let message = "暂无数据";
@@ -861,7 +869,7 @@ exports.printTicket = (req, res) => {
 
 			let objects = [];
 			tickets.forEach(item => {
-				if(item.Shop === payload.Shop) objects.push(item);
+				if(item.Shop === Shop) objects.push(item);
 			})
 			count = objects.length;
 			object = objects[0];
@@ -872,6 +880,7 @@ exports.printTicket = (req, res) => {
 			status = 200;
 			message = "打印成功";
 		}
+		console.log(112, tickets, object);
 		return MdFilter.jsonRes(res, {status, message: "printTicket", data: {object, count}, })
 	} catch (error) {
 		return MdFilter.json500(res, {message: "printTicket", error});
