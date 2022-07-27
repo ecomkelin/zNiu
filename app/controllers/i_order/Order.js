@@ -885,14 +885,14 @@ exports.printTicket = (req, res) => {
 			console.log(333, objects.length);
 			console.log(444, object);
 
-			let index = indexOfArrayObject(tickets, 'id', object._id);
+			let index = indexOfArrayObject(tickets, 'id', object.id);
 			if(index < -1) return MdFilter.json500(res, {message: "printTicket Error"});
 			if(index > -1) tickets.splice(index, 1);
 			console.log(555, index);
 			console.log(666, tickets);
-			index = indexOfArrayObject(objects, 'id', object._id);
-			if(index < -1) return MdFilter.json500(res, {message: "printTicket Error"});
-			if(index > -1) objects.splice(index, 1);
+			// index = indexOfArrayObject(objects, 'id', object._id);
+			// if(index < -1) return MdFilter.json500(res, {message: "printTicket Error"});
+			// if(index > -1) objects.splice(index, 1);
 			status = 200;
 			message = "打印成功";
 		}
