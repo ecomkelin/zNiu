@@ -701,83 +701,6 @@ exports.Order = async(req, res) => {
 
 
 
-const tickets = [];
-indexOfArrayObject = (arrs, field, str) => {
-	if(!(arrs instanceof Array)) return -2;
-	let index=0;
-	for(;index<arrs.length; index++) {
-		if(String(arrs[index][field]) == String(str)) break;
-	}
-	if(index == arrs.length) return -1;
-	return index;
-}
-exports.addTicket = async(req, res) => {
-	console.log("/addTicket");
-	try {
-		const payload = req.payload;
-		const GetDB_Filter = {
-			id: req.params.id,
-			payload: payload,
-			queryObj: req.query,
-			objectDB: OrderDB,
-			path_Callback: Order_path_Func,
-			dbName: dbOrder,
-		};
-		const db_res = await GetDB.db(GetDB_Filter);
-		if(db_res.status !== 200) return MdFilter.jsonSuccess(res, db_res);
-		const object = db_res.data.object;
-		const index = indexOfArrayObject(tickets, 'id', object._id);
-
-		if(index < -1) return MdFilter.json500(res, {message: "addTicket tickets Error"});
-		if(index > -1) tickets.splice(index, 1);
-		tickets.push({typePrint: req.query.typePrint, id: object._id, object});
-		
-		db_res.message = "addTicket";
-		return MdFilter.jsonSuccess(res, db_res);
-	} catch(error) {
-		return MdFilter.json500(res, {message: "addTicket", error});
-	}
-}
-exports.getTickets = (req, res) => {
-	try {
-		return MdFilter.jsonSuccess(res, {message: "getTickets", data: {objects: tickets}})
-	} catch (error) {
-		return MdFilter.json500(res, {message: "clearTicket", error});
-	}
-}
-exports.clearTicket = (req, res) => {
-	try {
-		tickets.splice(0,tickets.length);
-		return MdFilter.jsonSuccess(res, {message: "清除打印任务成功"})
-	} catch (error) {
-		return MdFilter.json500(res, {message: "clearTicket", error});
-	}
-}
-
-exports.printTicket = (req, res) => {
-	try {
-		let status = 400;
-		let message = "暂无数据";
-		let object = null;
-		const count = tickets.length;
-		if((tickets instanceof Array) && tickets.length > 0) {
-			object = tickets[0];
-			tickets.splice(0, 1);
-			status = 200;
-			message = "打印成功";
-		}
-		return MdFilter.jsonRes(res, {status, message: "printTicket", data: {object, count}, })
-	} catch (error) {
-		return MdFilter.json500(res, {message: "printTicket", error});
-	}
-}
-
-
-
-
-
-
-
 // const tickets = [];
 // indexOfArrayObject = (arrs, field, str) => {
 // 	if(!(arrs instanceof Array)) return -2;
@@ -791,11 +714,8 @@ exports.printTicket = (req, res) => {
 // exports.addTicket = async(req, res) => {
 // 	console.log("/addTicket");
 // 	try {
-// 		let payload = req.payload;
-// 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
-// 		let typePrint = req.query.typePrint;	// 什么类型的打印
-
-// 		let GetDB_Filter = {
+// 		const payload = req.payload;
+// 		const GetDB_Filter = {
 // 			id: req.params.id,
 // 			payload: payload,
 // 			queryObj: req.query,
@@ -803,14 +723,14 @@ exports.printTicket = (req, res) => {
 // 			path_Callback: Order_path_Func,
 // 			dbName: dbOrder,
 // 		};
-// 		let db_res = await GetDB.db(GetDB_Filter);
+// 		const db_res = await GetDB.db(GetDB_Filter);
 // 		if(db_res.status !== 200) return MdFilter.jsonSuccess(res, db_res);
-// 		let object = db_res.data.object;		// 找到要打印的订单
+// 		const object = db_res.data.object;
+// 		const index = indexOfArrayObject(tickets, 'id', object._id);
 
-// 		let index = indexOfArrayObject(tickets, 'id', object._id);
 // 		if(index < -1) return MdFilter.json500(res, {message: "addTicket tickets Error"});
 // 		if(index > -1) tickets.splice(index, 1);
-// 		tickets.push({id: object._id, object, typePrint, Shop: payload.Shop});
+// 		tickets.push({typePrint: req.query.typePrint, id: object._id, object});
 		
 // 		db_res.message = "addTicket";
 // 		return MdFilter.jsonSuccess(res, db_res);
@@ -820,27 +740,14 @@ exports.printTicket = (req, res) => {
 // }
 // exports.getTickets = (req, res) => {
 // 	try {
-// 		let payload = req.payload;
-// 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
-// 		let objects = [];
-// 		tickets.forEach(item => {
-// 			if(item.Shop === payload.Shop) objects.push(item);
-// 		})
-// 		return MdFilter.jsonSuccess(res, {message: "getTickets", data: {objects}})
+// 		return MdFilter.jsonSuccess(res, {message: "getTickets", data: {objects: tickets}})
 // 	} catch (error) {
 // 		return MdFilter.json500(res, {message: "clearTicket", error});
 // 	}
 // }
 // exports.clearTicket = (req, res) => {
 // 	try {
-// 		let payload = req.payload;
-// 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
-
-// 		let objects = [];
-// 		tickets.forEach(item => {
-// 			if(item.Shop !== payload.Shop) objects.push(item);
-// 		})
-// 		tickets = objects;
+// 		tickets.splice(0,tickets.length);
 // 		return MdFilter.jsonSuccess(res, {message: "清除打印任务成功"})
 // 	} catch (error) {
 // 		return MdFilter.json500(res, {message: "clearTicket", error});
@@ -849,26 +756,13 @@ exports.printTicket = (req, res) => {
 
 // exports.printTicket = (req, res) => {
 // 	try {
-// 		let payload = req.payload;
-// 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
-
 // 		let status = 400;
 // 		let message = "暂无数据";
 // 		let object = null;
-// 		let count = 0;
-		
+// 		const count = tickets.length;
 // 		if((tickets instanceof Array) && tickets.length > 0) {
-
-// 			let objects = [];
-// 			tickets.forEach(item => {
-// 				if(item.Shop === payload.Shop) objects.push(item);
-// 			})
-// 			count = objects.length;
-// 			object = objects[0];
-
-// 			let index = indexOfArrayObject(tickets, 'id', object._id);
-// 			if(index < -1) return MdFilter.json500(res, {message: "printTicket Error"});
-// 			if(index > -1) tickets.splice(index, 1);
+// 			object = tickets[0];
+// 			tickets.splice(0, 1);
 // 			status = 200;
 // 			message = "打印成功";
 // 		}
@@ -877,3 +771,109 @@ exports.printTicket = (req, res) => {
 // 		return MdFilter.json500(res, {message: "printTicket", error});
 // 	}
 // }
+
+
+
+
+
+
+
+const tickets = [];
+indexOfArrayObject = (arrs, field, str) => {
+	if(!(arrs instanceof Array)) return -2;
+	let index=0;
+	for(;index<arrs.length; index++) {
+		if(String(arrs[index][field]) == String(str)) break;
+	}
+	if(index == arrs.length) return -1;
+	return index;
+}
+exports.addTicket = async(req, res) => {
+	console.log("/addTicket");
+	try {
+		let payload = req.payload;
+		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
+		let typePrint = req.query.typePrint;	// 什么类型的打印
+
+		let GetDB_Filter = {
+			id: req.params.id,
+			payload: payload,
+			queryObj: req.query,
+			objectDB: OrderDB,
+			path_Callback: Order_path_Func,
+			dbName: dbOrder,
+		};
+		let db_res = await GetDB.db(GetDB_Filter);
+		if(db_res.status !== 200) return MdFilter.jsonSuccess(res, db_res);
+		let object = db_res.data.object;		// 找到要打印的订单
+
+		let index = indexOfArrayObject(tickets, 'id', object._id);
+		if(index < -1) return MdFilter.json500(res, {message: "addTicket tickets Error"});
+		if(index > -1) tickets.splice(index, 1);
+		tickets.push({id: object._id, object, typePrint, Shop: payload.Shop});
+		console.log(111, tickets);
+		db_res.message = "addTicket";
+		return MdFilter.jsonSuccess(res, db_res);
+	} catch(error) {
+		return MdFilter.json500(res, {message: "addTicket", error});
+	}
+}
+exports.getTickets = (req, res) => {
+	try {
+		let payload = req.payload;
+		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
+		let objects = [];
+		tickets.forEach(item => {
+			if(item.Shop === payload.Shop) objects.push(item);
+		})
+		return MdFilter.jsonSuccess(res, {message: "getTickets", data: {objects}})
+	} catch (error) {
+		return MdFilter.json500(res, {message: "clearTicket", error});
+	}
+}
+exports.clearTicket = (req, res) => {
+	try {
+		let payload = req.payload;
+		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
+
+		let objects = [];
+		tickets.forEach(item => {
+			if(item.Shop !== payload.Shop) objects.push(item);
+		})
+		tickets = objects;
+		return MdFilter.jsonSuccess(res, {message: "清除打印任务成功"})
+	} catch (error) {
+		return MdFilter.json500(res, {message: "clearTicket", error});
+	}
+}
+
+exports.printTicket = (req, res) => {
+	try {
+		let payload = req.payload;
+		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
+
+		let status = 400;
+		let message = "暂无数据";
+		let object = null;
+		let count = 0;
+		
+		if((tickets instanceof Array) && tickets.length > 0) {
+
+			let objects = [];
+			tickets.forEach(item => {
+				if(item.Shop === payload.Shop) objects.push(item);
+			})
+			count = objects.length;
+			object = objects[0];
+
+			let index = indexOfArrayObject(tickets, 'id', object._id);
+			if(index < -1) return MdFilter.json500(res, {message: "printTicket Error"});
+			if(index > -1) tickets.splice(index, 1);
+			status = 200;
+			message = "打印成功";
+		}
+		return MdFilter.jsonRes(res, {status, message: "printTicket", data: {object, count}, })
+	} catch (error) {
+		return MdFilter.json500(res, {message: "printTicket", error});
+	}
+}
