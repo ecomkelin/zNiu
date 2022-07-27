@@ -155,6 +155,9 @@ exports.OrderPost = async(req, res) => {
 			if(!MdFilter.isObjectId(obj_OrderProd.Prod)) continue;
 			const Prod = await ProdDB.findOne({_id: obj_OrderProd.Prod, Shop: obj_Order.Shop});
 			// if(!Prod || Prod.is_usable === false || Prod.is_sell === false) continue;
+			if(isNaN(Prod.price_cost)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_cost 信息错误, 请到后台检查修改`});
+			if(isNaN(Prod.price_sale)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_sale 信息错误, 请到后台检查修改`});
+			if(isNaN(Prod.price_regular)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_regular 信息错误, 请到后台检查修改`});
 			if(!Prod) continue;
 			// 为数据分析做铺垫
 			obj_OrderProd.Order = _Order._id;
@@ -224,8 +227,11 @@ exports.OrderPost = async(req, res) => {
 				for(let j=0; j<oSkus.length; j++) {
 					const obj_OrderSku = oSkus[j];
 					if(!MdFilter.isObjectId(obj_OrderSku.Sku)) continue;
-					const Sku = await SkuDB.findOne({_id: obj_OrderSku.Sku, Prod: Prod._id});
+					let Sku = await SkuDB.findOne({_id: obj_OrderSku.Sku, Prod: Prod._id});
 					// if(!Sku || Sku.is_usable === false || Sku.is_sell === false) continue;
+					if(isNaN(Sku.price_cost)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 下的其中一个Sku的 price_cost 信息错误, 请到后台检查修改`});
+					if(isNaN(Sku.price_sale)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 下的其中一个Sku的 price_sale 信息错误, 请到后台检查修改`});
+					if(isNaN(Sku.price_regular)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 下的其中一个Sku的 price_regular 信息错误, 请到后台检查修改`});
 					if(!Sku) continue;
 					obj_OrderSku.Order = _OrderProd.Order;
 					obj_OrderSku.OrderProd = _OrderProd._id;
@@ -259,7 +265,7 @@ exports.OrderPost = async(req, res) => {
 							obj_OrderSku.price = Sku.price_sale;
 						}
 					}
-
+					// 11
 					const _OrderSku = new OrderSkuDB(obj_OrderSku);
 					_OrderSku.at_crt = _OrderSku.at_upd = new Date();
 					obj_OrderSkus.push(_OrderSku);
