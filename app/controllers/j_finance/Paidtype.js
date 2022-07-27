@@ -92,7 +92,7 @@ exports.PaidtypePut = async(req, res) => {
 
 		if((obj.is_default == 1 || obj.is_default === 'true') && (Paidtype.is_default === false)) {
 			notDefault_sort = obj.sort || 0;
-			default_Paidtype = await PaidtypeDB.update({Firm, is_default: true}, {is_default: false, sort: notDefault_sort});
+			default_Paidtype = await PaidtypeDB.updateOne({Firm, is_default: true}, {is_default: false, sort: notDefault_sort});
 			obj.sort = 1000;
 		}
 		const _object = _.extend(Paidtype, obj);
