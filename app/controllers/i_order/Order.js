@@ -813,7 +813,6 @@ exports.addTicket = async(req, res) => {
 		if(index < -1) return MdFilter.json500(res, {message: "addTicket tickets Error"});
 		if(index > -1) tickets.splice(index, 1);
 		tickets.push({id: object._id, object, typePrint, Shop});
-		console.log(111, tickets);
 		db_res.message = "addTicket";
 		return MdFilter.jsonSuccess(res, db_res);
 	} catch(error) {
@@ -877,6 +876,10 @@ exports.printTicket = (req, res) => {
 			let index = indexOfArrayObject(tickets, 'id', object._id);
 			if(index < -1) return MdFilter.json500(res, {message: "printTicket Error"});
 			if(index > -1) tickets.splice(index, 1);
+
+			index = indexOfArrayObject(objects, 'id', object._id);
+			if(index < -1) return MdFilter.json500(res, {message: "printTicket Error"});
+			if(index > -1) objects.splice(index, 1);
 			status = 200;
 			message = "打印成功";
 		}
