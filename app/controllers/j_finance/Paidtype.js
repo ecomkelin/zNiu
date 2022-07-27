@@ -92,7 +92,9 @@ exports.PaidtypePut = async(req, res) => {
 
 		if((obj.is_default == 1 || obj.is_default === 'true') && (Paidtype.is_default === false)) {
 			notDefault_sort = obj.sort || 0;
+			console.log(111, Firm, notDefault_sort);
 			default_Paidtype = await PaidtypeDB.updateOne({Firm, is_default: true}, {is_default: false, sort: notDefault_sort});
+			console.log(112, default_Paidtype);
 			obj.sort = 1000;
 		}
 		const _object = _.extend(Paidtype, obj);
@@ -110,9 +112,9 @@ exports.PaidtypeDelete = async(req, res) => {
 		const payload = req.payload;
 		const id = req.params.id;		// 所要更改的Paidtype的id
 		const queryObj = req.query;
-		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {status: "请传递正确的数据_id"});
+		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 		const Paidtype = await PaidtypeDB.findOne({_id: id, is_default: false});
-		if(!Paidtype) return MdFilter.jsonFailed(res, {status: "没有找到此支付方式 或者 不能删除默认支付方式"});
+		if(!Paidtype) return MdFilter.jsonFailed(res, {message: "没有找到此支付方式 或者 不能删除默认支付方式"});
 
 		if(Paidtype.img_url && Paidtype.img_url.split("Paidtype").length > 1) await MdFiles.rmPicture(Paidtype.img_url);
 		const objDel = await PaidtypeDB.deleteOne({_id: id});
