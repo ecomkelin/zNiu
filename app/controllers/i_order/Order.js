@@ -282,13 +282,11 @@ exports.OrderPost = async(req, res) => {
 								obj_OrderSku.price = Sku.price_sale;
 							}
 						}
-						console.log(111, obj_OrderSku);
-
 					} else {
 						if(isNaN(obj_OrderSku.price)) return MdFilter.jsonFailed(res, {message: `obj_OrderSku.price 必须为数字`});
 						obj_OrderSku.price_regular = obj_OrderSku.price_sale = obj_OrderSku.price = parseFloat(obj_OrderSku.price);
 						// obj_OrderSku.weight = isNaN(obj_OrderSku.weight) ? 0: parseFloat(obj_OrderSku.weight);
-						console.log(222, obj_OrderSku);
+						obj_OrderSku.attrs = String(obj_OrderSku.attrs);
 					}
 
 					const _OrderSku = new OrderSkuDB(obj_OrderSku);

@@ -14,7 +14,7 @@ const dbSchema = new Schema({
 	status: Number,										// enum: ConfOrder;
 	// 基本信息
 	Sku: {type: ObjectId, ref: "Sku"},					// [post写, put只读]
-	attrs: String,										// [只读 相对 Sku]
+	attrs: String,										// [只读 相对 Sku] // description
 	weight: Float, 										// [只读] 	订单的货品重量
 	price_regular: Float,								// [只读 相对 Sku] 加入购物车时的原价 客户confirm时的原价
 	price_sale: Float,									// [只读 权限 Client相对 Sku] 加入购物车时的交易价格 客户confirm时的交易价格
