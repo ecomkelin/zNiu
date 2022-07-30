@@ -168,13 +168,15 @@ exports.OrderPost = async(req, res) => {
 			obj_OrderProd.Shop = _Order.Shop;
 			obj_OrderProd.Firm = _Order.Firm;
 			obj_OrderProd.status = _Order.status;
+
+			obj_OrderProd.is_simple = (obj_OrderProd.is_simple == 1 || obj_OrderProd.is_simple === 'true') ? true : false;
+			if(obj_OrderProd.is_simple !== Prod.is_simple) Prod = null;
 			if(Prod) {
 				if(isNaN(Prod.price_cost)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_cost 信息错误, 请到后台检查修改`});
 				if(isNaN(Prod.price_sale)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_sale 信息错误, 请到后台检查修改`});
 				if(isNaN(Prod.price_regular)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_regular 信息错误, 请到后台检查修改`});
 
 				obj_OrderProd.Pd = Prod.Pd;
-				obj_OrderProd.is_simple = Prod.is_simple;
 				obj_OrderProd.code = Prod.code;
 				obj_OrderProd.nome = Prod.nome;
 				obj_OrderProd.unit = Prod.unit;
