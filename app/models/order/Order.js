@@ -12,6 +12,7 @@ const dbSchema = new Schema({
 	type_Order: Number, 								// [post写(Client[-1]) put只读] enum: [1, -1] 采购 销售
 	Supplier: {type: ObjectId, ref: 'Shop'},			// 供应商
 
+	is_offline: Boolean,
 	status: Number,										// enum: ConfOrder;
 	is_hide_client: {type: Boolean, default: false}, 	// 客户是否可见, 客户删除状态下， 商家可删除
 

@@ -104,6 +104,10 @@ exports.OrderPost = async(req, res) => {
 			if(!org_Order) return MdFilter.jsonRes(res, {message: "没有找到需要修改的订单"});
 			obj_Order.code = org_Order.code;
 			obj_Order.at_crt = org_Order.at_crt;
+		} else if(obj_Order.is_offline == 1 || obj_Order.is_offline === 'true') {
+			if(!obj_Order.code) return MdFilter.jsonRes(res, {message: "请传递订单编号"});
+			if(isNaN(obj_Order.at_crt)) return MdFilter.jsonRes(res, {message: "请传递订单创建时间"});
+			obj_Order.at_crt = new Date(parseInt(obj_Order.at_crt));
 		} else {
 			const code_res = await generate_codeOrder_Prom(Shop._id, Shop.code);
 			if(code_res.status !== 200) return MdFilter.jsonRes(res, {message: code_res.message});
@@ -115,7 +119,7 @@ exports.OrderPost = async(req, res) => {
 			obj_Order.price_paid = parseFloat(obj_Order.price_paid);
 		}
 
-		obj_Order.Firm = Shop.Firm;
+		obj_Order.Firm = Shop.Firm;	// 一定要写 Shop.Firm
 
 		if(!(obj_Order.OrderProds instanceof Array)) return MdFilter.jsonFailed(res, {message: "购物车中的产品数据obj.OrderProds参数错误[应该是数组]"});
 		const oProds = [...obj_Order.OrderProds];
@@ -152,13 +156,10 @@ exports.OrderPost = async(req, res) => {
 		const obj_OrderSkus = [];
 		for(let i = 0; i<oProds.length; i++){
 			const obj_OrderProd = oProds[i];
-			if(!MdFilter.isObjectId(obj_OrderProd.Prod)) continue;
-			const Prod = await ProdDB.findOne({_id: obj_OrderProd.Prod, Shop: obj_Order.Shop});
+			let Prod = null;
+			if(MdFilter.isObjectId(obj_OrderProd.Prod)) Prod = await ProdDB.findOne({_id: obj_OrderProd.Prod, Shop: obj_Order.Shop});
+
 			// if(!Prod || Prod.is_usable === false || Prod.is_sell === false) continue;
-			if(isNaN(Prod.price_cost)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_cost 信息错误, 请到后台检查修改`});
-			if(isNaN(Prod.price_sale)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_sale 信息错误, 请到后台检查修改`});
-			if(isNaN(Prod.price_regular)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_regular 信息错误, 请到后台检查修改`});
-			if(!Prod) continue;
 			// 为数据分析做铺垫
 			obj_OrderProd.Order = _Order._id;
 			obj_OrderProd.Client = _Order.Client;
@@ -167,11 +168,20 @@ exports.OrderPost = async(req, res) => {
 			obj_OrderProd.Shop = _Order.Shop;
 			obj_OrderProd.Firm = _Order.Firm;
 			obj_OrderProd.status = _Order.status;
-			obj_OrderProd.Pd = Prod.Pd;
-			obj_OrderProd.is_simple = Prod.is_simple;
+			if(Prod) {
+				if(isNaN(Prod.price_cost)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_cost 信息错误, 请到后台检查修改`});
+				if(isNaN(Prod.price_sale)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_sale 信息错误, 请到后台检查修改`});
+				if(isNaN(Prod.price_regular)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 price_regular 信息错误, 请到后台检查修改`});
 
-			obj_OrderProd.nome = Prod.nome;
-			obj_OrderProd.unit = Prod.unit;
+				obj_OrderProd.Pd = Prod.Pd;
+				obj_OrderProd.is_simple = Prod.is_simple;
+				obj_OrderProd.nome = Prod.nome;
+				obj_OrderProd.unit = Prod.unit;
+			} else {
+				obj_OrderProd.Pd = null;
+				obj_OrderProd.Prod = null;
+				obj_OrderProd.is_simple = (obj_OrderProd.is_simple == 1 || obj_OrderProd.is_simple ==='true')?true:false;
+			}
 
 			obj_OrderProd.prod_quantity = 0;
 			obj_OrderProd.prod_weight = 0;
@@ -180,31 +190,35 @@ exports.OrderPost = async(req, res) => {
 			obj_OrderProd.prod_price = 0;
 
 			let _OrderProd
-			if(Prod.is_simple === true) {
+			if(obj_OrderProd.is_simple === true) {
+				if(isNaN(obj_OrderProd.quantity)) return MdFilter.jsonFailed(res, {message: `您的订单产品数量 quantity:${quantity} 信息错误, 应该为数字`});
 				obj_OrderProd.quantity = parseInt(obj_OrderProd.quantity);
-				obj_OrderProd.weight = Prod.weight || 0;
-
-				if(isNaN(obj_OrderProd.quantity)) continue;
-
 				// 简单的更改库存
 				let quantity = parseInt(obj_Order.type_Order) * obj_OrderProd.quantity;
-				if(isNaN(quantity)) continue;
 
-				await ProdDB.updateOne({"_id" : Prod._id},{$inc: {quantity}} );
+				if(Prod) {
+					obj_OrderProd.weight = Prod.weight || 0;
+					await ProdDB.updateOne({"_id" : Prod._id},{$inc: {quantity}} );
 
-				// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
-				obj_OrderProd.price_regular = (type_Order === 1) ? Prod.price_cost : Prod.price_regular;
-				obj_OrderProd.price_sale = (type_Order === 1) ? Prod.price_cost : Prod.price_sale;
-				if(type_Order === 1) {
-					if(isNaN(obj_OrderProd.price)) obj_OrderProd.price = Prod.price_cost;
-				} else {
-					if(ConfUser.role_Arrs.includes(payload.role)) {
-						if(isNaN(obj_OrderProd.price)) obj_OrderProd.price = Prod.price_sale;
+					// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
+					obj_OrderProd.price_regular = (type_Order === 1) ? Prod.price_cost : Prod.price_regular;
+					obj_OrderProd.price_sale = (type_Order === 1) ? Prod.price_cost : Prod.price_sale;
+					if(type_Order === 1) {
+						if(isNaN(obj_OrderProd.price)) obj_OrderProd.price = Prod.price_cost;
 					} else {
-						// 可以价cupon
-						obj_OrderProd.price = Prod.price_sale;
+						if(ConfUser.role_Arrs.includes(payload.role)) {
+							if(isNaN(obj_OrderProd.price)) obj_OrderProd.price = Prod.price_sale;
+						} else {
+							// 可以价cupon
+							obj_OrderProd.price = Prod.price_sale;
+						}
 					}
+				} else {
+					if(isNaN(obj_OrderProd.price)) return MdFilter.jsonFailed(res, {message: `您的订单产品价格 price:${price} 信息错误, 应该为数字`});
+					obj_OrderProd.price_regular = obj_OrderProd.prod_sale = obj_OrderProd.price = parseFloat(obj_OrderProd.price);
+					obj_OrderProd.weight = isNaN(obj_OrderProd.weight) ? 0: parseFloat(obj_OrderProd.weight);
 				}
+				
 
 				obj_OrderProd.prod_quantity = obj_OrderProd.quantity;
 				obj_OrderProd.prod_weight = obj_OrderProd.quantity * obj_OrderProd.weight;
@@ -215,7 +229,7 @@ exports.OrderPost = async(req, res) => {
 				_OrderProd = new OrderProdDB(obj_OrderProd);
 			} else {
 				// 接受前台 OrderSkus的数据不能为空
-				if(!(obj_OrderProd.OrderSkus instanceof Array)) continue;
+				if(!(obj_OrderProd.OrderSkus instanceof Array)) return MdFilter.jsonFailed(res, {message: `obj_OrderProd.OrderSkus 应该为数组`});
 				// 重命名 OrderSkus
 				const oSkus = [...obj_OrderProd.OrderSkus];
 				// 要存入数据库的 OrderSkus
@@ -225,14 +239,10 @@ exports.OrderPost = async(req, res) => {
 				_OrderProd = new OrderProdDB(obj_OrderProd);
 
 				for(let j=0; j<oSkus.length; j++) {
+					let Sku = null;
 					const obj_OrderSku = oSkus[j];
-					if(!MdFilter.isObjectId(obj_OrderSku.Sku)) continue;
-					let Sku = await SkuDB.findOne({_id: obj_OrderSku.Sku, Prod: Prod._id});
+					if(MdFilter.isObjectId(obj_OrderSku.Sku)) Sku = await SkuDB.findOne({_id: obj_OrderSku.Sku, Prod: Prod._id});
 					// if(!Sku || Sku.is_usable === false || Sku.is_sell === false) continue;
-					if(isNaN(Sku.price_cost)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 下的其中一个Sku的 price_cost 信息错误, 请到后台检查修改`});
-					if(isNaN(Sku.price_sale)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 下的其中一个Sku的 price_sale 信息错误, 请到后台检查修改`});
-					if(isNaN(Sku.price_regular)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 下的其中一个Sku的 price_regular 信息错误, 请到后台检查修改`});
-					if(!Sku) continue;
 					obj_OrderSku.Order = _OrderProd.Order;
 					obj_OrderSku.OrderProd = _OrderProd._id;
 					obj_OrderSku.type_Order = type_Order;
@@ -245,29 +255,40 @@ exports.OrderPost = async(req, res) => {
 					obj_OrderSku.Pd = _OrderProd.Pd;
 					obj_OrderSku.Prod = _OrderProd.Prod;
 
-					obj_OrderSku.attrs = "";
-					if(Sku.attrs) Sku.attrs.forEach(attr => obj_OrderSku.attrs += `${attr.nome}:${attr.option},`);
-
+					if(isNaN(obj_OrderSku.quantity)) return MdFilter.jsonFailed(res, {message: `obj_OrderSku.quantity 必须为数字`});
 					obj_OrderSku.quantity = parseInt(obj_OrderSku.quantity);
-					if(isNaN(obj_OrderSku.quantity)) continue;
 					let quantity = parseInt(obj_Order.type_Order * obj_OrderSku.quantity);
-					await SkuDB.updateOne({"_id" : Sku._id},{$inc: {quantity}} );
-					obj_OrderSku.weight = Sku.weight || 0;
-					// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
-					obj_OrderSku.price_regular = (type_Order === 1) ? Sku.price_cost : Sku.price_regular;
-					obj_OrderSku.price_sale = (type_Order === 1) ? Sku.price_cost : Sku.price_sale;
-					if(type_Order === 1) {
-						if(isNaN(obj_OrderSku.price)) obj_OrderSku.price = Sku.price_cost;
-					} else {
-						if(ConfUser.role_Arrs.includes(payload.role)) {
-							if(isNaN(obj_OrderSku.price)) obj_OrderSku.price = Sku.price_sale;
+
+					if(Sku) {
+						if(isNaN(Sku.price_cost)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 下的其中一个Sku的 price_cost 信息错误, 请到后台检查修改`});
+						if(isNaN(Sku.price_sale)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 下的其中一个Sku的 price_sale 信息错误, 请到后台检查修改`});
+						if(isNaN(Sku.price_regular)) return MdFilter.jsonFailed(res, {message: `您的${Prod.code}产品 下的其中一个Sku的 price_regular 信息错误, 请到后台检查修改`});
+						obj_OrderSku.attrs = "";
+						if(Sku.attrs) Sku.attrs.forEach(attr => obj_OrderSku.attrs += `${attr.nome}:${attr.option},`);
+
+						await SkuDB.updateOne({"_id" : Sku._id},{$inc: {quantity}} );
+						obj_OrderSku.weight = Sku.weight || 0;
+
+						// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
+						obj_OrderSku.price_regular = (type_Order === 1) ? Sku.price_cost : Sku.price_regular;
+						obj_OrderSku.price_sale = (type_Order === 1) ? Sku.price_cost : Sku.price_sale;
+						if(type_Order === 1) {
+							if(isNaN(obj_OrderSku.price)) obj_OrderSku.price = Sku.price_cost;
 						} else {
-							obj_OrderSku.price = Sku.price_sale;
+							if(ConfUser.role_Arrs.includes(payload.role)) {
+								if(isNaN(obj_OrderSku.price)) obj_OrderSku.price = Sku.price_sale;
+							} else {
+								obj_OrderSku.price = Sku.price_sale;
+							}
 						}
+					} else {
+						if(isNaN(obj_OrderSku.price)) return MdFilter.jsonFailed(res, {message: `obj_OrderSku.price 必须为数字`});
+						obj_OrderSku.price_regular = obj_OrderSku.price_sale = obj_OrderSku.price = parseFloat(obj_OrderSku.price);
+						obj_OrderSku.weight = isNaN(obj_OrderSku.weight) ? 0: parseFloat(obj_OrderSku.weight);
 					}
-					// 11
+
 					const _OrderSku = new OrderSkuDB(obj_OrderSku);
-					_OrderSku.at_crt = _OrderSku.at_upd = new Date();
+					_OrderSku.at_crt = _OrderSku.at_upd = obj_Order.at_crt;
 					obj_OrderSkus.push(_OrderSku);
 
 					_OrderProd.prod_quantity += _OrderSku.quantity;
@@ -287,7 +308,7 @@ exports.OrderPost = async(req, res) => {
 
 			// 判断 如果订单 商品下没有 Sku 则说明没有买此商品 则跳过
 			if(_OrderProd.prod_quantity < 1) continue;
-			_OrderProd.at_crt = _OrderProd.at_upd = new Date();
+			_OrderProd.at_crt = _OrderProd.at_upd = obj_Order.at_crt;
 			obj_OrderProds.push(_OrderProd);
 			// const OProdSave = await _OrderProd.save();
 			// if(!OProdSave) {
