@@ -14,6 +14,7 @@ const dbSchema = new Schema({
 	Prod: {type: ObjectId, ref: "Prod"},				// [只读 绝对]
 	is_simple: Boolean,									// [只读 绝对]
 
+	code: String,										// [只读 绝对]
 	nome: String,										// [只读 绝对]
 	unit: String,										// [只读 绝对]
 

@@ -175,6 +175,7 @@ exports.OrderPost = async(req, res) => {
 
 				obj_OrderProd.Pd = Prod.Pd;
 				obj_OrderProd.is_simple = Prod.is_simple;
+				obj_OrderProd.code = Prod.code;
 				obj_OrderProd.nome = Prod.nome;
 				obj_OrderProd.unit = Prod.unit;
 			} else {
