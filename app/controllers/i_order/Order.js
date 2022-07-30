@@ -244,7 +244,7 @@ exports.OrderPost = async(req, res) => {
 				for(let j=0; j<oSkus.length; j++) {
 					let Sku = null;
 					const obj_OrderSku = oSkus[j];
-					if(MdFilter.isObjectId(obj_OrderSku.Sku)) Sku = await SkuDB.findOne({_id: obj_OrderSku.Sku, Prod: Prod._id});
+					if(MdFilter.isObjectId(obj_OrderSku.Sku) && Prod) Sku = await SkuDB.findOne({_id: obj_OrderSku.Sku, Prod: Prod._id});
 					// if(!Sku || Sku.is_usable === false || Sku.is_sell === false) continue;
 					obj_OrderSku.Order = _OrderProd.Order;
 					obj_OrderSku.OrderProd = _OrderProd._id;
