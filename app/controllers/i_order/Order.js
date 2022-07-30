@@ -215,7 +215,7 @@ exports.OrderPost = async(req, res) => {
 					}
 				} else {
 					if(isNaN(obj_OrderProd.price)) return MdFilter.jsonFailed(res, {message: `您的订单产品价格 price:${price} 信息错误, 应该为数字`});
-					obj_OrderProd.price_regular = obj_OrderProd.prod_sale = obj_OrderProd.price = parseFloat(obj_OrderProd.price);
+					obj_OrderProd.price_regular = obj_OrderProd.price_sale = obj_OrderProd.price = parseFloat(obj_OrderProd.price);
 					obj_OrderProd.weight = isNaN(obj_OrderProd.weight) ? 0: parseFloat(obj_OrderProd.weight);
 				}
 				
