@@ -52,7 +52,6 @@ exports.ClientPost = async(req, res) => {
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 
 		if(same_param["$or"].length > 0) {
-			console.log(111, same_param);
 			const objSame = await ClientDB.findOne(same_param);
 			if(objSame) {
 				if(objSame.code === obj.code) return MdFilter.jsonFailed(res, {message: '已有此客户编号'});
@@ -229,12 +228,15 @@ exports.ClientDelete = async(req, res) => {
 	console.log("/ClientDelete");
 	try{
 		const payload = req.payload;
+		let Firm = payload.Firm;
+		if(Firm._id) Firm = Firm._id;
 
 		const id = req.params.id;		// 所要更改的User的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
-		console.log(222, payload.Firm._id);
-		const objDel = await ClientDB.deleteOne({_id: id, Firm: payload.Firm._id});
+		let param = {_id: id};
+		if(Firm) param.Firm = Firm;
+		const objDel = await ClientDB.deleteOne(param);
 		return MdFilter.jsonSuccess(res, {message: '删除成功'})
 	} catch(error) {
 		return MdFilter.json500(res, {message: "ClientDelete", error});
