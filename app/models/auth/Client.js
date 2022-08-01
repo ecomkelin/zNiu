@@ -37,7 +37,7 @@ const dbSchema = new Schema({
 		phone: String,
 		note: String,
 	}],
-
+	Firm: {type: ObjectId, ref: 'Firm'},
 	is_active: Boolean, 								// 只读
 	is_usable: { type: Boolean, default: true },		// 平台管理员
 	sort: {type: Number, default: 0},					// 平台管理员

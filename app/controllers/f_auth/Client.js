@@ -17,13 +17,20 @@ exports.ClientPost = async(req, res) => {
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 		// console.log(obj);
 
-		const same_param = {$or: []};
-		const stints = ['code', 'pwd'];
-		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
-		same_param["$or"].push({code: obj.code});
+		let same_param = {$or: []};
+		const stints = ['pwd'];
 
 		if(obj.pwd) obj.pwd = obj.pwd.replace(/^\s*/g,"");
 		if(!obj.pwd) obj.pwd = "111111";
+
+		if(obj.code) {
+			obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
+			if(obj.code && obj.code.length > 0) {
+				stints.push('code');
+				same_param["$or"].push({code: obj.code});
+			}
+		}
+
 		if(obj.phonePre && obj.phoneNum) {
 			obj.phonePre = obj.phonePre.replace(/^\s*/g,"");
 			obj.phoneNum = obj.phoneNum.replace(/^\s*/g,"");
@@ -43,15 +50,18 @@ exports.ClientPost = async(req, res) => {
 		const errorInfo = MdFilter.objMatchStint(StintClient, obj, stints);
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 
-		const objSame = await ClientDB.findOne(same_param);
-		if(objSame) {
-			if(objSame.code === obj.code) return MdFilter.jsonFailed(res, {message: '已有此客户编号'});
-			if(objSame.phone === obj.phone) return MdFilter.jsonFailed(res, {message: '已有此客户电话'});
-			if(objSame.email === obj.email) return MdFilter.jsonFailed(res, {message: '已有此客户邮箱'});
+		if(same_param["$or"].length > 0) {
+			const objSame = await ClientDB.findOne(same_param);
+			if(objSame) {
+				if(objSame.code === obj.code) return MdFilter.jsonFailed(res, {message: '已有此客户编号'});
+				if(objSame.phone === obj.phone) return MdFilter.jsonFailed(res, {message: '已有此客户电话'});
+				if(objSame.email === obj.email) return MdFilter.jsonFailed(res, {message: '已有此客户邮箱'});
+			}
+
 		}
 
 		obj.pwd = await MdFilter.encrypt_Prom(obj.pwd);
-
+		obj.Firm = payload.Firm._id || payload.Firm;
 		const _object = new ClientDB(obj);
 		const objSave = await _object.save();
 		if(Object.keys(req.query).length > 0) {
@@ -189,11 +199,10 @@ exports.ClientPut = async(req, res) => {
 	console.log("/ClientPut");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Client的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
-		const pathObj = {_id: id};
+		const pathObj = {_id: id, Firm: payload.Firm._id};
 
 		const Client = await ClientDB.findOne(pathObj);
 		if(!Client) return MdFilter.jsonFailed(res, {message: "没有找到此客户信息"});
@@ -222,7 +231,7 @@ exports.ClientDelete = async(req, res) => {
 		const id = req.params.id;		// 所要更改的User的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
-		const objDel = await ClientDB.deleteOne({_id: id});
+		const objDel = await ClientDB.deleteOne({_id: id, Firm: payload.Firm._id});
 		return MdFilter.jsonSuccess(res, {message: '删除成功'})
 	} catch(error) {
 		return MdFilter.json500(res, {message: "ClientDelete", error});
@@ -252,14 +261,17 @@ exports.Client = async(req, res) => {
 		return MdFilter.json500(res, {message: "Client", error});
 	}
 }
-
+const Client_path_Func = (pathObj, payload, queryObj) => {
+	pathObj.Firm = payload.Firm;
+	if(!queryObj) return;
+}
 const obtFilterObj = (req, id) => {
 	const DB_filter =  {
 		payload: req.payload,
 		queryObj: req.query,
 
 		objectDB: ClientDB,
-		path_Callback: null,
+		path_Callback: Client_path_Func,
 		dbName: dbClient,
 	};
 	if(id) DB_filter.id = id;
