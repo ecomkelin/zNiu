@@ -32,6 +32,7 @@ module.exports = (app) => {
 	app.get('/api/b1/Users', MdAuth.by_bser, User.Users);
 
 	// /* ------------------------ Client ------------------------ */
+	app.delete('/api/b1/Client/:id', MdAuth.by_bser, Client.ClientDelete);
 	app.get('/api/b1/Client/:id', MdAuth.path_User, Client.Client);
 	app.put('/api/b1/Client/:id', MdAuth.path_User, Client.ClientPut);
 	app.post('/api/b1/Client', MdAuth.path_User, Client.ClientPost);

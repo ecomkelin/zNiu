@@ -214,6 +214,21 @@ exports.ClientPut = async(req, res) => {
 	}
 }
 
+exports.ClientDelete = async(req, res) => {
+	console.log("/ClientDelete");
+	try{
+		const payload = req.payload;
+
+		const id = req.params.id;		// 所要更改的User的id
+		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
+
+		const objDel = await ClientDB.deleteOne({_id: id});
+		return MdFilter.jsonSuccess(res, {message: '删除成功'})
+	} catch(error) {
+		return MdFilter.json500(res, {message: "ClientDelete", error});
+	}
+}
+
 
 
 

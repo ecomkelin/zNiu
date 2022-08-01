@@ -238,7 +238,6 @@ exports.UserDelete = async(req, res) => {
 	console.log("/UserDelete");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的User的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
@@ -251,7 +250,7 @@ exports.UserDelete = async(req, res) => {
 		if(payload.role >= User.role) return MdFilter.jsonFailed(res, {message: "您没有权限删除此用户"});
 
 		const objDel = await UserDB.deleteOne({_id: User._id});
-		return MdFilter.jsonSuccess(res, {message: '删除成功'})
+		return MdFilter.jsonSuccess(res, {message: '删除成功'});
 	} catch(error) {
 		return MdFilter.json500(res, {message: "UserDelete", error});
 	}
