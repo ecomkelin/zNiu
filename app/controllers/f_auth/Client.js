@@ -11,13 +11,14 @@ exports.ClientPost = async(req, res) => {
 	console.log("/ClientPost");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
+		let Firm = payload.Firm;
+		if(Firm._id) Firm = Firm._id;
 
 		const obj = req.body.obj;
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 		// console.log(obj);
 
-		let same_param = {Firm: payload.Firm._id, $or: []};
+		let same_param = {Firm, $or: []};
 		const stints = ['pwd'];
 
 		if(obj.pwd) obj.pwd = obj.pwd.replace(/^\s*/g,"");
@@ -51,6 +52,7 @@ exports.ClientPost = async(req, res) => {
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 
 		if(same_param["$or"].length > 0) {
+			console.log(111, same_param);
 			const objSame = await ClientDB.findOne(same_param);
 			if(objSame) {
 				if(objSame.code === obj.code) return MdFilter.jsonFailed(res, {message: '已有此客户编号'});
@@ -61,7 +63,7 @@ exports.ClientPost = async(req, res) => {
 		}
 
 		obj.pwd = await MdFilter.encrypt_Prom(obj.pwd);
-		obj.Firm = payload.Firm._id || payload.Firm;
+		obj.Firm = Firm;
 		const _object = new ClientDB(obj);
 		const objSave = await _object.save();
 		if(Object.keys(req.query).length > 0) {
@@ -231,6 +233,7 @@ exports.ClientDelete = async(req, res) => {
 		const id = req.params.id;		// 所要更改的User的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
+		console.log(222, payload.Firm._id);
 		const objDel = await ClientDB.deleteOne({_id: id, Firm: payload.Firm._id});
 		return MdFilter.jsonSuccess(res, {message: '删除成功'})
 	} catch(error) {
