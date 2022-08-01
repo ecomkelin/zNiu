@@ -41,6 +41,7 @@ exports.OrderPost = async(req, res) => {
 		if(ConfUser.role_Arrs.includes(payload.role)) {
 			if(payload.role < ConfUser.role_set.boss) return MdFilter.jsonFailed(res, {message: "您的身份不是店铺工作人员"});
 			obj_Order.Shop = payload.Shop._id;
+			obj_Order.User_Oder = payload._id;
 		} else {
 			if(!MdFilter.isObjectId(obj_Order.Shop)) return MdFilter.jsonFailed(res, {message: "请传递正确的Shop_id信息"});
 		}
@@ -384,7 +385,7 @@ exports.OrderPost = async(req, res) => {
 const generate_codeOrder_Prom = (Shop_id, Shop_code) => {
 	return new Promise(async(resolve) => {
 		try{
-			const pre_Order = await OrderDB.findOne({Shop: Shop_id, code: {'$ne': null}})
+			const pre_Order = await OrderDB.findOne({Shop: Shop_id, is_offline: {"$ne": true}, code: {'$ne': null}})
 				.sort({'at_crt': -1});
 
 			const nowDate = new Date();
@@ -644,6 +645,9 @@ const Order_path_Func = (pathObj, payload, queryObj) => {
 		pathObj.Firm = payload.Firm;
 		if(payload.role >= ConfUser.role_set.pter) {
 			pathObj.Shop = payload.Shop._id;
+			if(payload.role > ConfUser.role_set.boss) {
+				pathObj.User_Oder = payload._id;
+			}
 		}
 	} else {
 		pathObj.is_hide_client = false;
