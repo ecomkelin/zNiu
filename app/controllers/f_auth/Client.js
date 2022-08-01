@@ -17,7 +17,7 @@ exports.ClientPost = async(req, res) => {
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 		// console.log(obj);
 
-		let same_param = {$or: []};
+		let same_param = {Firm: payload.Firm._id, $or: []};
 		const stints = ['pwd'];
 
 		if(obj.pwd) obj.pwd = obj.pwd.replace(/^\s*/g,"");
