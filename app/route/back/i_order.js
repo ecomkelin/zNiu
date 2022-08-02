@@ -16,11 +16,11 @@ module.exports = (app) => {
 	app.get('/api/b1/OrderSkus', MdAuth.path_User, OrderSku.OrderSkus);
 
 	/* =============================== Order =============================== */
-	app.delete('/api/b1/Order/:id', MdAuth.path_User, Order.OrderDelete);
+	app.delete('/api/b1/Order/:id', MdAuth.path_bser, Order.OrderDelete);
 	app.post('/api/b1/Order', MdAuth.path_User, Order.OrderPost);
 	app.get('/api/b1/Orders', MdAuth.path_User, Order.Orders);
 	app.get('/api/b1/Order/:id', MdAuth.path_User, Order.Order);
-	app.put('/api/b1/Order/:id', MdAuth.path_User, Order.OrderPutBack);
+	app.put('/api/b1/Order/:id', MdAuth.path_bser, Order.OrderPutBack);
 
 	app.get('/api/b1/addTicket/:id', MdAuth.path_User, Order.addTicket);
 	app.get('/api/b1/clearTicket', MdAuth.path_User, Order.clearTicket);

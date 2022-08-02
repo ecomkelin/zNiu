@@ -12,6 +12,7 @@ const dbSchema = new Schema({
 	nome: String,									// 店铺名称
 	addr: String,									// 店铺地址
 	zip: String,									// 店铺所属地址邮编
+	tel: String,
 
 	img_url: String,								// 店铺logo
 
