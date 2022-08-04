@@ -47,6 +47,12 @@ exports.ShopPost = async(req, res) => {
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 
+		if(obj.cassa_auth) {
+			let {hide_orders, hide_clients} = obj.cassa_auth;
+			obj.cassa_auth.hide_orders = (hide_orders == 1 || hide_orders === 'true') ? true : false;
+			obj.cassa_auth.hide_clients = (hide_clients == 1 || hide_clients === 'true') ? true : false;
+		}
+
 		// 分店的编号或者名称是否相同
 		const objSame = await ShopDB.findOne({$or:[{'code': obj.code}, {'nome': obj.nome}], Firm: payload.Firm});
 		if(objSame) return MdFilter.jsonFailed(res, {message: '店铺编号或名称相同'});
@@ -180,6 +186,13 @@ const Shop_general = async(res, obj, Shop, payload) => {
 		if(obj.img_url && (obj.img_url != Shop.img_url) && Shop.img_url && Shop.img_url.split("Shop").length > 1){
 			await MdFiles.rmPicture(Shop.img_url);
 			Shop.img_url = obj.img_url;
+		}
+
+		if(obj.cassa_auth) {
+			let {hide_orders, hide_clients} = obj.cassa_auth;
+			if(!Shop.cassa_auth) Shop.cassa_auth = {};
+			Shop.cassa_auth.hide_orders = (hide_orders == 1 || hide_orders === 'true') ? true : false;
+			Shop.cassa_auth.hide_clients = (hide_clients == 1 || hide_clients === 'true') ? true : false;
 		}
 
 		Shop.User_upd = payload._id;

@@ -14,6 +14,11 @@ const dbSchema = new Schema({
 	zip: String,									// 店铺所属地址邮编
 	tel: String,
 
+	cassa_auth: {
+		hide_orders: Boolean,
+		hide_clients: Boolean
+	},
+
 	img_url: String,								// 店铺logo
 
 	phonePre: String,
