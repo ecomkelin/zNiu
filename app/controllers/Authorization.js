@@ -15,7 +15,7 @@ exports.refreshtoken = async(req, res, objectDB) => {
 		const payload = refresh_res.data.payload;
 		const reToken = refresh_res.data.token;
 		const object = await objectDB.findOne({_id: payload._id})
-			.populate({path: "Shop", select: "typeShop"});
+			.populate({path: "Shop", select: "typeShop cassa_auth"});
 		if(!object) return MdFilter.jsonFailed(res, {message: "授权错误, 请重新登录"});
 		// const match_res = await MdFilter.matchBcryptProm(reToken, object.refreshToken);
 		// if(match_res.status != 200) return MdFilter.jsonFailed(res, {message: "refreshToken 不匹配"});
