@@ -24,6 +24,8 @@ exports.ShopPost = async(req, res) => {
 
 		if(obj.Firm === 'Supplier') {
 			obj.Firm = null;
+			obj.typeShop = 'Supplier';
+			obj.Firm = payload.Firm._id;
 			if(!MdFilter.isObjectId(obj.Cita)) obj.Cita = null;
 		} else {
 			if(payload.role > ConfUser.role_set.manager) return MdFilter.jsonFailed(res, {message: "需要公司管理者权限"});

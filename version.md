@@ -1,3 +1,4 @@
+0.92	Shop Supplier Firm
 0.91	payload Shop cassa_auth
 0.90	Shop auth 前台能否看订单
 0.89	只有老板能删除订单, Shop tel 字段

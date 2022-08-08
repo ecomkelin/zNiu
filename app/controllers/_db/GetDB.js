@@ -60,7 +60,7 @@ exports.dbs = (GetDB_Filter) => {
 			if(queryObj.sortVals) queryObj.sortVal = queryObj.sortVals[queryObj.sortVals.length -1];
 			const sortObj = MdFilter.sort_Func(queryObj.sortKey, parseInt(queryObj.sortVal), dbName);
 			console.log('dbs pathObj: ', pathObj)
-			console.log('dbs sortObj: ', sortObj)
+			// console.log('dbs sortObj: ', sortObj)
 			const count = await objectDB.countDocuments(pathObj);
 			let objects = await objectDB.find(pathObj, selectObj)
 				.sort(sortObj)
