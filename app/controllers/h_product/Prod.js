@@ -623,7 +623,7 @@ const Prod_path_Func = (pathObj, payload, queryObj) => {
 // let flag = 1;
 const dbProd = 'Prod';
 exports.Prods = async(req, res) => {
-	console.log("/prods");
+	console.log("/prods", req.query);
 	try {
 		const payload = req.payload;
 		// if(flag === 1) {
