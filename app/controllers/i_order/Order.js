@@ -113,8 +113,7 @@ exports.OrderPost = async(req, res) => {
 		} else if(obj_Order.is_virtual == 1 || obj_Order.is_virtual === 'true') {
 			is_virtual = true;
 			if(!obj_Order.code) return MdFilter.jsonRes(res, {message: "请传递订单编号"});
-			if(isNaN(obj_Order.show_crt)) return MdFilter.jsonRes(res, {message: "请传递订单创建时间"});
-			obj_Order.show_crt = new Date(parseInt(obj_Order.show_crt));
+			obj_Order.show_crt = new Date(obj_Order.show_crt);
 			obj_Order.at_crt = Date.now;
 		} else {
 			const code_res = await generate_codeOrder_Prom(Shop._id, Shop.code);
