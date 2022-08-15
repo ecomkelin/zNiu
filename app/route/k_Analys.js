@@ -225,8 +225,7 @@ const judge_field = (dbName, field) => {
 	if(!field) return true;
 	return dbs_obj[dbName].fields.includes(field);
 }
-const path_match = (dbName, match, payload) => {
-	if(!match) match = {};
+const path_match = (dbName, match={}, payload) => {
 	match.Firm = payload.Firm;
 	if(payload.Shop) match.Shop = payload.Shop._id;
 	if(dbName === 'Order' || dbName === 'OrderProd') match.type_Order = (match.type_Order === 1) ? 1: -1;
@@ -235,15 +234,17 @@ const path_match = (dbName, match, payload) => {
 		if(!isNaN(crt_after)) {
 			(match["at_crt"]) ? (match["at_crt"]["$gte"] = crt_after) : (match["at_crt"] = {"$gte": crt_after})
 		}
-		delete match.crt_after;
 	}
+	delete match.crt_after;
+
 	if(match.crt_before && match.crt_before.length > 8) {
 		let crt_before = new Date((new Date(match.crt_before).setHours(23,59,59,999)));
 		if(!isNaN(crt_before)) {
 			(match["at_crt"]) ? (match["at_crt"]["$lte"] = crt_before) : (match["at_crt"] = {"$lte": crt_before+24*60*60*1000})
 		}
-		delete match.crt_before;
 	}
+	delete match.crt_before;
+
 	return match;
 }
 
