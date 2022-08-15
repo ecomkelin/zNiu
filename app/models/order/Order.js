@@ -111,7 +111,7 @@ const dbSchema = new Schema({
 	OrderProds: [{type: ObjectId, ref: 'OrderProd'}],
 
 	Firm: {type: ObjectId, ref: 'Firm'},		// [只读 绝对]
-	show_crt: Date,								// 显示时间
+	show_crt: Date,								// 显示时间	// 如果是 is_virtual 就有时间
 	at_crt: Date,								// [只读 绝对]
 	at_upd: Date,								// [只读 绝对]
 	at_schedule: Date,							// [只读 绝对]	计划收货时间

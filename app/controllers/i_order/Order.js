@@ -335,7 +335,7 @@ exports.OrderPost = async(req, res) => {
 			_Order.OrderProds.push(_OrderProd._id);
 		}
 		// 判断 如果订单 下没有采购商品 则错误
-		if(_Order.goods_quantity < 1) return MdFilter.jsonFailed(res, {message: "订单中没有产品"});
+		// if(_Order.goods_quantity < 1) return MdFilter.jsonFailed(res, {message: "订单中没有产品"});
 
 		let tax = _Order.is_tax ? 1.22 : 1;
 		// 为 order_price 赋值
