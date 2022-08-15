@@ -1,3 +1,4 @@
+0.93	虚拟订单
 0.92	Shop Supplier Firm
 0.91	payload Shop cassa_auth
 0.90	Shop auth 前台能否看订单

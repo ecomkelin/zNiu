@@ -99,6 +99,7 @@ exports.OrderPost = async(req, res) => {
 			obj_Order.isPaid = (obj_Order.isPaid == 1 || obj_Order.isPaid == 'true') ? true : false;
 		}
 
+		let is_virtual = false;
 		// 基本信息赋值
 		if(org_OrderId) {
 			const org_Order = await OrderDB.findOne({_id: org_OrderId});
@@ -109,6 +110,12 @@ exports.OrderPost = async(req, res) => {
 			if(!obj_Order.code) return MdFilter.jsonRes(res, {message: "请传递订单编号"});
 			if(isNaN(obj_Order.at_crt)) return MdFilter.jsonRes(res, {message: "请传递订单创建时间"});
 			obj_Order.at_crt = new Date(parseInt(obj_Order.at_crt));
+		} else if(obj_Order.is_virtual == 1 || obj_Order.is_virtual === 'true') {
+			is_virtual = true;
+			if(!obj_Order.code) return MdFilter.jsonRes(res, {message: "请传递订单编号"});
+			if(isNaN(obj_Order.show_crt)) return MdFilter.jsonRes(res, {message: "请传递订单创建时间"});
+			obj_Order.show_crt = new Date(parseInt(obj_Order.show_crt));
+			obj_Order.at_crt = Date.now;
 		} else {
 			const code_res = await generate_codeOrder_Prom(Shop._id, Shop.code);
 			if(code_res.status !== 200) return MdFilter.jsonRes(res, {message: code_res.message});
@@ -202,7 +209,7 @@ exports.OrderPost = async(req, res) => {
 
 				if(Prod) {
 					obj_OrderProd.weight = Prod.weight || 0;
-					await ProdDB.updateOne({"_id" : Prod._id},{$inc: {quantity}} );
+					if(!is_virtual) await ProdDB.updateOne({"_id" : Prod._id},{$inc: {quantity}} );
 
 					// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
 					obj_OrderProd.price_regular = (type_Order === 1) ? Prod.price_cost : Prod.price_regular;
@@ -270,7 +277,7 @@ exports.OrderPost = async(req, res) => {
 						obj_OrderSku.attrs = "";
 						if(Sku.attrs) Sku.attrs.forEach(attr => obj_OrderSku.attrs += `${attr.nome}:${attr.option},`);
 
-						await SkuDB.updateOne({"_id" : Sku._id},{$inc: {quantity}} );
+						if(!is_virtual) await SkuDB.updateOne({"_id" : Sku._id},{$inc: {quantity}} );
 						obj_OrderSku.weight = Sku.weight || 0;
 
 						// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格

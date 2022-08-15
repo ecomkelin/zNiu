@@ -12,7 +12,8 @@ const dbSchema = new Schema({
 	type_Order: Number, 								// [post写(Client[-1]) put只读] enum: [1, -1] 采购 销售
 	Supplier: {type: ObjectId, ref: 'Shop'},			// 供应商
 
-	is_offline: Boolean,
+	is_offline: Boolean,								// 是否为离线订单 可能没有用
+	is_virtual: Boolean, 								// 是否为虚拟订单
 	status: Number,										// enum: ConfOrder;
 	is_hide_client: {type: Boolean, default: false}, 	// 客户是否可见, 客户删除状态下， 商家可删除
 
@@ -110,6 +111,7 @@ const dbSchema = new Schema({
 	OrderProds: [{type: ObjectId, ref: 'OrderProd'}],
 
 	Firm: {type: ObjectId, ref: 'Firm'},		// [只读 绝对]
+	show_crt: Date,								// 显示时间
 	at_crt: Date,								// [只读 绝对]
 	at_upd: Date,								// [只读 绝对]
 	at_schedule: Date,							// [只读 绝对]	计划收货时间
