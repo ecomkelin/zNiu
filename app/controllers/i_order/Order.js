@@ -114,7 +114,7 @@ exports.OrderPost = async(req, res) => {
 			is_virtual = true;
 			if(!obj_Order.code) return MdFilter.jsonRes(res, {message: "请传递订单编号"});
 			obj_Order.show_crt = new Date(obj_Order.show_crt);
-			obj_Order.at_crt = Date.now;
+			obj_Order.at_crt = Date.now();
 		} else {
 			const code_res = await generate_codeOrder_Prom(Shop._id, Shop.code);
 			if(code_res.status !== 200) return MdFilter.jsonRes(res, {message: code_res.message});
