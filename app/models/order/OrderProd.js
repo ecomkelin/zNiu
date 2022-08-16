@@ -9,6 +9,9 @@ const dbSchema = new Schema({
 	Order: {type: ObjectId, ref: "Order"},				// [只读 绝对]
 	status: Number,										// enum: ConfOrder;
 	type_Order: Number, 								// [post写(Client[-1]) put只读] enum: [1, -1] 采购 销售
+	
+	is_virtual: {type: Boolean, default: false},		// 是否为虚拟订单
+
 	Supplier: {type: ObjectId, ref: 'Shop'},			// 供应商
 	// 基本信息
 	Prod: {type: ObjectId, ref: "Prod"},				// [只读 绝对]

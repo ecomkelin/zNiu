@@ -8,8 +8,10 @@ const colection = 'OrderSku';
 const dbSchema = new Schema({
 	Order: {type: ObjectId, ref: "Order"},				// [只读 绝对]
 	OrderProd: {type: ObjectId, ref: "OrderProd"},		// [只读 绝对]
-	Client: {type: ObjectId, ref: 'Client'},			// [只读 权限 Client只读]
 	type_Order: Number, 								// [post写(Client[-1]) put只读] enum: [1, -1] 采购 销售
+	is_virtual: {type: Boolean, default: false},		// 是否为虚拟订单
+
+	Client: {type: ObjectId, ref: 'Client'},			// [只读 权限 Client只读]
 	Supplier: {type: ObjectId, ref: 'Shop'},			// 供应商
 	status: Number,										// enum: ConfOrder;
 	// 基本信息

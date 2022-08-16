@@ -169,6 +169,7 @@ exports.OrderPost = async(req, res) => {
 			// if(!Prod || Prod.is_usable === false || Prod.is_sell === false) continue;
 			// 为数据分析做铺垫
 			obj_OrderProd.Order = _Order._id;
+			obj_OrderProd.is_virtual = is_virtual;
 			obj_OrderProd.Client = _Order.Client;
 			obj_OrderProd.type_Order = type_Order;
 			obj_OrderProd.Supplier = _Order.Supplier;
@@ -254,6 +255,7 @@ exports.OrderPost = async(req, res) => {
 					if(MdFilter.isObjectId(obj_OrderSku.Sku) && Prod) Sku = await SkuDB.findOne({_id: obj_OrderSku.Sku, Prod: Prod._id});
 					// if(!Sku || Sku.is_usable === false || Sku.is_sell === false) continue;
 					obj_OrderSku.Order = _OrderProd.Order;
+					obj_OrderSku.is_virtual = is_virtual;
 					obj_OrderSku.OrderProd = _OrderProd._id;
 					obj_OrderSku.type_Order = type_Order;
 
