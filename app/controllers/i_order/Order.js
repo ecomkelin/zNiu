@@ -317,8 +317,8 @@ exports.OrderPost = async(req, res) => {
 			if(isNaN(_OrderProd.prod_sale)) return MdFilter.jsonFailed(res, {message: "订单 prod_sale 错误"});
 			if(isNaN(_OrderProd.prod_price)) return MdFilter.jsonFailed(res, {message: "订单 prod_price 错误"});
 
-			// 判断 如果订单 商品下没有 Sku 则说明没有买此商品 则跳过
-			if(_OrderProd.prod_quantity < 1) continue;
+			// // 判断 如果订单 商品下没有 Sku 则说明没有买此商品 则跳过
+			// if(_OrderProd.prod_quantity < 1) continue;
 			_OrderProd.at_crt = _OrderProd.at_upd = obj_Order.at_crt;
 			obj_OrderProds.push(_OrderProd);
 			// const OProdSave = await _OrderProd.save();
