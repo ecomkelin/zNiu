@@ -263,6 +263,9 @@ const vOrderSku_path_Func = (pathObj, payload, queryObj) => {
 	if(MdFilter.isObjectId(queryObj.Order) ) pathObj["Order"] = queryObj.Order;
 	if(MdFilter.isObjectId(queryObj.Prod) ) pathObj.Prod = queryObj.Prod; 
 	if(MdFilter.isObjectId(queryObj.Sku) ) pathObj.Sku = queryObj.Sku; 
+	if(queryObj.is_virtual) {
+		pathObj.is_virtual = (queryObj.is_virtual == 1 || queryObj.is_virtual === 'true') ? true : false;
+	}
 	if(queryObj.Clients) {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Clients);
 		if(arrs.length > 0) pathObj.Client = {"$in": arrs};

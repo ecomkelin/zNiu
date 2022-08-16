@@ -671,6 +671,9 @@ const Order_path_Func = (pathObj, payload, queryObj) => {
 	if(queryObj.User_Oder) {
 		pathObj.User_Oder = queryObj.User_Oder
 	}
+	if(queryObj.is_virtual) {
+		pathObj.is_virtual = (queryObj.is_virtual == 1 || queryObj.is_virtual === 'true') ? true : false;
+	}
 	if(queryObj.Clients) {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Clients);
 		if(arrs.length > 0) pathObj.Client = {"$in": arrs};
