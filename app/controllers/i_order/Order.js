@@ -649,13 +649,10 @@ const OrderDelete_Prom = (payload, id) => {
 const Order_path_Func = (pathObj, payload, queryObj) => {
 	if(payload.Firm) {
 		pathObj.Firm = payload.Firm;
-		console.log(111, payload.role, ConfUser.role_set.pter)
-		if(payload.role >= ConfUser.role_set.pter) {
+		if(payload.role >= ConfUser.role_set.printer) {
 			pathObj.Shop = payload.Shop._id;
-			console.log(222, ConfUser.role_set.boss, pathObj.Shop)
 			if(payload.role > ConfUser.role_set.boss) {
 				pathObj.User_Oder = payload._id;
-				console.log(333, pathObj.User_Oder)
 			}
 		}
 	} else {
@@ -683,7 +680,7 @@ const Order_path_Func = (pathObj, payload, queryObj) => {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Paidtypes);
 		if(arrs.length > 0) pathObj.Paidtype = {"$in": arrs};
 	}
-	if(queryObj.Shops && payload.role < ConfUser.role_set.pter) {
+	if(queryObj.Shops && payload.role < ConfUser.role_set.printer) {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Shops);
 		if(arrs.length > 0) pathObj.Shop = {"$in": arrs};
 	}

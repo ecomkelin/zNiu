@@ -1,3 +1,4 @@
+0.94	bug role_set pter -> printer
 0.93	虚拟订单
 0.92	Shop Supplier Firm
 0.91	payload Shop cassa_auth

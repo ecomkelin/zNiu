@@ -143,7 +143,7 @@ exports.TableDelete = async(req, res) => {
 
 const Table_path_Func = (pathObj, payload, queryObj) => {
 	pathObj.Firm = payload.Firm;
-	if(payload.role >= ConfUser.role_set.pter) {
+	if(payload.role >= ConfUser.role_set.printer) {
 		pathObj.Shop = payload.Shop._id;
 	}
 
@@ -153,11 +153,11 @@ const Table_path_Func = (pathObj, payload, queryObj) => {
 		// if(arrs.length > 0) pathObj.status["$in"] = arrs;
 		if(arrs.length > 0) pathObj.status = {"$in": arrs};
 	}
-	if(queryObj.Clients && payload.role < ConfUser.role_set.pter) {
+	if(queryObj.Clients && payload.role < ConfUser.role_set.printer) {
 		const arrs = MdFilter.stringToArray(queryObj.Clients);
 		if(arrs.length > 0) pathObj.Client = {"$in": arrs};
 	}
-	if(queryObj.Shops && payload.role < ConfUser.role_set.pter) {
+	if(queryObj.Shops && payload.role < ConfUser.role_set.printer) {
 		const arrs = MdFilter.stringToArray(queryObj.Shops);
 		if(arrs.length > 0) pathObj.Shop = {"$in": arrs};
 	}

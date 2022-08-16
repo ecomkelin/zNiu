@@ -60,7 +60,7 @@ exports.UserPost = async(req, res) => {
 		if(!obj.role) return MdFilter.jsonFailed(res, {message: "请选择用户权限"});
 		if(payload.role >= obj.role) return MdFilter.jsonFailed(res, {message: "您的权限不足"});
 		if(!ConfUser.role_Arrs.includes(parseInt(obj.role))) return MdFilter.jsonFailed(res, {message: '用户权限参数错误'});
-		if(obj.role >= ConfUser.role_set.pter) {
+		if(obj.role >= ConfUser.role_set.printer) {
 			if(!obj.Shop) return MdFilter.jsonFailed(res, {message: '请选择用户的所属分店'});
 			if(!MdFilter.isObjectId(obj.Shop)) return MdFilter.jsonFailed(res, {message: '请输入用户所在分店'});
 			const Shop = await ShopDB.findOne({_id: obj.Shop, Firm: payload.Firm});
@@ -201,14 +201,14 @@ const User_general = async(req, res, User, payload) => {
 			if(!ConfUser.role_Arrs.includes(obj.role)) return MdFilter.jsonFailed(res, {message: '您设置的用户权限参数不存在'});
 			if(obj.role <= payload.role) return MdFilter.jsonFailed(res, {message: '您无权授予此权限'});
  
-			if(obj.role >= ConfUser.role_set.pter && !obj.Shop) return MdFilter.jsonFailed(res, {message: '请为该角色设置分店'});
-			if(obj.role < ConfUser.role_set.pter) obj.Shop = null;
+			if(obj.role >= ConfUser.role_set.printer && !obj.Shop) return MdFilter.jsonFailed(res, {message: '请为该角色设置分店'});
+			if(obj.role < ConfUser.role_set.printer) obj.Shop = null;
 			User.role = obj.role;
 		}
 
 		if(obj.Shop && (obj.Shop != User.Shop)) {
 			const role = obj.role || User.role;
-			if(role >= ConfUser.role_set.pter) {
+			if(role >= ConfUser.role_set.printer) {
 				if(!MdFilter.isObjectId(obj.Shop)) return MdFilter.jsonFailed(res, {message: '分店数据需要为 _id 格式'});
 				if(payload.role >= ConfUser.role_set.manager)	return MdFilter.jsonFailed(res, {message: '修改用户所属店铺需要总公司管理权限'});
 				const Shop = await ShopDB.findOne({_id: obj.Shop, Firm: payload.Firm});
