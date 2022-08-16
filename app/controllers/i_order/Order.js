@@ -358,8 +358,8 @@ exports.OrderPost = async(req, res) => {
 			await OrderProdDB.deleteMany({Order: org_OrderId});
 		}
 
-		const OrderSame = await OrderDB.findOne({code: _Order.code, Firm: _Order.Firm, _id: {"$ne": _Order._id}});
-		if(OrderSame) return MdFilter.json500(res, {message: "下单错误 错误码 100101"});
+		// const OrderSame = await OrderDB.findOne({code: _Order.code, Firm: _Order.Firm, _id: {"$ne": _Order._id}});
+		// if(OrderSame) return MdFilter.json500(res, {message: "下单错误 错误码 100101"});
 
 		const OrderSave = await _Order.save();
 		if(!OrderSave) return MdFilter.json500(res, {message: "下单错误 错误码 100102"});
