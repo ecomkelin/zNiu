@@ -667,7 +667,7 @@ const Order_path_Func = (pathObj, payload, queryObj) => {
 		if(arrs.length > 0) pathObj.status = {"$in": arrs};
 	}
 	if(queryObj.User_Oder) {
-		console.log(222, queryObj.User_Oder);
+		pathObj.User_Oder = queryObj.User_Oder
 	}
 	if(queryObj.Clients) {
 		const arrs = MdFilter.stringToObjectIds(queryObj.Clients);
@@ -692,7 +692,7 @@ const Order_path_Func = (pathObj, payload, queryObj) => {
 const dbOrder = 'Order';
 exports.Orders = async(req, res) => {
 	console.log("/Orders");
-	console.log(111, req.query)
+	// console.log(111, req.query)
 	// const ods = await OrderDB.find({});
 	// console.log(ods);
 	try {
