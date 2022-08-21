@@ -630,11 +630,11 @@ exports.Prods = async(req, res) => {
 	console.log("/prods");
 	try {
 		const payload = req.payload;
-		if(flag === 1) {
+		// if(flag === 1) {
 		// 	fNiu_zNiu(payload);
-			code_supplier2(payload);
-			flag = 2;
-		}
+			// code_supplier2(payload);
+		// 	flag = 2;
+		// }
 
 		// console.log(payload)
 		const GetDB_Filter = {
