@@ -454,19 +454,21 @@ exports.ProdPut = async(req, res) => {
 
 			if(payload.Shop.typeShop === "ws"){
 				obj.codeFlag = obj.codeFlag.replace(/^\s*/g,"").toUpperCase();
-				if((obj.Supplier && obj.Supplier !== Prod.Supplier) || (obj.codeFlag && obj.codeFlag !== Prod.codeFlag)) {
+				if(obj.Supplier !== Prod.Supplier || (obj.codeFlag && obj.codeFlag !== Prod.codeFlag)) {
 					let SupplierCode = "";
-					if(MdFilter.isObjectId(obj.Supplier) && obj.Supplier !== Prod.Supplier) {
+					if(obj.Supplier) {
 						const Supplier = await ShopDB.findOne({_id: obj.Supplier});
 						if(!Supplier) return MdFilter.jsonFailed(res, {message: "没有找到供应商信息"});
 						SupplierCode = "-"+Supplier.code;
 						Prod.Supplier = obj.Supplier;
 					}
-					if(obj.codeFlag && obj.codeFlag !== Prod.codeFlag) {
+						
+					if(obj.codeFlag !== Prod.codeFlag) {
 						isWsChangeCodeFlag = true;
 						Prod.codeFlag = obj.codeFlag;
-						Prod.codeLen = obj.codeFlag.length;		
+						Prod.codeLen = obj.codeFlag.length;
 					}
+
 					Prod.code = Prod.codeFlag+SupplierCode;
 				}
 			} else {
