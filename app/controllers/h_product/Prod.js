@@ -673,13 +673,31 @@ let nub = 0;
 // Supplier = code(SS) codeFlag = code(nnn)
 const code_supplier2 = async(payload) => {
 	console.log(111, 'code_supplier2');
-	const ps = await ProdDB.find({}, {code: 1, codeFlag: 1, Supplier: 1});
-	for(let i=0; i<ps.length; i++) {
-		let pd = ps[i];
-		if(pd.code[0] === 'Z' && pd.code[1] === 'S' && !pd.Supplier) {
-			console.log(nub++);
+	const sps = await ShopDB.find({}, {code: 1});
+	const pds = await ProdDB.find({}, {code: 1, codeFlag: 1, Supplier: 1});
+
+
+	for(let i=0; i<pds.length; i++) {
+		let pd = pds[i];
+		let p_code = pd.code;
+		if(pd.Supplier) continue;
+		if(!isNaN(parseInt(p_code[0]))) continue;
+		for(let n = 0; n<sps.length; n++) {
+			let sp = sps[n];
+			let s_code = sp.code;
+			let flag = true;
+			for(let j=0; j<s_code.length; j++) {
+				if(p_code[j] !== s_code[j]) {
+					flag = false;
+					break;
+				}
+			}
+			if(flag) {
+
+			}
 		}
 	}
+	
 }
 
 
