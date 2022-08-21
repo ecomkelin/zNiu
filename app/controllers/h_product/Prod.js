@@ -660,8 +660,8 @@ const code_supplier = async(payload) => {
 		let pd = ps[i];
 		if(pd.Supplier) {
 			let sc = pd.Supplier.code;
-			console.log(111, pd.code, 222, sc);
-			let cs = ps.code.split('-');
+			console.log(111, pd.code, 222, sc, 333, pd.codeFlag);
+			let cs = String(ps.code).split('-');
 			if(cs.length > 1 && cs[cs.length-1] !== sc) {
 				pd.code = pd.codeFlag+'-'+sc;
 				console.log(111, pd.code);
