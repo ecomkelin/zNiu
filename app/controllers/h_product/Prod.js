@@ -622,16 +622,19 @@ const Prod_path_Func = (pathObj, payload, queryObj) => {
 		pathObj["Categs"] = {$in: ids};
 	}
 }
-// let flag = 1;
+
+
+let flag = 1;
 const dbProd = 'Prod';
 exports.Prods = async(req, res) => {
 	console.log("/prods");
 	try {
 		const payload = req.payload;
-		// if(flag === 1) {
+		if(flag === 1) {
 		// 	fNiu_zNiu(payload);
-		// 	flag = 2;
-		// }
+			code_supplier(payload);
+			flag = 2;
+		}
 
 		// console.log(payload)
 		const GetDB_Filter = {
@@ -648,11 +651,26 @@ exports.Prods = async(req, res) => {
 		return MdFilter.json500(res, {message: "Prods", error});
 	}
 }
-
+const code_supplier = async(payload) => {
+	console.log(111);
+	const ps = await ProdDB.find({Firm: payload.Firm._id}, {code: 1, codeFlag: 1})
+		.populate({path: "Supplier", select: "code"});
+	for(let i=0; i<ps.length; i++) {
+		let pd = ps[i];
+		if(pd.Supplier) {
+			let sc = pd.Supplier.code;
+			let cs = ps.code.split('-');
+			if(cs[1] != sc) {
+				pd.code = pd.codeFlag+'-'+sc;
+				await pd.save();
+			}
+		}
+	}
+}
 const fNiu_zNiu = async(payload) => {
-	console.log(111111)
+	// console.log(111111)
 	const nowDate = new Date();
-	const ps = await ProdDB.find();
+	const ps = await ProdDB.find({Firm: payload.Firm._id});
 	for(let i=0; i<ps.length; i++) {
 		const p = ps[i];
 
