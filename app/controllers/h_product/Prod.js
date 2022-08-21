@@ -671,7 +671,7 @@ const code_supplier1 = async(payload) => {
 }
 let nub = 0;
 // Supplier = code(SS) codeFlag = code(nnn)
-const code_supplier2 = async(payload) {
+const code_supplier2 = async(payload) => {
 	console.log(111, 'code_supplier2');
 	const ps = await ProdDB.find({}, {code: 1, codeFlag: 1, Supplier: 1});
 	for(let i=0; i<ps.length; i++) {
