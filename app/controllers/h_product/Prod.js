@@ -631,9 +631,8 @@ exports.Prods = async(req, res) => {
 	try {
 		const payload = req.payload;
 		if(flag === 1) {
-			console.log(111, payload.Firm);
 		// 	fNiu_zNiu(payload);
-			code_supplier(payload);
+			code_supplier2(payload);
 			flag = 2;
 		}
 
@@ -652,7 +651,8 @@ exports.Prods = async(req, res) => {
 		return MdFilter.json500(res, {message: "Prods", error});
 	}
 }
-const code_supplier = async(payload) => {
+// code = codeFlag + '-' + supplier.code
+const code_supplier1 = async(payload) => {
 	console.log(111, 'code_supplier');
 	const ps = await ProdDB.find({}, {code: 1, codeFlag: 1})
 		.populate({path: "Supplier", select: "code"});
@@ -669,6 +669,20 @@ const code_supplier = async(payload) => {
 		}
 	}
 }
+let nub = 0;
+// Supplier = code(SS) codeFlag = code(nnn)
+const code_supplier2 = async(payload) {
+	console.log(111, 'code_supplier2');
+	const ps = await ProdDB.find({}, {code: 1, codeFlag: 1, Supplier: 1});
+	for(let i=0; i<ps.length; i++) {
+		let pd = ps[i];
+		if(pd.code[0] === 'Z' && pd.code[1] === 'S' && !pd.Supplier) {
+			console.log(nub++);
+		}
+	}
+}
+
+
 const fNiu_zNiu = async(payload) => {
 	// console.log(111111)
 	const nowDate = new Date();
