@@ -670,6 +670,7 @@ const code_supplier1 = async(payload) => {
 	}
 }
 let nub = 0;
+let fixNum = 0;
 // Supplier = code(SS) codeFlag = code(nnn)
 const code_supplier2 = async(payload) => {
 	console.log(111, 'code_supplier2');
@@ -682,6 +683,7 @@ const code_supplier2 = async(payload) => {
 		let p_code = pd.code;
 		if(pd.Supplier) continue;
 		if(!isNaN(parseInt(p_code[0]))) continue;
+		console.log("nub", nub++);
 		for(let n = 0; n<sps.length; n++) {
 			let sp = sps[n];
 			let s_code = sp.code;
@@ -693,7 +695,12 @@ const code_supplier2 = async(payload) => {
 				}
 			}
 			if(flag) {
-
+				console.log("fixNum", fixNum++);
+				let pcode = p_code.split(s_code)[1].replace(/^\s*/g,"").toUpperCase();
+				pd.codeFlag = pcode;
+				pd.code = pcode+'-'+s_code;
+				pd.Supplier = sp._id;
+				await pd.save();
 			}
 		}
 	}
