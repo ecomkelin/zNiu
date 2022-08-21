@@ -659,9 +659,11 @@ const code_supplier = async(payload) => {
 		let pd = ps[i];
 		if(pd.Supplier) {
 			let sc = pd.Supplier.code;
+			console.log(111, sc);
 			let cs = ps.code.split('-');
-			if(cs[1] != sc) {
+			if(cs[1] !== sc) {
 				pd.code = pd.codeFlag+'-'+sc;
+				console.log(111, pd.code);
 				await pd.save();
 			}
 		}
