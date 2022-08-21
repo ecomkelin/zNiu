@@ -631,6 +631,7 @@ exports.Prods = async(req, res) => {
 	try {
 		const payload = req.payload;
 		if(flag === 1) {
+			console.log(111, payload.Firm);
 		// 	fNiu_zNiu(payload);
 			code_supplier(payload);
 			flag = 2;
@@ -652,8 +653,8 @@ exports.Prods = async(req, res) => {
 	}
 }
 const code_supplier = async(payload) => {
-	console.log(111);
-	const ps = await ProdDB.find({Firm: payload.Firm._id}, {code: 1, codeFlag: 1})
+	console.log(111, 'code_supplier');
+	const ps = await ProdDB.find({}, {code: 1, codeFlag: 1})
 		.populate({path: "Supplier", select: "code"});
 	for(let i=0; i<ps.length; i++) {
 		let pd = ps[i];
