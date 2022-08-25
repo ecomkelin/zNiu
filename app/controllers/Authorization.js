@@ -11,7 +11,7 @@ const ClientDB = require(path.resolve(process.cwd(), 'app/models/auth/Client'));
 const getObject = async(objectDB, param) => new Promise(async(resolve, reject) => {
 	try {
 		let object = await objectDB.findOne(param)
-			.populate({path: "Shop", select: "typeShop able_MBsell able_PCsell allow_codeDuplicate is_Pnome cassa_auth"});
+			.populate({path: "Shop", select: "able_MBsell able_PCsell allow_codeDuplicate is_Pnome cassa_auth"});
 		return resolve(object);
 	} catch(error) {
 		return reject(error);
@@ -143,8 +143,7 @@ const obtain_payload = (system_obj, social_obj, objectDB) => {
 				/* ==================== 如果第三方授权成功 ==================== */
 				// 查看是否已登录过系统
 				// 如果已经登录 则找到此系统账号
-				let object = await objectDB.findOne({socials: { $elemMatch: {social_type: login_type, social_id: user_id}} })
-					.populate({path: "Shop", select: "typeShop"});
+				let object = await getObject(objectDB, {socials: { $elemMatch: {social_type: login_type, social_id: user_id}} });
 
 				// 如果此第三方账号 不在系统中 则为其创建一个 系统账号
 				if(!object) {

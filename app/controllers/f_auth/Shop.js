@@ -184,7 +184,7 @@ const Shop_general = async(res, obj, Shop, payload) => {
 		}
 		if(obj.contact) Shop.contact = obj.contact;
 		if(obj.tel) Shop.tel = obj.tel;
-		if(obj.typeShop) Shop.typeShop = obj.typeShop;
+		// if(obj.typeShop) Shop.typeShop = obj.typeShop;
 		if(obj.img_url && (obj.img_url != Shop.img_url) && Shop.img_url && Shop.img_url.split("Shop").length > 1){
 			await MdFiles.rmPicture(Shop.img_url);
 			Shop.img_url = obj.img_url;
