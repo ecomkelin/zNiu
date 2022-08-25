@@ -27,6 +27,38 @@ a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upInfo") 修改�
 						.col-9
 							input#typeShopIpt.form-control(type="text", name="obj[typeShop]" value=Shop.typeShop, placeholder="如果是limit则前端手机版 只显示管理 不显示销售和采购")
 						.offset-3.col-9.col-form-label.text-danger
+					.form-group.row
+						label.col-3.col-form-label(for="able_MBsell") 手机销售
+						.col-9
+							.form-check.form-check-inline
+								if Shop.able_MBsell
+									input#able_MBsell.form-check-input(type="checkbox", name="obj[able_MBsell]" checked)
+								else
+									input#able_MBsell.form-check-input(type="checkbox", name="obj[able_MBsell]")
+					.form-group.row
+						label.col-3.col-form-label(for="able_PCsell") PC销售
+						.col-9
+							.form-check.form-check-inline
+								if Shop.able_PCsell
+									input#able_PCsell.form-check-input(type="checkbox", name="obj[able_PCsell]" checked)
+								else
+									input#able_PCsell.form-check-input(type="checkbox", name="obj[able_PCsell]")
+					.form-group.row
+						label.col-3.col-form-label(for="allow_codeReply", title="允许不同的供应商存在相同的产品号") 同产品号
+						.col-9
+							.form-check.form-check-inline
+								if Shop.allow_codeReply
+									input#allow_codeReply.form-check-input(type="checkbox", name="obj[allow_codeReply]" checked)
+								else
+									input#allow_codeReply.form-check-input(type="checkbox", name="obj[allow_codeReply]")
+					.form-group.row
+						label.col-3.col-form-label(for="is_Pnome") 存产品名
+						.col-9
+							.form-check.form-check-inline
+								if Shop.is_Pnome
+									input#is_Pnome.form-check-input(type="checkbox", name="obj[is_Pnome]" checked)
+								else
+									input#is_Pnome.form-check-input(type="checkbox", name="obj[is_Pnome]")
 				.modal-footer
 					button.btn.btn-default(type="button" data-dismiss="modal") 取消
 					button.btn.btn-success(type="submit") 提交

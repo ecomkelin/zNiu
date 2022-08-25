@@ -1,14 +1,14 @@
 table.mt-3.table.table-hover
-	tr
-		td: strong 账号:
-		td #{Shop.code}
 	if Shop.Firm
 		- Firm = Shop.Firm;
 		tr
-			td: strong 公司:
+			td: strong 所属公司:
 			td #{Firm.code} [#{Firm.nome}]
 	tr
-		td: strong 姓名:
+		td: strong 账号:
+		td #{Shop.code}
+	tr
+		td: strong 名称:
 		td #{Shop.nome}
 	tr
 		td: strong 是否可用:
@@ -21,3 +21,35 @@ table.mt-3.table.table-hover
 	tr
 		td: strong createAt:
 		td #{moment(Shop.at_crt).format('DD/MM/YYYY HH:mm:ss')}
+
+	tr
+		td: strong 公司类型(旧):
+		td #{Shop.typeShop}
+	tr
+		td: strong 允许手机销售:
+		td
+			if Shop.able_MBsell === true
+				span 是
+			else
+				span 否
+	tr
+		td: strong 允许电脑销售:
+		td
+			if Shop.able_PCsell === true
+				span 是
+			else
+				span 否
+	tr
+		td: strong 允许不同供应商下有相同编号的产品:
+		td
+			if Shop.allow_codeReply === true
+				span 是
+			else
+				span 否
+	tr
+		td: strong 是否要加载产品名称:
+		td
+			if Shop.is_Pnome === true
+				span 是
+			else
+				span 否

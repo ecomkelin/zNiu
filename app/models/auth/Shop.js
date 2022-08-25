@@ -8,7 +8,17 @@ const Float = require('mongoose-float').loadType(mongoose, 2);
 const colection = 'Shop';
 const dbSchema = new Schema({
 	code: String,									// 店铺编号
-	typeShop: String,
+
+	/* ader 控制  */
+	typeShop: String,	// V pre
+
+	able_MBsell: {type: Boolean, default: true},	// 销售端 可以使用手机版,
+	able_PCsell: {type: Boolean, default: true},	// 销售端 可以使用PC版
+	// 是否允许根据不同的供应商 产品的code可以相同[codeFlag, codeMatchs,]
+	allow_codeReply: {type: Boolean, default: false},
+	is_Pnome: {type: Boolean, default: false},	// 是否使用 Pnome
+	/* ader 控制  */
+
 	nome: String,									// 店铺名称
 	addr: String,									// 店铺地址
 	zip: String,									// 店铺所属地址邮编

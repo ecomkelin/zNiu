@@ -5,7 +5,7 @@ block content
 		nav(aria-label="breadcrumb")
 			ol.breadcrumb
 				li.breadcrumb-item: a(href="/adHome") Home
-				li.breadcrumb-item.active(aria-current="page") 用户列表
+				li.breadcrumb-item.active(aria-current="page") 商店列表
 		.row
 			.col-12.text-right
 				button.mr-5.btn.btn-danger#toggle_del_Btn(type="button") -
@@ -18,7 +18,11 @@ block content
 							th 账户
 							th 名字
 							th 是否可用
-							th 公司
+							th 手机销售
+							th PC销售
+							th 可重复产品编号
+							th 是否存Pnome
+							th 所属公司
 							th.del_show 删除
 					tbody
 						each Shop in Shops
@@ -32,6 +36,26 @@ block content
 										span 可用
 									else
 										span.text-warning 禁用
+								td
+									if Shop.able_MBsell === true
+										span 是
+									else
+										span 否
+								td
+									if Shop.able_PCsell === true
+										span 是
+									else
+										span 否
+								td
+									if Shop.allow_codeReply === true
+										span 是
+									else
+										span 否
+								td
+									if Shop.is_Pnome === true
+										span 是
+									else
+										span 否
 								td
 									if Shop.Firm
 										-Firm = Shop.Firm;

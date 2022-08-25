@@ -21,6 +21,8 @@ const dbSchema = new Schema({
 	nome: String,										// [只读 绝对]
 	unit: String,										// [只读 绝对]
 
+	Suppliments: [{type: ObjectId, ref: "Suppliment"}],
+
 	OrderSkus: [{type: ObjectId, ref: "OrderSku"}],		//
 	/* 如果 is_simple 为 true */
 	weight: Float, 										// [只读] 	订单的货品重量

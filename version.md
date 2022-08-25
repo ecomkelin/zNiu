@@ -1,3 +1,4 @@
+1.0		店铺控制
 0.95	订单要影响商品 at_upd
 0.94	虚拟订单不参与分析和记录
 0.94	bug role_set pter -> printer

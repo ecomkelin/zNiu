@@ -50,6 +50,12 @@ const dbSchema = new Schema({
 
 	is_usable: { type: Boolean, default: false },
 
+
+	decorates: [{
+		Decorate: {type: ObjectId, ref: 'Decorate'},
+		Suppliments: [{type: ObjectId, ref: 'Suppliment'}],
+	}],
+
 	Attrs: [{type: ObjectId, ref: "Attr"}],			// [只读 相对 Attr] 公司层面是否可用
 
 	/* 只读 根据 Skus 的price_sale 或 price_regular*/

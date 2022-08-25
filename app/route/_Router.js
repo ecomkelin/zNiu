@@ -2,7 +2,13 @@ module.exports = (app) => {
 	app.get('/', (req, res) => {
 		return res.render('./index', {title: process.env.SYSTEMNAME, error: req.query.error, reUrl: req.query.reUrl});
 	});
-	require('./a_Ader')(app);
+	// require('./a_Ader')(app);
+	require('./ader/ader0_Ader')(app);
+	require('./ader/ader1_login')(app);
+	require('./ader/ader2_addr')(app);
+	require('./ader/ader3_Firm')(app);
+	require('./ader/ader4_User')(app);
+	require('./ader/ader5_multi')(app);
 	require('./c_Conf')(app);
 
 	require('./back/b_authorization')(app);

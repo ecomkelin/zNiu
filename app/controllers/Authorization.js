@@ -106,7 +106,7 @@ const obtain_payload = (system_obj, social_obj, objectDB) => {
 				}
 
 				let object = await objectDB.findOne(param)
-					.populate({path: "Shop", select: "typeShop cassa_auth"});
+					.populate({path: "Shop", select: "typeShop able_MBsell able_PCsell allow_codeReply cassa_auth"});
 				if(!object) return resolve({status: 400, message: "登录失败"});
 				const pwd_match_res = await MdFilter.matchBcryptProm(system_obj.pwd, object.pwd);
 				if(pwd_match_res.status != 200) return resolve({status: 400, message: "登录失败"});

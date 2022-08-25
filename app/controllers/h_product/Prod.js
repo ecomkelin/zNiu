@@ -178,7 +178,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 
 
 		// 批发商
-		if(payload.Shop.typeShop === "ws") {
+		if(payload.Shop.typeShop === "ws" || payload.Shop.allow_codeReply) {
 			let SupplierCode = "";
 			obj.codeFlag = obj.codeFlag.replace(/^\s*/g,"").toUpperCase();
 			obj.codeLen = obj.codeFlag.length;
@@ -224,7 +224,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 		const save_res = await Prod_save_Prom(obj, payload, null);
 
 		// 如果是批发商 那么就把codeFlag相同的 匹配到一起
-		if(payload.Shop.typeShop === "ws" && save_res.status === 200) {
+		if((payload.Shop.typeShop === "ws" || payload.Shop.allow_codeReply) && save_res.status === 200) {
 			await put_ProdMatch(obj.codeFlag, payload.Shop._id);
 		}
 
@@ -373,7 +373,7 @@ exports.ProdDelete = async(req, res) => {
 		setModify_Prods(Prod._id, true);
 
 
-		if(payload.Shop.typeShop === "ws") {
+		if(payload.Shop.typeShop === "ws" || payload.Shop.allow_codeReply) {
 			await put_ProdMatch(codeFlag, payload.Shop._id);
 		}
 
@@ -445,14 +445,14 @@ exports.ProdPut = async(req, res) => {
 		if(obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') Prod.is_usable = true;
 		if(obj.is_usable == 0 || obj.is_usable === false || obj.is_usable === 'false') Prod.is_usable = false;
 
-		let isWsChangeCodeFlag = false;
+		let isAllow_supplierCodeCsell = false;
 		let orgCodeFlag = Prod.codeFlag;
 		let newCodeFlag = obj.code;
 
 		if(!Prod.Pd) {	// 如果是单店 可以修改名称等 暂时没有做
 			if(obj.code) obj.code.replace(/^\s*/g,"").toUpperCase();
 
-			if(payload.Shop.typeShop === "ws"){
+			if(payload.Shop.typeShop === "ws" || payload.Shop.allow_codeReply){
 				obj.codeFlag = obj.codeFlag.replace(/^\s*/g,"").toUpperCase();
 				if(obj.Supplier !== Prod.Supplier || (obj.codeFlag && obj.codeFlag !== Prod.codeFlag)) {
 					let SupplierCode = "";
@@ -464,7 +464,7 @@ exports.ProdPut = async(req, res) => {
 					}
 						
 					if(obj.codeFlag !== Prod.codeFlag) {
-						isWsChangeCodeFlag = true;
+						isAllow_supplierCodeCsell = true;
 						Prod.codeFlag = obj.codeFlag;
 						Prod.codeLen = obj.codeFlag.length;
 					}
@@ -539,7 +539,7 @@ exports.ProdPut = async(req, res) => {
 		setModify_Prods(Prod._id);
 
 
-		if(payload.Shop.typeShop === "ws" && isWsChangeCodeFlag) {
+		if(payload.Shop.typeShop === "ws" && isAllow_supplierCodeCsell) {
 			put_ProdMatch(orgCodeFlag, payload.Shop._id);
 			put_ProdMatch(newCodeFlag, payload.Shop._id);
 		}
