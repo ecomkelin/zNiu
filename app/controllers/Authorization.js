@@ -8,7 +8,7 @@ const MdJwt = require(path.resolve(process.cwd(), 'app/middle/MdJwt'));
 const ClientDB = require(path.resolve(process.cwd(), 'app/models/auth/Client'));
 
 
-const getObject = async(param) => new Promise(async(resolve, reject) => {
+const getObject = async(objectDB, param) => new Promise(async(resolve, reject) => {
 	try {
 		let object = await objectDB.findOne(param)
 			.populate({path: "Shop", select: "typeShop able_MBsell able_PCsell allow_codeDuplicate cassa_auth"});
@@ -24,7 +24,7 @@ exports.refreshtoken = async(req, res, objectDB) => {
 		if(refresh_res.status !== 200) return MdFilter.jsonRes(res, refresh_res);
 		const payload = refresh_res.data.payload;
 		const reToken = refresh_res.data.token;
-		let object = await getObject({_id: payload._id});
+		let object = await getObject(objectDB, {_id: payload._id});
 		if(!object) return MdFilter.jsonFailed(res, {message: "授权错误, 请重新登录"});
 		// const match_res = await MdFilter.matchBcryptProm(reToken, object.refreshToken);
 		// if(match_res.status != 200) return MdFilter.jsonFailed(res, {message: "refreshToken 不匹配"});
@@ -114,7 +114,7 @@ const obtain_payload = (system_obj, social_obj, objectDB) => {
 					param.phone = system_obj.phonePre+system_obj.phoneNum;
 				}
 
-				let object = await getObject(param);
+				let object = await getObject(objectDB, param);
 				if(!object) return resolve({status: 400, message: "登录失败"});
 				const pwd_match_res = await MdFilter.matchBcryptProm(system_obj.pwd, object.pwd);
 				if(pwd_match_res.status != 200) return resolve({status: 400, message: "登录失败"});
@@ -505,7 +505,7 @@ const generate_codeClient = () => {
 				}
 			}
 			const codePre = String(year%100) + Mth;	// 编号的前缀
-			// 根据编号前缀 和 预计编号 获取完整的 用户编号， 为了防止账户重复 所以要先验证
+			// 根据编号前缀 和 预计编号 获取完整的 用户编号, 为了防止账户重复 所以要先验证
 			const code_res = await recu_codeClientSame(codePre, codeNum);
 			return resolve(code_res);
 		} catch(error) {
