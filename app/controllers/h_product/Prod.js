@@ -178,7 +178,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 
 
 		// 批发商
-		if(payload.Shop.typeShop === "ws" || payload.Shop.allow_codeReply) {
+		if(payload.Shop.typeShop === "ws" || payload.Shop.allow_codeDuplicate) {
 			let SupplierCode = "";
 			obj.codeFlag = obj.codeFlag.replace(/^\s*/g,"").toUpperCase();
 			obj.codeLen = obj.codeFlag.length;
@@ -224,7 +224,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 		const save_res = await Prod_save_Prom(obj, payload, null);
 
 		// 如果是批发商 那么就把codeFlag相同的 匹配到一起
-		if((payload.Shop.typeShop === "ws" || payload.Shop.allow_codeReply) && save_res.status === 200) {
+		if((payload.Shop.typeShop === "ws" || payload.Shop.allow_codeDuplicate) && save_res.status === 200) {
 			await put_ProdMatch(obj.codeFlag, payload.Shop._id);
 		}
 
@@ -373,7 +373,7 @@ exports.ProdDelete = async(req, res) => {
 		setModify_Prods(Prod._id, true);
 
 
-		if(payload.Shop.typeShop === "ws" || payload.Shop.allow_codeReply) {
+		if(payload.Shop.typeShop === "ws" || payload.Shop.allow_codeDuplicate) {
 			await put_ProdMatch(codeFlag, payload.Shop._id);
 		}
 
@@ -452,7 +452,7 @@ exports.ProdPut = async(req, res) => {
 		if(!Prod.Pd) {	// 如果是单店 可以修改名称等 暂时没有做
 			if(obj.code) obj.code.replace(/^\s*/g,"").toUpperCase();
 
-			if(payload.Shop.typeShop === "ws" || payload.Shop.allow_codeReply){
+			if(payload.Shop.typeShop === "ws" || payload.Shop.allow_codeDuplicate){
 				obj.codeFlag = obj.codeFlag.replace(/^\s*/g,"").toUpperCase();
 				if(obj.Supplier !== Prod.Supplier || (obj.codeFlag && obj.codeFlag !== Prod.codeFlag)) {
 					let SupplierCode = "";

@@ -171,7 +171,7 @@ module.exports = (app) => {
 			}
 			obj.able_MBsell = obj.able_MBsell ? true : false;
 			obj.able_PCsell = obj.able_PCsell ? true : false;
-			obj.allow_codeReply = obj.allow_codeReply ? true : false;
+			obj.allow_codeDuplicate = obj.allow_codeDuplicate ? true : false;
 			obj.is_Pnome = obj.is_Pnome ? true : false;
 
 			const _object = new ShopDB(obj)
@@ -205,7 +205,7 @@ module.exports = (app) => {
 
 			obj.able_MBsell = obj.able_MBsell ? true : false;
 			obj.able_PCsell = obj.able_PCsell ? true : false;
-			obj.allow_codeReply = obj.allow_codeReply ? true : false;
+			obj.allow_codeDuplicate = obj.allow_codeDuplicate ? true : false;
 			obj.is_Pnome = obj.is_Pnome ? true : false;
 
 			if(obj.code) {
