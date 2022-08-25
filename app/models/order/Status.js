@@ -40,47 +40,60 @@ Client
 conf = {
 	steps: ['正在', "wancheng"... ],
 }
+Order: {
+	Status: {}
+}
 // 活
 StepPost = {
 	name: "正在1"
 }
-const Steps = [{
-	_id: 0,
-	code: 0
-	name_back: "正在",
+const Status = [{
+	_id: 1,
+
+	name_back: {
+		user: "正在",
+		client: ""
+	},
+
+	
+	sort: 1
 
 	init_roles: [1000], // 有且只有唯一的一个ture
 
-	lasts : {
-		null,
-		last_ableRle: '',
-		last_btn: '',
-	},
 	nexts:[{
-		Step: 1,
+		Step: 3,
 		ableRole: [sfer, bser],
 		btn: 确认完成
 	}, {
-		Step: 3,
-		ableRole: [client],
+		Step: 2,
+		ableRole: [client, sfer],
 		btn: 确认付款
 	}],
 },
 
 // click => 确认完成
 {
-	code: 1,
+	code: 4,
 	name: String
 
-	is_init: false, // 有且只有唯一的一个ture
+	is_init: [100, 101], // 有且只有唯一的一个ture
+
 	code: "正在进行",
-	last : null,
-	last_ableRle: '',
-	last_btn: '',
 	nexts:[{
+		Step: 1,
+		ableRole: [sfer, bser],
+		btn: 返回到新建,
+		flag: 2
+	}, {
 		Step: 3,
 		ableRole: [sfer, bser],
-		btn: 确认完成
+		btn: 返回到未支付,
+		flag : 2
+	}, {
+		Step: 5,
+		ableRole: [client, sfer],
+		btn: 确认付款,
+		flag: 1
 	}],
 	
 },
