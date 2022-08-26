@@ -46,10 +46,10 @@ exports.OrderPost = async(req, res) => {
 			obj_Order.Shop = payload.Shop._id;
 			obj_Order.User_Oder = payload._id;
 
-			paramStep.typeStep = ConfStep.typeStep_obj.User;
+			paramStep.typeStep = ConfStep.typeStep_obj.User.num;
 		} else {
 			if(!MdFilter.isObjectId(obj_Order.Shop)) return MdFilter.jsonFailed(res, {message: "请传递正确的Shop_id信息"});
-			paramStep.typeStep = ConfStep.typeStep_obj.Client;
+			paramStep.typeStep = ConfStep.typeStep_obj.Client.num;
 		}
 		const Shop = await ShopDB.findOne({_id: obj_Order.Shop, is_usable: 1}, {code:1, serve_Citas: 1, Firm: 1})
 			.populate({path: 'serve_Citas.Cita'});
