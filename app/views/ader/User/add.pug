@@ -39,7 +39,6 @@ block content
 					select#FirmIpt.form-control(name="obj[Firm]", data-style="btn-info")
 						//- option(value=0) 请选择
 						each Firm in Firms
-							-a;
 							option(value=Firm._id) #{Firm.code}
 				.offset-4.offset-sm-2.col-8.col-sm-6#FirmOpt.text-danger(style="display:none") 请选择公司
 			.form-group.row
@@ -48,7 +47,6 @@ block content
 					select#roleIpt.form-control(name="obj[role]", data-style="btn-info")
 						//- option(value=0) 请选择
 						each key in Conf.User.role
-							-a;
 							option(value=Conf.User.role_set[key.en])  #{key.cn}
 				.offset-4.offset-sm-2.col-8.col-sm-6#roleOpt.text-danger(style="display:none") 请选择商店
 			.form-group.row
@@ -57,7 +55,6 @@ block content
 					select#ShopIpt.form-control(name="obj[Shop]", data-style="btn-info")
 						//- option(value=0) 请选择
 						each Shop in Shops
-							-a;
 							option(value=Shop._id) #{Shop.code}
 				.offset-4.offset-sm-2.col-8.col-sm-6#ShopOpt.text-danger(style="display:none") 请选择商店
 			.form-group.row
@@ -71,7 +68,6 @@ block content
 				.col-8.col-sm-6
 					select#langIpt.form-control(name="obj[lang]", data-style="btn-info")
 						each Lang in Conf.Lang
-							-a;
 							option(value=Lang.num) #{Lang.val}
 				.offset-4.col-8.col-form-label.text-danger
 			.form-group.row

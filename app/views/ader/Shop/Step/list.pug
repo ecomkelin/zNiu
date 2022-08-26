@@ -1,0 +1,36 @@
+extends ../../../aalayout/layout
+
+block content
+	.container.mt-3
+		nav(aria-label="breadcrumb")
+			ol.breadcrumb
+				li.breadcrumb-item: a(href="/adHome") Home
+				li.breadcrumb-item: a(href="/adShop/"+Shop._id) 商店详情
+				li.breadcrumb-item.active(aria-current="page") 状态列表
+		.row
+			.col-md-6.col-12
+				span 所属店铺: #{Shop.code}
+			.col-md-6.col-12.text-right
+				button.mr-5.btn.btn-danger#toggle_del_Btn(type="button") -
+				a.btn.btn-warning.mr-4(href="/adStepAdd/"+Shop._id+"?typeStep=100") 添加User的状态
+				a.btn.btn-warning(href="/adStepAdd/"+Shop._id+"?typeStep=1000") 添加Client的状态
+		.row.mt-3
+			.col-12
+				table.table.table-hover.table-bordered
+					thead
+						tr
+							th type
+							th 编号
+							th 名称
+							th.del_show 删除
+					tbody
+						each Step in Steps
+							tr(class="Step-id-"+Step._id)
+								td #{ConfStep.typeSteps[Step.typeStep]}
+								td: a(href="/adStep/"+Step._id) #{Step.code}
+								td
+									span #{Step.nome}
+									if Step.isUnique_init
+										span.text-success (初始)
+								td.del_show
+									a.btn.btn-danger(href="/adStepDel/"+Step._id) 删除

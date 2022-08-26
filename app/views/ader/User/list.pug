@@ -23,14 +23,12 @@ block content
 							th.del_show 删除
 					tbody
 						each User in Users
-							-a;
 							tr(class="User-id-"+User._id)
 								td #{Conf.User.role[User.role].cn}
 								td: a(href="/adUser/"+User._id) #{User.code}
 								td #{User.nome}
 								td
 									if User.is_usable
-										-a;
 										span 可用
 									else
 										span.text-warning 禁用

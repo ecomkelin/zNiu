@@ -1,0 +1,29 @@
+a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upInfo") 修改信息
+
+#upInfo.modal.fade
+	.modal-dialog
+		.modal-content
+			form#adStepUpdInfo-Form(method="post", action="/adStepPut/"+Step._id)
+				.modal-header: h3 修改信息
+				.modal-body
+					.form-group.row
+						label.col-3.col-form-label(for="codeIpt") 状态编号
+						.col-9
+							input#codeIpt.form-control(type="text", name="obj[code]" value=Step.code)
+						.offset-3.col-9.col-form-label.text-danger
+					.form-group.row
+						label.col-3.col-form-label(for="nomeIpt") 状态名称
+						.col-9
+							input#nomeIpt.form-control(type="text", name="obj[nome]" value=Step.nome)
+						.offset-3.col-9.col-form-label.text-danger
+					.form-group.row
+						label.col-3.col-form-label(for="isUnique_init") isUnique_init
+						.col-9
+							.form-check.form-check-inline
+								if Step.isUnique_init
+									input#isUnique_init.form-check-input(type="checkbox", name="obj[isUnique_init]" checked)
+								else
+									input#isUnique_init.form-check-input(type="checkbox", name="obj[isUnique_init]")
+				.modal-footer
+					button.btn.btn-default(type="button" data-dismiss="modal") 取消
+					button.btn.btn-success(type="submit") 提交

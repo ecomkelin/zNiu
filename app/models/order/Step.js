@@ -1,3 +1,50 @@
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const ObjectId = Schema.Types.ObjectId;
+
+const colection = 'Step';
+const dbSchema = new Schema({
+
+	typeStep: Number,
+	// role: Number, // 如果需要区分 User的角色 就加这个字段
+
+	code: Number,
+
+	nome: String,
+	isUnique_init: Boolean,
+
+	rels:[{
+		Step: {type: ObjectId, ref: "Step"},
+		// optRoles: [sfer, bser],
+		btn_val: String,
+		btn_color: String
+	}],
+
+	User_upd: {type: ObjectId, ref: 'User'},	// [只读 自动]
+	User_crt: {type: ObjectId, ref: 'User'},	// [只读 绝对]
+	at_upd: Date,								// [只读 自动]
+	at_crt: Date,								// [只读 绝对]
+	Firm: {type: ObjectId, ref: 'Firm'},		// [只读 绝对]
+	Shop: {type: ObjectId, ref: 'Shop'},		// [只读 绝对]
+});
+
+dbSchema.pre('save', function(next) {
+	if(this.isNew) {
+		if(!this.sort) this.sort = 0;
+		this.at_upd = this.at_crt = Date.now();
+	} else {
+		this.at_upd = Date.now();
+	}
+	next();
+})
+
+module.exports = mongoose.model(colection, dbSchema);
+
+
+
+
+
 /*
 User:
 	最简单 奶茶店 东哥						弄堂里					小唐 吃饭仔				
@@ -37,6 +84,7 @@ Client
 
 
 // 配置
+/*
 conf = {
 	steps: ['正在', "wancheng"... ],
 }
@@ -60,13 +108,13 @@ const Status = [{
 
 	init_roles: [1000], // 有且只有唯一的一个ture
 
-	nexts:[{
+	rels:[{
 		Step: 3,
-		ableRole: [sfer, bser],
+		optRoles: [sfer, bser],
 		btn: 确认完成
 	}, {
 		Step: 2,
-		ableRole: [client, sfer],
+		optRoles: [client, sfer],
 		btn: 确认付款
 	}],
 },
@@ -79,19 +127,19 @@ const Status = [{
 	is_init: [100, 101], // 有且只有唯一的一个ture
 
 	code: "正在进行",
-	nexts:[{
+	rels:[{
 		Step: 1,
-		ableRole: [sfer, bser],
+		optRoles: [sfer, bser],
 		btn: 返回到新建,
 		flag: 2
 	}, {
 		Step: 3,
-		ableRole: [sfer, bser],
+		optRoles: [sfer, bser],
 		btn: 返回到未支付,
 		flag : 2
 	}, {
 		Step: 5,
-		ableRole: [client, sfer],
+		optRoles: [client, sfer],
 		btn: 确认付款,
 		flag: 1
 	}],
@@ -106,7 +154,7 @@ const Status = [{
 	last_ableRle: [老板],
 	last_btn: '取消',
 	next: null,
-	next_ableRole: '',
+	next_optRoles: '',
 	next_btn: ''
 }, 
 
@@ -137,3 +185,4 @@ Order = {
 
 OrderList Page
 1 2 3
+*/

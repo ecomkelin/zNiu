@@ -26,7 +26,6 @@ block content
 					select#FirmIpt.form-control(name="obj[Firm]", data-style="btn-info")
 						//- option(value=0) 请选择
 						each Firm in Firms
-							-a;
 							option(value=Firm._id) #{Firm.code}
 				.offset-4.offset-sm-2.col-8.col-sm-6#FirmOpt.text-danger(style="display:none") 请选择公司
 			.form-group.row

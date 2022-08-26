@@ -1,0 +1,15 @@
+extends ../../../aalayout/layout
+
+block content
+	.container.mt-3
+		nav(aria-label="breadcrumb")
+			ol.breadcrumb
+				li.breadcrumb-item: a(href="/adHome") Home
+				li.breadcrumb-item: a(href="/adSteps/"+Step.Shop._id) 状态列表
+				li.breadcrumb-item.active(aria-current="page") 状态信息
+		.row
+			.col-12.text-right
+				include ./detail/upInfo
+				span &nbsp;
+				include ./detail/upNexts
+		include ./detail/thisInfo

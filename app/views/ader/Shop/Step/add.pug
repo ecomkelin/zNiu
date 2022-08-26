@@ -1,0 +1,55 @@
+extends ../../../aalayout/layout
+
+block content
+	.container.mt-3
+		nav(aria-label="breadcrumb")
+			ol.breadcrumb
+				li.breadcrumb-item: a(href="/adHome") Home
+				li.breadcrumb-item: a(href="/adSteps/"+Shop._id) 状态列表
+				li.breadcrumb-item.active(aria-current="page") 添加状态
+		hr
+		form#adStepPost-Form(method="post", action="/adStepPost", autocomplete="off")
+			.row.mb-5
+				.col-4.col-sm-2 状态所属商铺:
+				input(type="hidden", name="obj[Shop]", value=Shop._id)
+				input(type="hidden", name="obj[typeStep]", value=typeStep)
+				.col-8.col-sm-6.text-info #{Shop.code} #{Shop.nome} [#{ConfStep.typeSteps[typeStep]}]
+
+			//- .form-group.row
+			//- 	label.col-4.col-sm-2.col-form-label(for="typeStep")#typeStepLabel 状态种类
+			//- 	.col-8.col-sm-6
+			//- 		each typeStep in ConfStep.typeStep_obj
+			//- 			.form-check.form-check-inline
+			//- 				input#typeStep1.form-check-input(type="radio", name="obj[typeStep]", value=tp.num)
+			//- 				label.form-check-label(for="typeStep1") #{tp.val}
+			.form-group.row
+				label.col-4.col-sm-2.col-form-label(for="codeIpt")#codeLabel.text-info 状态编号
+				.col-8.col-sm-6
+					input#codeIpt.form-control(type="text", name="obj[code]")
+				.offset-4.offset-sm-2.col-8.col-sm-6#codeOpt.text-danger(style="display:none")
+			.form-group.row
+				label.col-4.col-sm-2.col-form-label(for="nomeIpt") 状态名称
+				.col-8.col-sm-6
+					input#nomeIpt.form-control(type="text", name="obj[nome]")
+				.offset-4.col-8.col-form-label.text-danger
+			//- .form-group.row
+			//- 	label.col-4.col-sm-2.col-form-label(for="isUnique_init") isUnique_init
+			//- 	.col-9
+			//- 		.form-check.form-check-inline
+			//- 			input#isUnique_init.form-check-input(type="checkbox", name="obj[isUnique_init]" checked)
+			//- 			label.form-check-label
+			//- .form-group.row
+			//- 	label.col-4.col-sm-2.col-form-label(for="rels") rels
+			//- 	.col-8.col-sm-3
+			//- 		select#StepIpt.form-control(name="obj[rels][0][Step]", data-style="btn-info")
+			//- 			//- option(value=0) 请选择
+			//- 			each Step in Steps
+			//- 				option(value=Step._id) #{Step.code}
+			//- 	.col-8.col-sm-3
+			//- 		input#btn_valIpt.form-control(type="text", name="obj[rels][0][btn_val]")
+			//- 	.col-8.col-sm-3
+			//- 		input#btn_colorIpt.form-control(type="text", name="obj[rels][0][btn_color]")
+
+			.form-group.row
+				.offset-sm-6.col-sm-2
+					input.btn.btn-success.btn-block(type="submit" value="添加")

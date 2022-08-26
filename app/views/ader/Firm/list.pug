@@ -24,7 +24,6 @@ block content
 					th.del_show 删除
 			tbody
 				each Firm in Firms
-					-a;
 					tr(class="Firm-id-"+Firm._id)
 						td: a.btn.btn-info(href="/adFirm/"+Firm._id) #{Firm.code}
 						td #{Firm.nome}
@@ -34,7 +33,6 @@ block content
 						td #{Firm.sort}
 						td
 							if Firm.is_usable
-								-a;
 								span 可用
 							else
 								span.text-warning 禁用

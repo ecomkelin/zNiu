@@ -1,0 +1,27 @@
+table.mt-3.table.table-hover
+	if Step.Shop
+		- Shop = Step.Shop;
+		tr
+			td: strong 所属店铺:
+			td #{Shop.code} [#{Shop.nome}]
+	tr
+		td: strong typeStep:
+		td #{ConfStep.typeSteps[Step.typeStep]}
+	tr
+		td: strong 账号:
+		td #{Step.code}
+	tr
+		td: strong 名称:
+		td #{Step.nome}
+			if Step.isUnique_init
+				span.text-success (初始)
+	tr
+		td: strong createAt:
+		td #{moment(Step.at_crt).format('DD/MM/YYYY HH:mm:ss')}
+
+	- i= -1;
+	each rel in Step.rels
+		- i++;
+		tr
+			td 关联 #{i}
+			td #{rel.Step.code} #{rel.Step.nome} - #{rel.btn_val} [##{rel.btn_color}]

@@ -3,7 +3,6 @@ extends ../aalayout/layout
 block content
 	.container.mt-3
 		if curAder
-			-a;
 			.row.text-center
 				.col-6.col-lg-3.mt-3
 					a(href="/adUsers")
@@ -37,7 +36,6 @@ block content
 						select#FirmIpt.form-control(name="obj[Firm]", data-style="btn-info")
 							//- option(value=0) 请选择
 							each Firm in Firms
-								-a;
 								option(value=Firm._id) #{Firm.code}
 					.col-md-4
 						input.btn.btn-info.btn-block(type="file", name="mulFile")
@@ -49,7 +47,6 @@ block content
 						select#FirmIpt2.form-control(name="obj[Firm]", data-style="btn-info")
 							//- option(value=0) 请选择
 							each Firm in Firms
-								-a;
 								option(value=Firm._id) #{Firm.code}
 					.col-md-4
 						input.btn.btn-info.btn-block(type="file", name="mulFile")
@@ -61,13 +58,11 @@ block content
 						select#FirmIpt3.form-control(name="obj[Firm]", data-style="btn-info")
 							//- option(value=0) 请选择
 							each Firm in Firms
-								-a;
 								option(value=Firm._id) #{Firm.code}
 					.col-md-3
 						select#ShopIpt.form-control(name="obj[Shop]", data-style="btn-info")
 							//- option(value=0) 请选择
 							each Shop in Shops
-								-a;
 								option(value=Shop._id) #{Shop.code}
 					.col-md-3
 						input.btn.btn-info.btn-block(type="file", name="mulFile")

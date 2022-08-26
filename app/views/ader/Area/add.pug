@@ -26,7 +26,6 @@ block content
 				.col-8.col-sm-6
 					select#NationIpt.form-control(name="obj[Nation]", data-style="btn-info")
 						each Nation in Nations
-							-a;
 							option(value=Nation._id) #{Nation.code}
 			.form-group.row
 				label.col-4.col-sm-2.col-form-label(for="is_usableIpt") 是否可用

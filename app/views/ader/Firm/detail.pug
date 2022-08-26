@@ -21,7 +21,6 @@ block content
 					td <strong>是否可用:</strong>
 					td
 						if Firm.is_usable
-							-a;
 							span 可用
 						else
 							span.text-warning 禁用
@@ -68,7 +67,6 @@ block content
 					.col-8.col-sm-6
 						select#is_usableIpt.form-control(name="obj[is_usable]", data-style="btn-info")
 							if Firm.is_usable
-								-a;
 								option(value="true", selected="selected") 可用
 								option(value="false") 禁用
 							else

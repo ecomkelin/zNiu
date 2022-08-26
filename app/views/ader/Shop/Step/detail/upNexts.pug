@@ -1,0 +1,34 @@
+a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upNexts") 修改关联状态
+
+#upNexts.modal.fade
+	.modal-dialog
+		.modal-content
+			form#adStepUpdNexts-Form(method="post", action="/adStepPut/"+Step._id)
+				.modal-header: h3 修改关联状态
+				.modal-body
+					- let i = -1;
+					each item in Steps
+						- i++;
+						- let relStep = {};
+						each rel in Step.rels
+							if String(rel.Step._id) === String(item._id)
+								- relStep = rel;
+						.form-group.row
+							.col-1
+								.form-check.form-check-inline
+									if relStep.Step
+										input.form-check-input(type="checkbox", name="obj[rels]["+i+"][confirm]", checked)
+									else
+										input.form-check-input(type="checkbox", name="obj[rels]["+i+"][confirm]")
+							.col-3
+								input(type="hidden", name="obj[rels]["+i+"][Step]" value=item._id)
+								span #{item.code}-#{item.nome}
+							.col-4
+								input.form-control(type="text", name="obj[rels]["+i+"][btn_val]", value=relStep.btn_val)
+
+							.col-4
+								input.form-control(type="text", name="obj[rels]["+i+"][btn_color]", value=relStep.btn_color)
+
+				.modal-footer
+					button.btn.btn-default(type="button" data-dismiss="modal") 取消
+					button.btn.btn-success(type="submit") 提交
