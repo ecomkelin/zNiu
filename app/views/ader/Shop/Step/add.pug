@@ -12,16 +12,8 @@ block content
 			.row.mb-5
 				.col-4.col-sm-2 状态所属商铺:
 				input(type="hidden", name="obj[Shop]", value=Shop._id)
-				input(type="hidden", name="obj[typeStep]", value=typeStep)
-				.col-8.col-sm-6.text-info #{Shop.code} #{Shop.nome} [#{ConfStep.typeSteps[typeStep]}]
+				.col-8.col-sm-6.text-info #{Shop.code} #{Shop.nome}
 
-			//- .form-group.row
-			//- 	label.col-4.col-sm-2.col-form-label(for="typeStep")#typeStepLabel 状态种类
-			//- 	.col-8.col-sm-6
-			//- 		each typeStep in ConfStep.typeStep_obj
-			//- 			.form-check.form-check-inline
-			//- 				input#typeStep1.form-check-input(type="radio", name="obj[typeStep]", value=tp.num)
-			//- 				label.form-check-label(for="typeStep1") #{tp.val}
 			.form-group.row
 				label.col-4.col-sm-2.col-form-label(for="codeIpt")#codeLabel.text-info 状态编号
 				.col-8.col-sm-6
@@ -33,10 +25,10 @@ block content
 					input#nomeIpt.form-control(type="text", name="obj[nome]")
 				.offset-4.col-8.col-form-label.text-danger
 			//- .form-group.row
-			//- 	label.col-4.col-sm-2.col-form-label(for="isUnique_init") isUnique_init
+			//- 	label.col-4.col-sm-2.col-form-label(for="is_initUser") is_initUser
 			//- 	.col-9
 			//- 		.form-check.form-check-inline
-			//- 			input#isUnique_init.form-check-input(type="checkbox", name="obj[isUnique_init]" checked)
+			//- 			input#is_initUser.form-check-input(type="checkbox", name="obj[is_initUser]" checked)
 			//- 			label.form-check-label
 			//- .form-group.row
 			//- 	label.col-4.col-sm-2.col-form-label(for="rels") rels

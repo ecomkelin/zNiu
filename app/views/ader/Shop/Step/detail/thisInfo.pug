@@ -1,27 +1,43 @@
 table.mt-3.table.table-hover
-	if Step.Shop
-		- Shop = Step.Shop;
-		tr
-			td: strong 所属店铺:
-			td #{Shop.code} [#{Shop.nome}]
 	tr
-		td: strong typeStep:
-		td #{ConfStep.typeSteps[Step.typeStep]}
+		td
+			strong 编号:
+			span.ml-3 #{Step.code}
+		td
+			strong sort:
+			span.ml-3 #{Step.sort}
+		td
+			if Step.Shop
+				- Shop = Step.Shop;
+				strong 所属店铺:
+				span.ml-3 #{Shop.code} [#{Shop.nome}]
 	tr
-		td: strong 账号:
-		td #{Step.code}
-	tr
-		td: strong 名称:
-		td #{Step.nome}
-			if Step.isUnique_init
+		td: strong User:
+		td #{Step.nome} 
+			if Step.is_initUser
 				span.text-success (初始)
+		td
+			each rel in Step.rels
+				span.text-info [#{rel.Step.code}] 
+				span #{rel.Step.nome} : #{rel.btn_val} [##{rel.btn_color}]
+				br
+	tr
+		td: strong Client:
+		if Step.exist_Client
+			td
+					span #{Step.nome_Client} 
+					if Step.is_initClient
+						span.text-success (初始)
+			td
+				each rel in Step.crels
+					span.text-info [#{rel.Step.code}] 
+					span #{rel.Step.nome_Client} : #{rel.btn_val} [##{rel.btn_color}]
+					br
+		else
+			td
+				span 无
+			td
 	tr
 		td: strong createAt:
+		td
 		td #{moment(Step.at_crt).format('DD/MM/YYYY HH:mm:ss')}
-
-	- i= -1;
-	each rel in Step.rels
-		- i++;
-		tr
-			td 关联 #{i}
-			td #{rel.Step.code} #{rel.Step.nome} - #{rel.btn_val} [##{rel.btn_color}]

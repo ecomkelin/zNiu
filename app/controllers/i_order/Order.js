@@ -4,7 +4,6 @@ const moment = require('moment');
 const path = require('path');
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const ConfOrder = require(path.resolve(process.cwd(), 'app/config/conf/ConfOrder'));
-const ConfStep = require(path.resolve(process.cwd(), 'app/config/conf/ConfStep'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
 const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
@@ -40,16 +39,16 @@ exports.OrderPost = async(req, res) => {
 		delete obj_Order._id;
 
 		// 确认订单所属 (Shop)
-		let paramStep = {isUnique_init: true};
+		let paramStep = {};
 		if(ConfUser.role_Arrs.includes(payload.role)) {
 			if(payload.role < ConfUser.role_set.boss) return MdFilter.jsonFailed(res, {message: "您的身份不是店铺工作人员"});
 			obj_Order.Shop = payload.Shop._id;
 			obj_Order.User_Oder = payload._id;
 
-			paramStep.typeStep = ConfStep.typeStep_obj.User.num;
+			paramStep.is_initUser = true;
 		} else {
 			if(!MdFilter.isObjectId(obj_Order.Shop)) return MdFilter.jsonFailed(res, {message: "请传递正确的Shop_id信息"});
-			paramStep.typeStep = ConfStep.typeStep_obj.Client.num;
+			paramStep.is_initClient = true;
 		}
 		const Shop = await ShopDB.findOne({_id: obj_Order.Shop, is_usable: 1}, {code:1, serve_Citas: 1, Firm: 1})
 			.populate({path: 'serve_Citas.Cita'});
@@ -59,8 +58,8 @@ exports.OrderPost = async(req, res) => {
 		obj_Order.status = ConfOrder.status_obj.placing.num;
 
 		paramStep.Shop = Shop._id;
-		let Step = await StepDB.findOne(paramStep)
-		obj_Order.Step = Step._id;
+		let Step = await StepDB.findOne(paramStep);
+		obj_Order.Step = Step ? Step._id : null;
 
 		// Client 订单的送货方式
 		if(obj_Order.type_ship == ConfOrder.type_ship_obj.sClient.num) {

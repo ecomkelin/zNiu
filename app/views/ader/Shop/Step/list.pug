@@ -12,30 +12,44 @@ block content
 				span 所属店铺: #{Shop.code}
 			.col-md-6.col-12.text-right
 				button.mr-5.btn.btn-danger#toggle_del_Btn(type="button") -
-				a.btn.btn-warning.mr-4(href="/adStepAdd/"+Shop._id+"?typeStep=100") 添加User的状态
-				a.btn.btn-warning(href="/adStepAdd/"+Shop._id+"?typeStep=1000") 添加Client的状态
+				a.btn.btn-warning.mr-4(href="/adStepAdd/"+Shop._id) +
+
 		.row.mt-3
 			.col-12
 				table.table.table-hover.table-bordered
 					thead
 						tr
-							th type
 							th 编号
-							th 名称
-							th 关联
+							th sort
+							th 名称(init)
+							th User关联
+							th Client
+							th Client关联
 							th.del_show 删除
 					tbody
 						each Step in Steps
 							tr(class="Step-id-"+Step._id)
-								td #{ConfStep.typeSteps[Step.typeStep]}
 								td: a(href="/adStep/"+Step._id) #{Step.code}
+								td #{Step.sort}
 								td
 									span #{Step.nome}
-									if Step.isUnique_init
-										span.text-success (初始)
+									if Step.is_initUser
+										span.text-success.ml-2 (初始)
 								td
-									- let i = -1;
+									- i = -1;
 									each rel in Step.rels
+										- i++;
+										if i!==0 
+											span -
+										span [#{rel.Step.code}] &nbsp;
+								td
+									if Step.exist_Client
+										span #{Step.nome_Client}
+										if Step.is_initClient
+											span.text-success.ml-2 (初始)
+								td
+									- i = -1;
+									each rel in Step.crels
 										- i++;
 										if i!==0 
 											span -

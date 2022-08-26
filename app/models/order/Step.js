@@ -5,24 +5,26 @@ const ObjectId = Schema.Types.ObjectId;
 
 const colection = 'Step';
 const dbSchema = new Schema({
-
-	typeStep: Number,
-	// role: Number, // 如果需要区分 User的角色 就加这个字段
-
 	code: Number,
-
 	nome: String,
-	isUnique_init: Boolean,
-
+	is_initUser: {type: Boolean, default: false},
 	rels:[{
 		Step: {type: ObjectId, ref: "Step"},
-		// optRoles: [sfer, bser],
 		btn_val: String,
 		btn_color: String
 	}],
 
-	User_upd: {type: ObjectId, ref: 'User'},	// [只读 自动]
-	User_crt: {type: ObjectId, ref: 'User'},	// [只读 绝对]
+	/* Client */
+	exist_Client: {type: Boolean, default: false},
+	sort: {type: Number, default: 0},
+	nome_Client: String,
+	is_initClient: {type: Boolean, default: false},
+	crels: [{
+		Step: {type: ObjectId, ref: "Step"},
+		btn_val: String,
+		btn_color: String
+	}],
+
 	at_upd: Date,								// [只读 自动]
 	at_crt: Date,								// [只读 绝对]
 	Firm: {type: ObjectId, ref: 'Firm'},		// [只读 绝对]

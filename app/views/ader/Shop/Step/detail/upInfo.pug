@@ -4,7 +4,7 @@ a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upInfo") 修改�
 	.modal-dialog
 		.modal-content
 			form#adStepUpdInfo-Form(method="post", action="/adStepPut/"+Step._id)
-				.modal-header: h3 修改信息
+				.modal-header: h3 User状态
 				.modal-body
 					.form-group.row
 						label.col-3.col-form-label(for="codeIpt") 状态编号
@@ -17,13 +17,42 @@ a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upInfo") 修改�
 							input#nomeIpt.form-control(type="text", name="obj[nome]" value=Step.nome)
 						.offset-3.col-9.col-form-label.text-danger
 					.form-group.row
-						label.col-3.col-form-label(for="isUnique_init") isUnique_init
+						label.col-3.col-form-label(for="is_initUser") is_initUser
 						.col-9
 							.form-check.form-check-inline
-								if Step.isUnique_init
-									input#isUnique_init.form-check-input(type="checkbox", name="obj[isUnique_init]" checked)
+								if Step.is_initUser
+									input#is_initUser.form-check-input(type="checkbox", name="obj[is_initUser]" checked)
 								else
-									input#isUnique_init.form-check-input(type="checkbox", name="obj[isUnique_init]")
+									input#is_initUser.form-check-input(type="checkbox", name="obj[is_initUser]")
+				.modal-header: h3 Client状态
+				.modal-body
+					.form-group.row
+						label.col-3.col-form-label(for="exist_Client") exist_Client
+						.col-9
+							.form-check.form-check-inline
+								if Step.exist_Client
+									input#exist_Client.form-check-input(type="checkbox", name="obj[exist_Client]" checked)
+								else
+									input#exist_Client.form-check-input(type="checkbox", name="obj[exist_Client]")
+					.form-group.row
+						label.col-3.col-form-label(for="sortIpt") sort
+						.col-9
+							input#sortIpt.form-control(type="text", name="obj[sort]" value=Step.sort)
+						.offset-3.col-9.col-form-label.text-danger
+					.form-group.row
+						label.col-3.col-form-label(for="nome_ClientIpt") 状态名称
+						.col-9
+							input#nome_ClientIpt.form-control(type="text", name="obj[nome_Client]" value=Step.nome_Client)
+						.offset-3.col-9.col-form-label.text-danger
+					.form-group.row
+						label.col-3.col-form-label(for="is_initClient") is_initClient
+						.col-9
+							.form-check.form-check-inline
+								if Step.is_initClient
+									input#is_initClient.form-check-input(type="checkbox", name="obj[is_initClient]" checked)
+								else
+									input#is_initClient.form-check-input(type="checkbox", name="obj[is_initClient]")
+
 				.modal-footer
 					button.btn.btn-default(type="button" data-dismiss="modal") 取消
 					button.btn.btn-success(type="submit") 提交

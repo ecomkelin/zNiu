@@ -4,6 +4,7 @@ const OrderProd = require(path.resolve(process.cwd(), 'app/controllers/i_order/O
 const OrderSku = require(path.resolve(process.cwd(), 'app/controllers/i_order/OrderSku'));
 const Order_status = require(path.resolve(process.cwd(), 'app/controllers/i_order/Order_status'));
 const Order_Step = require(path.resolve(process.cwd(), 'app/controllers/i_order/Order_Step'));
+const Step = require(path.resolve(process.cwd(), 'app/controllers/i_order/Step'));
 const MdAuth = require(path.resolve(process.cwd(), 'app/middle/MdAuth'));
 
 module.exports = (app) => {
@@ -31,8 +32,14 @@ module.exports = (app) => {
 	/* ------------------- Order_status ------------------- */
 	app.put('/api/b1/Order_change_status/:id', MdAuth.path_User, Order_status.Order_change_status);
 
-	/* ------------------- Step ------------------- */
+	/* ------------------- Order_Step ------------------- */
 	app.put('/api/b1/OrderPutStep/:id', MdAuth.path_User, Order_Step.OrderPutStep);
 
+	/* ------------------- step ------------------- */
+	// app.delete('/api/b1/Step/:id', MdAuth.path_bser, Step.StepDelete);
+	// app.get('/api/b1/Step/:id', MdAuth.path_User, Step.Step);
+	// app.put('/api/b1/Step/:id', MdAuth.path_bser, Step.StepPut);
+	// app.post('/api/b1/Step', MdAuth.path_bser, Step.StepPost);
+	app.get('/api/b1/Steps/:Shop_id', MdAuth.path_User, Step.Steps);
 
 };

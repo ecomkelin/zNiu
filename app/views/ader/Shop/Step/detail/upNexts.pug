@@ -1,15 +1,15 @@
-a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upNexts") 修改关联状态
+a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upNexts") 关联状态
 
 #upNexts.modal.fade
 	.modal-dialog
 		.modal-content
 			form#adStepUpdNexts-Form(method="post", action="/adStepPut/"+Step._id)
-				.modal-header: h3 修改关联状态
+				.modal-header: h3 User关联状态
 				.modal-body
-					- let i = -1;
+					- i = -1;
 					each item in Steps
 						- i++;
-						- let relStep = {};
+						- relStep = {};
 						each rel in Step.rels
 							if String(rel.Step._id) === String(item._id)
 								- relStep = rel;
@@ -28,6 +28,32 @@ a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upNexts") 修改�
 
 							.col-4
 								input.form-control(type="text", name="obj[rels]["+i+"][btn_color]", value=relStep.btn_color)
+				.modal-header: h3 Client关联状态
+				.modal-body
+					- i = -1;
+					each item in Steps
+						if !item.exist_Client
+							- continue;
+						- i++;
+						- relStep = {};
+						each rel in Step.crels
+							if String(rel.Step._id) === String(item._id)
+								- relStep = rel;
+						.form-group.row
+							.col-1
+								.form-check.form-check-inline
+									if relStep.Step
+										input.form-check-input(type="checkbox", name="obj[crels]["+i+"][confirm]", checked)
+									else
+										input.form-check-input(type="checkbox", name="obj[crels]["+i+"][confirm]")
+							.col-3
+								input(type="hidden", name="obj[crels]["+i+"][Step]" value=item._id)
+								span #{item.code}-#{item.nome}
+							.col-4
+								input.form-control(type="text", name="obj[crels]["+i+"][btn_val]", value=relStep.btn_val)
+
+							.col-4
+								input.form-control(type="text", name="obj[crels]["+i+"][btn_color]", value=relStep.btn_color)
 
 				.modal-footer
 					button.btn.btn-default(type="button" data-dismiss="modal") 取消
