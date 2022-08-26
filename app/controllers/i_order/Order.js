@@ -4,9 +4,11 @@ const moment = require('moment');
 const path = require('path');
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const ConfOrder = require(path.resolve(process.cwd(), 'app/config/conf/ConfOrder'));
+const ConfStep = require(path.resolve(process.cwd(), 'app/config/conf/ConfStep'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
 const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
+const StepDB = require(path.resolve(process.cwd(), 'app/models/order/Step'));
 const OrderDB = require(path.resolve(process.cwd(), 'app/models/order/Order'));
 const OrderProdDB = require(path.resolve(process.cwd(), 'app/models/order/OrderProd'));
 const OrderSkuDB = require(path.resolve(process.cwd(), 'app/models/order/OrderSku'));
@@ -38,12 +40,16 @@ exports.OrderPost = async(req, res) => {
 		delete obj_Order._id;
 
 		// 确认订单所属 (Shop)
+		let paramStep = {isUnique_init: true};
 		if(ConfUser.role_Arrs.includes(payload.role)) {
 			if(payload.role < ConfUser.role_set.boss) return MdFilter.jsonFailed(res, {message: "您的身份不是店铺工作人员"});
 			obj_Order.Shop = payload.Shop._id;
 			obj_Order.User_Oder = payload._id;
+
+			paramStep.typeStep = ConfStep.typeStep_obj.User;
 		} else {
 			if(!MdFilter.isObjectId(obj_Order.Shop)) return MdFilter.jsonFailed(res, {message: "请传递正确的Shop_id信息"});
+			paramStep.typeStep = ConfStep.typeStep_obj.Client;
 		}
 		const Shop = await ShopDB.findOne({_id: obj_Order.Shop, is_usable: 1}, {code:1, serve_Citas: 1, Firm: 1})
 			.populate({path: 'serve_Citas.Cita'});
@@ -51,6 +57,10 @@ exports.OrderPost = async(req, res) => {
 
 		// 订单状态
 		obj_Order.status = ConfOrder.status_obj.placing.num;
+
+		paramStep.Shop = Shop._id;
+		let Step = await StepDB.findOne(paramStep)
+		obj_Order.Step = Step._id;
 
 		// Client 订单的送货方式
 		if(obj_Order.type_ship == ConfOrder.type_ship_obj.sClient.num) {
@@ -99,7 +109,7 @@ exports.OrderPost = async(req, res) => {
 			obj_Order.isPaid = (obj_Order.isPaid == 1 || obj_Order.isPaid == 'true') ? true : false;
 		}
 
-		let is_virtual = false;
+		let is_virtual = false; // 判断是否为虚拟订单 虚拟订单 无关库存和分析
 		// 基本信息赋值
 		if(org_OrderId) {
 			const org_Order = await OrderDB.findOne({_id: org_OrderId});
@@ -742,84 +752,6 @@ exports.Order = async(req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-// const tickets = [];
-// indexOfArrayObject = (arrs, field, str) => {
-// 	if(!(arrs instanceof Array)) return -2;
-// 	let index=0;
-// 	for(;index<arrs.length; index++) {
-// 		if(String(arrs[index][field]) == String(str)) break;
-// 	}
-// 	if(index == arrs.length) return -1;
-// 	return index;
-// }
-// exports.addTicket = async(req, res) => {
-// 	console.log("/addTicket");
-// 	try {
-// 		const payload = req.payload;
-// 		const GetDB_Filter = {
-// 			id: req.params.id,
-// 			payload: payload,
-// 			queryObj: req.query,
-// 			objectDB: OrderDB,
-// 			path_Callback: Order_path_Func,
-// 			dbName: dbOrder,
-// 		};
-// 		const db_res = await GetDB.db(GetDB_Filter);
-// 		if(db_res.status !== 200) return MdFilter.jsonSuccess(res, db_res);
-// 		const object = db_res.data.object;
-// 		const index = indexOfArrayObject(tickets, 'id', object._id);
-
-// 		if(index < -1) return MdFilter.json500(res, {message: "addTicket tickets Error"});
-// 		if(index > -1) tickets.splice(index, 1);
-// 		tickets.push({typePrint: req.query.typePrint, id: object._id, object});
-		
-// 		db_res.message = "addTicket";
-// 		return MdFilter.jsonSuccess(res, db_res);
-// 	} catch(error) {
-// 		return MdFilter.json500(res, {message: "addTicket", error});
-// 	}
-// }
-// exports.getTickets = (req, res) => {
-// 	try {
-// 		return MdFilter.jsonSuccess(res, {message: "getTickets", data: {objects: tickets}})
-// 	} catch (error) {
-// 		return MdFilter.json500(res, {message: "clearTicket", error});
-// 	}
-// }
-// exports.clearTicket = (req, res) => {
-// 	try {
-// 		tickets.splice(0,tickets.length);
-// 		return MdFilter.jsonSuccess(res, {message: "清除打印任务成功"})
-// 	} catch (error) {
-// 		return MdFilter.json500(res, {message: "clearTicket", error});
-// 	}
-// }
-
-// exports.printTicket = (req, res) => {
-// 	try {
-// 		let status = 400;
-// 		let message = "暂无数据";
-// 		let object = null;
-// 		const count = tickets.length;
-// 		if((tickets instanceof Array) && tickets.length > 0) {
-// 			object = tickets[0];
-// 			tickets.splice(0, 1);
-// 			status = 200;
-// 			message = "打印成功";
-// 		}
-// 		return MdFilter.jsonRes(res, {status, message: "printTicket", data: {object, count}, })
-// 	} catch (error) {
-// 		return MdFilter.json500(res, {message: "printTicket", error});
-// 	}
-// }
 
 
 

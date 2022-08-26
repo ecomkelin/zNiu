@@ -15,6 +15,7 @@ const dbSchema = new Schema({
 	is_offline: {type: Boolean, default: false},		// 是否为离线订单 可能没有用
 	is_virtual: {type: Boolean, default: false},		// 是否为虚拟订单
 	status: Number,										// enum: ConfOrder;
+	Step: {type: ObjectId, ref: "Step"},
 	is_hide_client: {type: Boolean, default: false}, 	// 客户是否可见, 客户删除状态下， 商家可删除
 
 	note_Client: String,
