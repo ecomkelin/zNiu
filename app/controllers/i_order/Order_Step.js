@@ -47,6 +47,9 @@ exports.OrderPutStep = async(req, res) => {
 		let rels = orgStep.rels;
 		if(!(rels instanceof Array)) return MdFilter.jsonFailed(res, {message: "此状态没有下一步"});
 
+		let obj = req.body.obj;
+		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递 obj"});
+		let Step_id = obj.Step_id;
 		let i = 0;
 		for(; i<rels.length; i++) {
 			let rel = rels[i];

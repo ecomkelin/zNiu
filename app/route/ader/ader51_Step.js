@@ -18,7 +18,9 @@ module.exports = (app) => {
 			let curAder = req.session.curAder;
 			let Shop_id = req.params.Shop_id;
 			let Shop = await ShopDB.findOne({_id: Shop_id});
-			let Steps = await StepDB.find({Shop: Shop_id}).sort({'typeStep': 1, 'code': 1});
+			let Steps = await StepDB.find({Shop: Shop_id})
+				.populate("rels.Step", "code")
+				.sort({'typeStep': 1, 'code': 1});
 			return res.render('./ader/Shop/Step/list', {title: '状态列表', curAder, Shop, Steps, ConfStep });
 		} catch(error) {
 			return res.redirect('/?error=adSteps,Error: '+error+'&reUrl=/adHome');

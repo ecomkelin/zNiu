@@ -22,6 +22,7 @@ block content
 							th type
 							th 编号
 							th 名称
+							th 关联
 							th.del_show 删除
 					tbody
 						each Step in Steps
@@ -32,5 +33,12 @@ block content
 									span #{Step.nome}
 									if Step.isUnique_init
 										span.text-success (初始)
+								td
+									- let i = -1;
+									each rel in Step.rels
+										- i++;
+										if i!==0 
+											span -
+										span [#{rel.Step.code}] &nbsp;
 								td.del_show
 									a.btn.btn-danger(href="/adStepDel/"+Step._id) 删除
