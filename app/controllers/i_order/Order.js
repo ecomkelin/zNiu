@@ -185,6 +185,7 @@ exports.OrderPost = async(req, res) => {
 			obj_OrderProd.Shop = _Order.Shop;
 			obj_OrderProd.Firm = _Order.Firm;
 			obj_OrderProd.status = _Order.status;
+			obj_OrderProd.at_crt =  obj_OrderProd.at_upd = obj_Order.at_crt;
 
 			obj_OrderProd.is_simple = (obj_OrderProd.is_simple == 1 || obj_OrderProd.is_simple === 'true') ? true : false;
 			if(obj_OrderProd.is_simple !== Prod.is_simple) Prod = null;
@@ -275,6 +276,7 @@ exports.OrderPost = async(req, res) => {
 					obj_OrderSku.Firm = _OrderProd.Firm;
 					obj_OrderSku.Pd = _OrderProd.Pd;
 					obj_OrderSku.Prod = _OrderProd.Prod;
+					obj_OrderSku.at_crt =  obj_OrderSku.at_upd = obj_Order.at_crt;
 
 					if(isNaN(obj_OrderSku.quantity)) return MdFilter.jsonFailed(res, {message: `obj_OrderSku.quantity 必须为数字`});
 					obj_OrderSku.quantity = parseInt(obj_OrderSku.quantity);

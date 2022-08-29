@@ -49,12 +49,6 @@ const dbSchema = new Schema({
 });
 
 dbSchema.pre('save', function(next) {
-	if(this.isNew) {
-		this.at_upd = this.at_crt = Date.now();
-	} else {
-		this.at_upd = Date.now();
-	}
-
 	next();
 })
 
