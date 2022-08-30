@@ -173,14 +173,16 @@ const Shop_general = async(res, obj, Shop, payload) => {
 		}
 
 		if(obj.Cita && (obj.Cita != Shop.Cita)) {
-			if(!MdFilter.isObjectId(obj.Cita)) return MdFilter.jsonFailed(res, {message: '城市数据需要为 _id 格式'});
+			if(!MdFilter.isObjectId(obj.Cita)) obj.Cita = null;
 
-			const index = MdFilter.indexOfArrayObject(Shop.serve_Citas, "Cita", obj.Cita);	// 查看服务区中 是否有此城市
-			if(index < 0) return MdFilter.jsonFailed(res, {message: '请先添加服务区'});
+			if(obj.Cita) {
+				const index = MdFilter.indexOfArrayObject(Shop.serve_Citas, "Cita", obj.Cita);	// 查看服务区中 是否有此城市
+				if(index < 0) return MdFilter.jsonFailed(res, {message: '请先添加服务区'});
 
-			const Cita = await CitaDB.findOne({_id: obj.Cita});
-			if(!Cita) return MdFilter.jsonFailed(res, {message: '没有找到此城市信息'});
-			Shop.Cita = obj.Cita;
+				const Cita = await CitaDB.findOne({_id: obj.Cita});
+				if(!Cita) return MdFilter.jsonFailed(res, {message: '没有找到此城市信息'});
+				Shop.Cita = obj.Cita;
+			}
 		}
 		if(obj.contact) Shop.contact = obj.contact;
 		if(obj.tel) Shop.tel = obj.tel;

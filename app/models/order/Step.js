@@ -25,6 +25,10 @@ const dbSchema = new Schema({
 		btn_color: String
 	}],
 
+	// 关于付款后的下一步
+	is_relPay: {type: Boolean, default: false},
+	nextAfterPaid: {type: ObjectId, ref: "Step"},
+
 	at_upd: Date,								// [只读 自动]
 	at_crt: Date,								// [只读 绝对]
 	Firm: {type: ObjectId, ref: 'Firm'},		// [只读 绝对]
