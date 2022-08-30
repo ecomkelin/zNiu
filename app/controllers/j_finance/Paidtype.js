@@ -38,6 +38,7 @@ exports.PaidtypePost = async(req, res) => {
 
 		if((obj.is_cash == 1) || (obj.is_cash === 'true')) obj.is_cash = true;
 
+		if(obj.Coin && obj.Coin._id) obj.Coin = obj.Coin._id;
 		if(!MdFilter.isObjectId(obj.Coin)) {
 			console.log("PaidtypePost: obj.Coin", obj.Coin);
 			return MdFilter.jsonFailed(res, {message: '请输入支付方式的币种'});
