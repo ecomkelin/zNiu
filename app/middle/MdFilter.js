@@ -147,7 +147,11 @@ exports.path_Func = (queryObj) => {
 	const pathObj = {};
 	if(queryObj.search) {
 		const search = new RegExp(String(queryObj.search).replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase() + '.*');
-		pathObj["$or"] = [{'code': search}, {'nome': { $regex: search, $options: '$i' }}];
+		pathObj["$or"] = [
+			{'code': { $regex: search, $options: '$i' }},
+			{'nome': { $regex: search, $options: '$i' }},
+			{'nomeTR': { $regex: search, $options: '$i' }}
+		];
 	}
 	if(queryObj.is_usable) {	// 特殊情况 要在各自的文件处理
 		(queryObj.is_usable == 0 || queryObj.is_usable == "false") ? (is_usable = 0) : (is_usable = 1)
