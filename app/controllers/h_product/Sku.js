@@ -91,7 +91,7 @@ exports.SkuPost = async(req, res) => {
 		if(isNaN(obj.price_cost)) {
 			obj.price_cost = Prod.price_cost;
 		} else {
-			obj.price_cost = parseFloat(obj.price_cost);
+			obj.price_cost = parseFloat(obj.price_cost) || 0;
 		}
 
 		if(obj.is_controlStock == 1 || obj.is_controlStock === 'true') {

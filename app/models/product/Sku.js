@@ -70,7 +70,6 @@ dbSchema.pre('save', function(next) {
 			: true
 		: true;
 	if(this.price_sale > this.price_regular) this.price_sale = this.price_regular;
-	if(isNaN(this.price_sale)) this.price_sale = 0;
 	this.is_discount = (this.price_sale < this.price_regular) ? true : false ;
 
 	this.is_alert = (this.quantity <= this.quantity_alert) ? true : false;

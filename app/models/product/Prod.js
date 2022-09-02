@@ -113,9 +113,6 @@ dbSchema.pre('save', function(next) {
 	} else {
 		this.is_simple = false;
 	}
-	if(isNaN(this.price_sale)) this.price_sale = this.price_regular;
-	if(this.price_sale > this.price_regular) this.price_sale = this.price_regular;
-	if(isNaN(this.price_cost)) this.price_cost = 0;
 
 	if(this.is_simple === true) {	// 如果是单品 则一些控制字段 是自身赋予的
 		this.price_unit = this.price_min = this.price_max = this.price_sale;

@@ -20,6 +20,7 @@ const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 const PdnomeCT = require("../g_complement/Pnome");
 
 const modify_Prods = [];
+// 查看缓存变化
 const setModify_Prods = (Prod, isDel) => {
 	const modify_Prod = {
 		at_upd: Date.now(),
@@ -35,9 +36,10 @@ const setModify_Prods = (Prod, isDel) => {
 	}
 	modify_Prods.push(modify_Prod);
 
+	// 如果是大于3天的缓存 自动删除
 	let i=0;
 	for(; i<modify_Prods.length; i++) {
-		if(Date.now() - modify_Prods[i].at_upd < 7*24*60*60*1000) break;
+		if(Date.now() - modify_Prods[i].at_upd < 3*24*60*60*1000) break;
 	}
 	modify_Prods.splice(0, i);
 }
@@ -101,8 +103,10 @@ exports.modifyProds = (req, res) => {
 	const mProds = [];
 	const dProds = [];
 	let is_modify = false;
+
 	for(let i=modify_Prods.length-1; i>=0; i--) {
 		let mdProd = modify_Prods[i];
+		// 获取前台未更新的变更数据
 		if(timestamp - mdProd.at_upd < 0) {
 			is_modify = true;
 			if(mdProd.isDel) {
@@ -206,11 +210,11 @@ const Prod_PdNull = async(res, obj, payload) => {
 		if(isNaN(obj.price_cost)) obj.price_cost = 0;
 		obj.price_cost = parseFloat(obj.price_cost);
 
-		if(isNaN(obj.price_regular)) return MdFilter.jsonFailed(res, {message: "price_regular要为数字"});
-		obj.price_regular = parseFloat(obj.price_regular);
-
 		if(isNaN(obj.price_sale)) return MdFilter.jsonFailed(res, {message: "price_sale要为数字"});
 		obj.price_sale = parseFloat(obj.price_sale);
+
+		if(isNaN(obj.price_regular)) obj.price_regular = obj.price_sale;
+		obj.price_regular = parseFloat(obj.price_regular);
 
 		if(!MdFilter.isObjectId(obj.Brand)) obj.Brand = null;
 		if(!MdFilter.isObjectId(obj.Nation)) obj.Nation = null;
@@ -386,7 +390,41 @@ exports.ProdDelete = async(req, res) => {
 	}
 }
 
+exports.ProdPut1 = async(req, res) => {
+	console.log("/ProdPut1");
+	try{
+		const id = req.params.id;
 
+		const Prod = await ProdDB.findOne({_id: id},{price_cost: 1});
+		if(!Prod) return MdFilter.jsonFailed(res, {message: "没有找到此商品信息"});
+
+		let obj = req.body.general;
+		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
+			
+		console.log(obj);
+		if(obj.price_regular || obj.price_regular == 0) {
+			obj.price_regular = parseFloat(obj.price_regular);
+			if(!isNaN(obj.price_regular)) Prod.price_regular = obj.price_regular;
+		}
+		if(obj.price_sale || obj.price_sale == 0) {
+			obj.price_sale = parseFloat(obj.price_sale);
+			if(!isNaN(obj.price_sale)) Prod.price_sale = obj.price_sale;
+		}
+		if(obj.price_cost) {
+			obj.price_cost = parseFloat(obj.price_cost);
+			if(!isNaN(obj.price_cost)) Prod.price_cost = obj.price_cost;
+		}
+		if(obj.price_cost == 0) Prod.price_cost = 0;
+
+		console.log("Prod pre Save:  ", Prod)
+		const objSave = await Prod.save();
+
+		return MdFilter.jsonSuccess(res, {message: "ProdPut", data: {object: objSave}});
+		
+	} catch(error) {
+		return MdFilter.json500(res, {message: "ProdPut", error});
+	}
+}
 exports.ProdPut = async(req, res) => {
 	console.log("/ProdPut");
 	try{
@@ -507,6 +545,7 @@ exports.ProdPut = async(req, res) => {
 				obj.weight = parseFloat(obj.weight);
 				if(!isNaN(obj.weight)) Prod.weight = obj.weight;
 			}
+
 			if(obj.price_regular || obj.price_regular == 0) {
 				obj.price_regular = parseFloat(obj.price_regular);
 				if(!isNaN(obj.price_regular)) Prod.price_regular = obj.price_regular;
@@ -520,6 +559,7 @@ exports.ProdPut = async(req, res) => {
 				if(!isNaN(obj.price_cost)) Prod.price_cost = obj.price_cost;
 			}
 			if(obj.price_cost == 0) Prod.price_cost = 0;
+
 
 			if(obj.img_url && (obj.img_url != Prod.img_url) && Prod.img_url && Prod.img_url.split("Prod").length > 1){
 				await MdFiles.rmPicture(Prod.img_url);
