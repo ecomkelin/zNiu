@@ -21,7 +21,7 @@ const dbSchema = new Schema({
 
 	nome: String,									// 店铺名称
 	addr: String,									// 店铺地址
-	zip: String,									// 店铺所属地址邮编
+	zip: String,									// 店铺区号
 	tel: String,
 
 	cassa_auth: {
