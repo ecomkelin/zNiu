@@ -5,14 +5,14 @@ block content
 		nav(aria-label="breadcrumb")
 			ol.breadcrumb
 				li.breadcrumb-item: a(href="/adHome") Home
-				li.breadcrumb-item: a(href="/adSteps/"+Shop._id) 状态列表
+				li.breadcrumb-item: a(href="/adSteps/"+Firm._id) 状态列表
 				li.breadcrumb-item.active(aria-current="page") 添加状态
 		hr
 		form#adStepPost-Form(method="post", action="/adStepPost", autocomplete="off")
 			.row.mb-5
 				.col-4.col-sm-2 状态所属商铺:
-				input(type="hidden", name="obj[Shop]", value=Shop._id)
-				.col-8.col-sm-6.text-info #{Shop.code} #{Shop.nome}
+				input(type="hidden", name="obj[Firm]", value=Firm._id)
+				.col-8.col-sm-6.text-info #{Firm.code} #{Firm.nome}
 
 			.form-group.row
 				label.col-4.col-sm-2.col-form-label(for="codeIpt")#codeLabel.text-info 状态编号

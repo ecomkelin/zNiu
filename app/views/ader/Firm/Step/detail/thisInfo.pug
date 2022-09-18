@@ -7,10 +7,10 @@ table.mt-3.table.table-hover
 			strong sort:
 			span.ml-3 #{Step.sort}
 		td
-			if Step.Shop
-				- Shop = Step.Shop;
+			if Step.Firm
+				- Firm = Step.Firm;
 				strong 所属店铺:
-				span.ml-3 #{Shop.code} [#{Shop.nome}]
+				span.ml-3 #{Firm.code} [#{Firm.nome}]
 	tr
 		td: strong User:
 		td #{Step.nome} 

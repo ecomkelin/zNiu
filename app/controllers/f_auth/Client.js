@@ -11,8 +11,8 @@ exports.ClientPost = async(req, res) => {
 	console.log("/ClientPost");
 	try{
 		const payload = req.payload;
-		let Firm = payload.Firm;
-		if(Firm._id) Firm = Firm._id;
+		let Firm = payload.Firm._id || payload.Firm;
+		let Shop = payload.Shop._id || payload.Shop;
 
 		const obj = req.body.obj;
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
@@ -63,6 +63,7 @@ exports.ClientPost = async(req, res) => {
 
 		obj.pwd = await MdFilter.encrypt_Prom(obj.pwd);
 		obj.Firm = Firm;
+		obj.Shop = Shop;
 		const _object = new ClientDB(obj);
 		const objSave = await _object.save();
 		if(Object.keys(req.query).length > 0) {

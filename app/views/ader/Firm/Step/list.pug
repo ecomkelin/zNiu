@@ -5,14 +5,14 @@ block content
 		nav(aria-label="breadcrumb")
 			ol.breadcrumb
 				li.breadcrumb-item: a(href="/adHome") Home
-				li.breadcrumb-item: a(href="/adShop/"+Shop._id) 商店详情
+				li.breadcrumb-item: a(href="/adFirm/"+Firm._id) 公司详情
 				li.breadcrumb-item.active(aria-current="page") 状态列表
 		.row
 			.col-md-6.col-12
-				span 所属店铺: #{Shop.code}
+				span 所属店铺: #{Firm.code}
 			.col-md-6.col-12.text-right
 				button.mr-5.btn.btn-danger#toggle_del_Btn(type="button") -
-				a.btn.btn-warning.mr-4(href="/adStepAdd/"+Shop._id) +
+				a.btn.btn-warning.mr-4(href="/adStepAdd/"+Firm._id) +
 
 		.row.mt-3
 			.col-12

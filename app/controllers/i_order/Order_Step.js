@@ -12,7 +12,7 @@ exports.OrderPutStep = async(req, res) => {
 		let id = req.params.id;
 
 		paramOrder = {_id: id};
-		let flagUser = true;
+		let flagUser = true;	// 哪个角色在修改 Step User还是Client?
 		if(payload.Firm && payload.role) {
 			if(payload.role > ConfUser.role_set.boss) paramOrder.User_Oder = payload._id;
 			if(payload.Shop) paramOrder.Shop = payload.Shop._id || payload.Shop;

@@ -44,39 +44,26 @@ module.exports = (app) => {
 			same_param.code = obj.code;
 			const errorInfo = MdFilter.objMatchStint(Stint.Shop, obj, stints);
 			if(errorInfo) return res.redirect('/?error=没有找到此公司,请重新选择'+errorInfo+'&reUrl=/adShopAdd');
-					
+
 			const Firm = await FirmDB.findOne({'_id': obj.Firm});
 			if(!Firm) return res.redirect('/?error=没有找到此公司,请重新选择&reUrl=/adShopAdd');
-			// if(!ConfShop.role_Arrs.includes(parseInt(obj.role))) return res.redirect('/?error=商店角色参数错误&reUrl=/adShopAdd');
-			
+
 			const objSame = await ShopDB.findOne(same_param);
 			if(objSame) {
 				let errorInfo = '已有此账号，请重新注册';
 				return res.redirect('/?error='+errorInfo+'&reUrl=/adShopAdd');
 			}
-			obj.able_MBsell = obj.able_MBsell ? true : false;
-			obj.able_PCsell = obj.able_PCsell ? true : false;
-			obj.allow_codeDuplicate = obj.allow_codeDuplicate ? true : false;
-			obj.is_Pnome = obj.is_Pnome ? true : false;
+
+			obj.able_MBsell = obj.able_MBsell ? true : false;	// 是否能够手机售卖
+			obj.able_PCsell = obj.able_PCsell ? true : false;	// 是否能够pc售卖
+			obj.allow_codeDuplicate = obj.allow_codeDuplicate ? true : false;	// 是否允许多code
+			obj.is_Pnome = obj.is_Pnome ? true : false;			// 是否存储产品名称
 
 			const _object = new ShopDB(obj)
 			const objSave = await _object.save();
 			return res.redirect('/adShops')
 		} catch(error) {
 			return res.redirect('/?error=adShopPost,Error: '+error+'&reUrl=/adShopAdd')
-		}
-	})
-
-	app.get('/adShop/:id', AderIsLogin, async(req, res) => {
-		try{
-			const curAder = req.session.curAder;
-			const id = req.params.id;
-			const Shop = await ShopDB.findOne({_id: id}, {pwd: 0, refreshToken: 0})
-				.populate("Firm", "code nome")
-			if(!Shop) return res.redirect('/?error=没有找到此商店&reUrl=/adShops');
-			return res.render('./ader/Shop/detail', {title: '商店详情', curAder, Shop})
-		} catch(error) {
-			return res.redirect('/?error=adShop,Error: '+error+'&reUrl=/adShops')
 		}
 	})
 
@@ -88,6 +75,7 @@ module.exports = (app) => {
 			const obj = req.body.obj
 			if(obj.firm) return res.redirect('/?error=不允许修改公司&reUrl=/adShop/'+id);
 
+			// 注释 看 Post
 			obj.able_MBsell = obj.able_MBsell ? true : false;
 			obj.able_PCsell = obj.able_PCsell ? true : false;
 			obj.allow_codeDuplicate = obj.allow_codeDuplicate ? true : false;
@@ -113,6 +101,19 @@ module.exports = (app) => {
 		} catch(error) {
 			console.log(error);
 			return res.redirect('/?error=adShopPut,Error: '+error+'&reUrl=/adShops');
+		}
+	});
+
+	app.get('/adShop/:id', AderIsLogin, async(req, res) => {
+		try{
+			const curAder = req.session.curAder;
+			const id = req.params.id;
+			const Shop = await ShopDB.findOne({_id: id}, {pwd: 0, refreshToken: 0})
+				.populate("Firm", "code nome")
+			if(!Shop) return res.redirect('/?error=没有找到此商店&reUrl=/adShops');
+			return res.render('./ader/Shop/detail', {title: '商店详情', curAder, Shop})
+		} catch(error) {
+			return res.redirect('/?error=adShop,Error: '+error+'&reUrl=/adShops')
 		}
 	});
 

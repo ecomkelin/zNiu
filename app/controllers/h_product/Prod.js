@@ -308,6 +308,7 @@ const Pd_to_Prod = (Pd) => {
 	obj.price_unit = obj.price_min = obj.price_max = Pd.price_regular;
 	return obj;
 }
+// 在添加 Prod 时, 店铺直接添加 公司总部同步和批量同步时 saveProd
 const Prod_save_Prom = async(obj, payload, Pd) => {
 	return new Promise(async(resolve) => {
 		try {

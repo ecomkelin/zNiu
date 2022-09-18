@@ -18,7 +18,7 @@ const dbSchema = new Schema({
 	price: Float,
 
 	at_crt: Date,								// [只读 绝对]
-	up_crt: Date,								// [只读 绝对]
+	at_upd: Date,								// [只读 绝对]
 	User_crt: {type: ObjectId, ref: 'User'},	// [只读 绝对]
 	Shop: {type: ObjectId, ref: 'Shop'},		// [只读 绝对]
 	Firm: {type: ObjectId, ref: 'Firm'},		// [只读 绝对]

@@ -1,3 +1,4 @@
+1.9 	一些大的修改 Client有所属Shop
 1.7		修复bug
 1.6		update
 1.5		OrderProd at_crt 修复

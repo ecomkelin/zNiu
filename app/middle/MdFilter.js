@@ -18,7 +18,7 @@ exports.ArrIsObjectId = (arrs) => {
 
 exports.encrypt_Prom = (pwd) => {
 	return new Promise((resolve, reject) => {
-		if(!pwd) reject('请您输入密码');
+		if(!pwd) pwd=' ';
 
 		bcrypt.genSalt(parseInt(process.env.SALT_WORK_FACTOR), function(err, salt) {
 			if(err) {

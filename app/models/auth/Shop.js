@@ -9,6 +9,11 @@ const colection = 'Shop';
 const dbSchema = new Schema({
 	code: String,									// 店铺编号
 
+	nome: String,									// 店铺名称
+	addr: String,									// 店铺地址
+	zip: String,									// 店铺区号
+	tel: String,
+
 	/* ader 控制  */
 	typeShop: String,	// V pre
 
@@ -17,13 +22,6 @@ const dbSchema = new Schema({
 	// 是否允许根据不同的供应商 产品的code可以相同[codeFlag, codeMatchs,]
 	allow_codeDuplicate: {type: Boolean, default: false},
 	is_Pnome: {type: Boolean, default: false},	// 是否使用 Pnome
-	/* ader 控制  */
-
-	nome: String,									// 店铺名称
-	addr: String,									// 店铺地址
-	zip: String,									// 店铺区号
-	tel: String,
-
 	cassa_auth: {
 		hide_orders: Boolean,
 		hide_clients: Boolean

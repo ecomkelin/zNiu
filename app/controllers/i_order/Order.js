@@ -57,7 +57,7 @@ exports.OrderPost = async(req, res) => {
 		// 订单状态
 		obj_Order.status = ConfOrder.status_obj.placing.num;
 
-		paramStep.Shop = Shop._id;
+		paramStep.Firm = Shop.Firm;
 		let Step = await StepDB.findOne(paramStep);
 		obj_Order.Step = Step ? Step._id : null;
 
@@ -110,21 +110,21 @@ exports.OrderPost = async(req, res) => {
 
 		let is_virtual = false; // 判断是否为虚拟订单 虚拟订单 无关库存和分析
 		// 基本信息赋值
-		if(org_OrderId) {
+		if(org_OrderId) {	// 修改订单
 			const org_Order = await OrderDB.findOne({_id: org_OrderId});
 			if(!org_Order) return MdFilter.jsonRes(res, {message: "没有找到需要修改的订单"});
 			obj_Order.code = org_Order.code;
 			obj_Order.at_crt = org_Order.at_crt;
-		} else if(obj_Order.is_offline == 1 || obj_Order.is_offline === 'true') {
+		} else if(obj_Order.is_offline == 1 || obj_Order.is_offline === 'true') {	// 离线订单
 			if(!obj_Order.code) return MdFilter.jsonRes(res, {message: "请传递订单编号"});
 			if(isNaN(obj_Order.at_crt)) return MdFilter.jsonRes(res, {message: "请传递订单创建时间"});
 			obj_Order.at_crt = new Date(parseInt(obj_Order.at_crt));
-		} else if(obj_Order.is_virtual == 1 || obj_Order.is_virtual === 'true') {
+		} else if(obj_Order.is_virtual == 1 || obj_Order.is_virtual === 'true') {	// 虚拟订单
 			is_virtual = true;
 			if(!obj_Order.code) return MdFilter.jsonRes(res, {message: "请传递订单编号"});
 			obj_Order.show_crt = obj_Order.show_crt ? new Date(obj_Order.show_crt) : new Date();
 			obj_Order.at_crt = Date.now();
-		} else {
+		} else {			// 正常订单
 			const code_res = await generate_codeOrder_Prom(Shop._id, Shop.code);
 			if(code_res.status !== 200) return MdFilter.jsonRes(res, {message: code_res.message});
 			obj_Order.code = code_res.data.code;
