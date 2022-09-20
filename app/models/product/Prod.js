@@ -30,7 +30,7 @@ const dbSchema = new Schema({
 	Categs: [{type: ObjectId, ref: 'Categ'}],			// [if(Pd !== null)只读] 
 
 	weight: Float,
-	iva: Float, 									// [只读] 	税 意大利 默认 22
+	iva: Number, 									// [只读] 	税 意大利 默认 22
 	num_batch: Number, 								// [只读] 一箱包含的数量
 	price_cost: Float,								// 采购价
 	price_regular: Float,							// 
@@ -47,14 +47,7 @@ const dbSchema = new Schema({
 	// Tags: [{type: ObjectId, ref: 'Tag'}],
 	sort: Number,
 
-
 	is_usable: { type: Boolean, default: false },
-
-
-	decorates: [{
-		Decorate: {type: ObjectId, ref: 'Decorate'},
-		Suppliments: [{type: ObjectId, ref: 'Suppliment'}],
-	}],
 
 	Attrs: [{type: ObjectId, ref: "Attr"}],			// [只读 相对 Attr] 公司层面是否可用
 
@@ -64,7 +57,6 @@ const dbSchema = new Schema({
 
 	/* 如果 is_simple 为 true */
 	purchase_note: String,
-	limit_quantity: {type: Number, default: 0},
 	Batchs: [{
 		quantity: Number,	// 采购数量
 		at_pur: Date,		// 采购时间
@@ -72,8 +64,6 @@ const dbSchema = new Schema({
 	}],
 	is_controlStock: {type: Boolean, default: true},
 	quantity: {type:Number, default: 0},
-	quantity_pack: {type:Number, default: 1},
-	note_pack: String,
 	quantity_alert: {type: Number, default: 0},
 	allow_backorder: {type: Boolean, default: true},
 

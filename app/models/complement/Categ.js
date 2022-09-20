@@ -16,7 +16,7 @@ const dbSchema = new Schema({
 	}],
 
 	is_usable: { type: Boolean, default: true },
-	sort: Number,
+	sort: {type: Number, default: 0},
 
 	User_upd: {type: ObjectId, ref: 'User'},		// [只读 绝对]
 	User_crt: {type: ObjectId, ref: 'User'},		// [只读 绝对]
@@ -28,14 +28,10 @@ const dbSchema = new Schema({
 
 dbSchema.pre('save', function(next) {
 	if(this.isNew) {
-		if(!this.sort) this.sort = 0;
-		if(!this.level) this.level = 1;
 		this.at_upd = this.at_crt = Date.now();
 	} else {
 		this.at_upd = Date.now();
 	}
-	if(this.level === 1) this.Categ_far = null;
-	if(this.level === 2) this.Categ_sons = null;
 
 	next();
 })

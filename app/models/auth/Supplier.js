@@ -10,8 +10,15 @@ const dbSchema = new Schema({
 	is_plat: Boolean,								// 是否为平台关联
 
 	/* 平台信息 */
-	plat_code: String,								// 次供应商的平台编号
+	plat_code: String,								// 此供应商的平台编号 比如 0342SHP**** 0342位平台好 SHP为店铺号
+	// let plat_code = "1234SHOP234";
+	// let dns_code = plat_code.match(/^[0-9]+/gi)[0];
+	// console.log("dns_code: ", dns_code);
+	// plat_code = plat_code.slice(dns_code.length);
+	// let shop_code = plat_code.match(/^[a-z|A-Z]+/gi);
+	// console.log(111, shop_code[0]);
 
+	/* 基本信息 */
 	code: String,									// 店铺编号
 	nome: String,									// 店铺名称
 	addr: String,									// 店铺地址

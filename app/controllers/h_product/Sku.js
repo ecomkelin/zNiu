@@ -86,7 +86,6 @@ exports.SkuPost = async(req, res) => {
 		obj.weight = isNaN(parseFloat(obj.weight)) ? Prod.weight : parseFloat(obj.weight);
 		obj.price_regular = isNaN(parseFloat(obj.price_regular)) ? Prod.price_regular : parseFloat(obj.price_regular);
 		obj.price_sale = isNaN(parseFloat(obj.price_sale)) ? Prod.price_sale : parseFloat(obj.price_sale);
-		obj.limit_quantity = isNaN(parseInt(obj.limit_quantity)) ? 0 : parseInt(obj.limit_quantity);
 
 		if(isNaN(obj.price_cost)) {
 			obj.price_cost = Prod.price_cost;
@@ -206,7 +205,6 @@ exports.SkuPut = async(req, res) => {
 		if(obj.weight && !isNaN(parseFloat(obj.weight))) Sku.weight =parseFloat(obj.weight);
 		if(obj.price_regular && !isNaN(parseFloat(obj.price_regular))) Sku.price_regular =parseFloat(obj.price_regular);
 		if(obj.price_sale && !isNaN(parseFloat(obj.price_sale))) Sku.price_sale =parseFloat(obj.price_sale);
-		if(obj.limit_quantity && !isNaN(parseInt(obj.limit_quantity))) Sku.limit_quantity =parseInt(obj.limit_quantity);
 		if(obj.quantity && !isNaN(parseInt(obj.quantity))) Sku.quantity =parseInt(obj.quantity);
 		if(obj.quantity_alert && !isNaN(parseInt(obj.quantity_alert))) Sku.quantity_alert =parseInt(obj.quantity_alert);
 		if(obj.purchase_note) Sku.purchase_note = obj.purchase_note;

@@ -1,4 +1,5 @@
-1.9 	一些大的修改 Client有所属Shop
+1.91	批量上传 Prod优化
+1.9 	一些大的修改 Client有所属Shop 但是筛选的时候不动
 1.7		修复bug
 1.6		update
 1.5		OrderProd at_crt 修复

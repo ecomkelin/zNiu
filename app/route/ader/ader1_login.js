@@ -11,7 +11,7 @@ module.exports = (app) => {
 	/* ========================================== Ader 首页 登录页面 登录 登出 ========================================== */
 	app.get('/adHome', async(req, res, next) => {
 		const Firms = await FirmDB.find();
-		const Shops = await ShopDB.find();
+		const Shops = await ShopDB.find({Firm: {$ne: null}});
 		return res.render('./ader/adHome', {title: '超级管理', Firms, Shops, curAder : req.session.curAder}); 
 	});
 	app.post('/loginAder', async(req, res) => {

@@ -25,13 +25,6 @@ const dbSchema = new Schema({
 	// at_toSale: Date,
 
 	purchase_note: String,
-	limit_quantity: {type: Number, default: 0},
-
-	batchs: [{
-		quantity: Number,
-		at_pur: Date,
-		at_exp: Date,
-	}],
 
 	is_controlStock: {type: Boolean, default: true},
 
