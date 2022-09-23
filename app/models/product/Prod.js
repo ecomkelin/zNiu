@@ -14,7 +14,7 @@ const dbSchema = new Schema({
 	/* 为批发商做的 */
 	Supplier: {type: ObjectId, ref: 'Shop'},		// 产品所属供应商
 	codeFlag: String,								// codeFlag 所属供应商唯一
-	codeLen: Number,								// codeFlag 的长度
+	codeLen: Number,								// [只读] codeFlag 的长度
 	codeMatchs: [{type: ObjectId, ref: 'Prod'}], 	// 相关同codeFlag的产品，为了前端缓存
 
 	/* 如果 Pd 不为空则 只读*/

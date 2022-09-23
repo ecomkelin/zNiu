@@ -222,6 +222,8 @@ const Prod_PdNull = async(res, obj, payload) => {
 
 		if(!isNaN(obj.quantity)) obj.quantity = parseInt(obj.quantity);
 		if(!isNaN(obj.quantity_alert)) obj.quantity_alert = parseInt(obj.quantity_alert);
+		if(!isNaN(obj.num_batch)) obj.num_batch = parseInt(obj.num_batch);
+
 		obj.allow_backorder = (obj.allow_backorder == 1 || obj.allow_backorder === true || obj.allow_backorder === 'true') ? true : false; 
 		const save_res = await Prod_save_Prom(obj, payload, null);
 
@@ -465,14 +467,10 @@ exports.ProdPut = async(req, res) => {
 		}
 		if(obj.desp) Prod.desp = obj.desp.replace(/^\s*/g,"");
 		if(obj.unit) Prod.unit = obj.unit.replace(/^\s*/g,"");
-		if(obj.sort) {
-			obj.sort = parseInt(obj.sort);
-			if(!isNaN(obj.sort)) Prod.sort = obj.sort;
-		}
-		if(obj.quantity) {
-			obj.quantity = parseInt(obj.quantity);
-			if(!isNaN(obj.quantity)) Prod.quantity = obj.quantity;
-		}
+
+		if(!isNaN(parseInt(obj.sort))) Prod.sort = parseInt(obj.sort);
+		if(!isNaN(parseInt(obj.quantity))) Prod.quantity = parseInt(obj.quantity);
+		if(!isNaN(parseInt(obj.quantity_alert))) Prod.quantity_alert = parseInt(obj.quantity_alert);
 
 		if(obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') Prod.is_usable = true;
 		if(obj.is_usable == 0 || obj.is_usable === false || obj.is_usable === 'false') Prod.is_usable = false;
@@ -484,6 +482,7 @@ exports.ProdPut = async(req, res) => {
 		if(!Prod.Pd) {	// 如果是单店 可以修改名称等 暂时没有做
 			if(obj.code) obj.code.replace(/^\s*/g,"").toUpperCase();
 
+			// code是否可重复
 			if(payload.Shop.allow_codeDuplicate){
 				obj.codeFlag = obj.codeFlag.replace(/^\s*/g,"").toUpperCase();
 				if(obj.Supplier !== Prod.Supplier || (obj.codeFlag && obj.codeFlag !== Prod.codeFlag)) {
@@ -535,10 +534,7 @@ exports.ProdPut = async(req, res) => {
 			if(MdFilter.isObjectId(obj.Nation)) Prod.Nation = obj.Nation;
 			if(MdFilter.isObjectId(obj.Brand)) Prod.Brand = obj.Brand;
 			if(MdFilter.ArrIsObjectId(obj.Categs)) Prod.Categs = obj.Categs;
-			if(obj.weight) {
-				obj.weight = parseFloat(obj.weight);
-				if(!isNaN(obj.weight)) Prod.weight = obj.weight;
-			}
+			if(!isNaN(parseFloat(obj.weight))) Prod.weight = parseFloat(obj.weight);
 
 			if(obj.price_regular || obj.price_regular == 0) {
 				obj.price_regular = parseFloat(obj.price_regular);
@@ -554,6 +550,7 @@ exports.ProdPut = async(req, res) => {
 			}
 			if(obj.price_cost == 0) Prod.price_cost = 0;
 
+			if(!isNaN(parseInt(obj.iva))) Prod.iva = parseInt(obj.iva);
 
 			if(obj.img_url && (obj.img_url != Prod.img_url) && Prod.img_url && Prod.img_url.split("Prod").length > 1){
 				await MdFiles.rmPicture(Prod.img_url);
