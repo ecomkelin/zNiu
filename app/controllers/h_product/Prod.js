@@ -139,7 +139,7 @@ exports.ProdPost = async(req, res) => {
 			Prod_PdSynchronize(res, req.body.Pd, payload);
 		} else if(req.body.Pds) {	// 从公司批量同步
 			Prods_PdSynchronize(res, req.body.Pds, payload);
-		} else {
+		} else {	// 自己添加
 			let obj = req.body.obj;
 			if(!obj) {
 				res_PdImg = await MdFiles.PdImg_sm(req, "/Prod");
@@ -180,6 +180,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 		const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code', 'nome']);
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 
+		obj.is_quick = (obj.is_quick == 1 || obj.is_quick === 'true') ? true: false;
 
 		// 批发商
 		if(payload.Shop.allow_codeDuplicate) {
@@ -472,8 +473,8 @@ exports.ProdPut = async(req, res) => {
 		if(!isNaN(parseInt(obj.quantity))) Prod.quantity = parseInt(obj.quantity);
 		if(!isNaN(parseInt(obj.quantity_alert))) Prod.quantity_alert = parseInt(obj.quantity_alert);
 
-		if(obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') Prod.is_usable = true;
-		if(obj.is_usable == 0 || obj.is_usable === false || obj.is_usable === 'false') Prod.is_usable = false;
+		if(obj.is_usable) Prod.is_usable = (obj.is_usable == 1 || obj.is_usable === 'true') ? true: false;
+		if(obj.is_quick) Prod.is_quick = (obj.is_quick == 1 || obj.is_quick === 'true') ? true: false;
 
 		let isAllow_supplierCodeCsell = false;
 		let orgCodeFlag = Prod.codeFlag;

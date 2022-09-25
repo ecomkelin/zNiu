@@ -1,3 +1,4 @@
+1.921	Prod is_quick ShopPut Firm
 1.92	ProdPut iva
 1.91	批量上传 Prod优化
 1.9 	一些大的修改 Client有所属Shop 但是筛选的时候不动

@@ -4,7 +4,6 @@ const path = require('path');
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const StintShop = require(path.resolve(process.cwd(), 'app/config/stint/StintShop'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const MdFiles = require(path.resolve(process.cwd(), 'app/middle/MdFiles'));
 const UserDB = require(path.resolve(process.cwd(), 'app/models/auth/User'));
 const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
@@ -17,31 +16,17 @@ exports.ShopPost = async(req, res) => {
 	console.log("/ShopPost");
 	try{
 		const payload = req.payload;
+		let Firm = payload.Firm._id || payload.Firm;
 
 		let obj = req.body.obj;
 		if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Shop", field: "img_url"});
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 
 		if(obj.Firm === 'Supplier') {
-			obj.Firm = null;
 			obj.typeShop = 'Supplier';
 			obj.Firm = payload.Firm._id;
-			if(!MdFilter.isObjectId(obj.Cita)) obj.Cita = null;
 		} else {
-			if(payload.role > ConfUser.role_set.manager) return MdFilter.jsonFailed(res, {message: "需要公司管理者权限"});
-			obj.Firm = payload.Firm;
-
-			if(!MdFilter.isObjectId(obj.Cita)) return MdFilter.jsonFailed(res, {message: '请输入商店所在城市'});
-			const Cita = await CitaDB.findOne({_id: obj.Cita});
-			if(!Cita) return MdFilter.jsonFailed(res, {message: '没有找到您选择的城市信息'});
-
-			obj.User_crt = payload._id;
-			obj.price_ship = 0;
-			obj.serve_Citas = [];
-			const serve_Cita = {};
-			serve_Cita.Cita = Cita._id;
-			serve_Cita.price_ship = 0;
-			obj.serve_Citas.push(serve_Cita);
+			return MdFilter.jsonFailed(res, {message: '您没有添加商铺的权限'});
 		}
 
 		// 判断参数是否符合要求
@@ -49,6 +34,7 @@ exports.ShopPost = async(req, res) => {
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 
+		// 控制前台是否可以看到 客户 和 今日的所有订单 如果hide_orders==true则前台只能看到自己最近一单
 		if(obj.cassa_auth) {
 			let {hide_orders, hide_clients} = obj.cassa_auth;
 			obj.cassa_auth.hide_orders = (hide_orders == 1 || hide_orders === 'true') ? true : false;
@@ -73,12 +59,12 @@ exports.ShopDelete = async(req, res) => {
 	console.log("/ShopDelete");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
+		let Firm = payload.Firm._id || payload.Firm;
 
 		const id = req.params.id;		// 所要更改的Shop的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据 _id"});
 
-		const pathObj = {_id: id};
+		const pathObj = {_id: id, Firm};
 		Shop_path_Func(pathObj, payload, req.query);
 
 		const Shop = await ShopDB.findOne(pathObj);
@@ -108,11 +94,11 @@ exports.ShopPut = async(req, res) => {
 	console.log("/ShopPut");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
+		let Firm = payload.Firm._id || payload.Firm;
 
 		const id = req.params.id;		// 所要更改的Shop的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
-		const pathObj = {_id: id};
+		const pathObj = {_id: id, Firm};
 		Shop_path_Func(pathObj, payload, req.query);
 
 		const Shop = await ShopDB.findOne(pathObj);
@@ -188,7 +174,7 @@ const Shop_general = async(res, obj, Shop, payload) => {
 		if(obj.tel) Shop.tel = obj.tel;
 		if(obj.addr) Shop.addr = obj.addr;
 		if(obj.zip) Shop.zip = obj.zip;
-		// if(obj.typeShop) Shop.typeShop = obj.typeShop;
+
 		if(obj.img_url && (obj.img_url != Shop.img_url) && Shop.img_url && Shop.img_url.split("Shop").length > 1){
 			await MdFiles.rmPicture(Shop.img_url);
 			Shop.img_url = obj.img_url;
