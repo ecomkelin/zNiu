@@ -21,11 +21,16 @@ const dbSchema = new Schema({
 	able_PCsell: {type: Boolean, default: true},	// 销售端 可以使用PC版
 	// 是否允许根据不同的供应商 产品的code可以相同[codeFlag, codeMatchs,]
 	allow_codeDuplicate: {type: Boolean, default: false},
+	allow_codeRepeat: {type: Boolean, default: false},
 	is_Pnome: {type: Boolean, default: false},	// 是否使用 Pnome
 	cassa_auth: {
 		hide_orders: Boolean,
 		hide_clients: Boolean
 	},
+
+	is_main: {type: Boolean, default: false},	// 是否为公司主店
+	is_boutique: {type: Boolean, default: false},	// 是否为精品店
+	is_usable: { type: Boolean, default: true },	// 是否可用
 
 	img_url: String,								// 店铺logo
 
@@ -42,9 +47,6 @@ const dbSchema = new Schema({
 		price_ship: Float,								// 额外运费, 如果无则为0 
 	}],
 
-	is_main: {type: Boolean, default: false},	// 是否为公司主店
-	is_boutique: {type: Boolean, default: false},	// 是否为精品店
-	is_usable: { type: Boolean, default: true },	// 是否可用
 	sort: Number,									// 排序
 	tot_reserves: Number, 							// 可预定人数(餐馆用的)
 

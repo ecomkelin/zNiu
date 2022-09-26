@@ -193,6 +193,10 @@ const Prod_PdNull = async(res, obj, payload) => {
 				SupplierCode = '-'+Supplier.code;
 			}
 			obj.code = obj.codeFlag+SupplierCode;
+		}
+		if(payload.Shop.allow_codeRepeat) {
+
+		} else {
 
 		}
 
@@ -205,7 +209,8 @@ const Prod_PdNull = async(res, obj, payload) => {
 			}
 		}
 
-		PdnomeCT.PnomePlus_prom(payload, obj.nome);
+		if(payload.Shop.is_Pnome) PdnomeCT.PnomePlus_prom(payload, obj.nome);
+
 		if(!isNaN(obj.weight)) obj.weight = parseFloat(obj.weight);
 
 		if(isNaN(obj.price_cost)) obj.price_cost = 0;
@@ -360,7 +365,7 @@ exports.ProdDelete = async(req, res) => {
 		const Prod = await ProdDB.findOne(pathObj);
 		if(!Prod) return MdFilter.jsonFailed(res, {message: "没有找到此商品信息,请刷新重试"});
 		
-		PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
+		if(payload.Shop.is_Pnome) PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
 
 		const codeFlag = Prod.codeFlag;
 
@@ -522,8 +527,10 @@ exports.ProdPut = async(req, res) => {
 
 			if(obj.nome) obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();	// 注意 Pd nome 没有转大写
 			if(obj.nome !== Prod.nome) {
-				PdnomeCT.PnomePlus_prom(payload, obj.nome);
-				PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
+				if(payload.Shop.is_Pnome) {
+					PdnomeCT.PnomePlus_prom(payload, obj.nome);
+					PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
+				}
 				// 如果输入了 编号 则编号必须是唯一;  注意 Prod nome 没有转大写
 				const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['nome']);
 				if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
@@ -640,6 +647,13 @@ const Prod_path_Func = (pathObj, payload, queryObj) => {
 	if(queryObj.Shops) {
 		const ids = MdFilter.stringToObjectIds(queryObj.Shops);
 		pathObj["Shop"] = {$in: ids};
+	}
+	if(queryObj.is_quick) {
+		if(queryObj.is_quick == 1 || queryObj.is_quick === 'true') {
+			pathObj["is_quick"] = true;
+		} else if(queryObj.is_quick == 0 || queryObj.is_quick === 'false'){
+			pathObj["is_quick"] = false;
+		}
 	}
 	if(queryObj.Brands) {
 		const ids = MdFilter.stringToObjectIds(queryObj.Brands);
