@@ -154,7 +154,7 @@ exports.ProdPost = async(req, res) => {
 	}
 }
 
-const put_ProdMatch = (code, Shop_id) => new Promise(async(resolve, reject) => {
+const change_codeMatchs_Prod = (code, Shop_id) => new Promise(async(resolve, reject) => {
 	try {
 		const param = {code, Shop: Shop_id};
 		const Prods = await ProdDB.find(param);
@@ -178,6 +178,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 		obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();
 		const errorInfo = MdFilter.objMatchStint(StintPd, obj, ['code', 'nome']);
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
+		obj.codeLen = obj.code.length
 
 		obj.is_quick = (obj.is_quick == 1 || obj.is_quick === 'true') ? true: false;
 
@@ -211,7 +212,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 		if(save_res.status !== 200) return MdFilter.jsonFailed(res, {message: "数据库 保存错误"});
 		// 如果允许重复code 则需要给这些重复code的产品 匹配到一起
 		if(payload.Shop.allow_codeDuplicate) {
-			await put_ProdMatch(obj.code, payload.Shop._id);
+			await change_codeMatchs_Prod(obj.code, payload.Shop._id);
 		}
 
 		return MdFilter.jsonSuccess(res, save_res);
@@ -357,7 +358,7 @@ exports.ProdDelete = async(req, res) => {
 		setModify_Prods(Prod._id, true);	// 缓存变化
 
 		if(payload.Shop.allow_codeDuplicate) {
-			await put_ProdMatch(code, payload.Shop._id);
+			await change_codeMatchs_Prod(code, payload.Shop._id);
 		}
 
 		if(Prod.img_url && Prod.img_url.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_url);
@@ -441,6 +442,7 @@ exports.ProdPut = async(req, res) => {
 					});
 					if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
 					Prod.code = obj.code;
+					Prod.codeLen = Prod.code.length;
 				}
 			}
 
@@ -499,8 +501,8 @@ exports.ProdPut = async(req, res) => {
 		setModify_Prods(Prod._id); // 缓存变化
 
 		if(need_matchs) {
-			put_ProdMatch(orgCode, payload.Shop._id);
-			put_ProdMatch(newCode, payload.Shop._id);
+			change_codeMatchs_Prod(orgCode, payload.Shop._id);
+			change_codeMatchs_Prod(newCode, payload.Shop._id);
 		}
 
 		if(req.query.populateObjs) {	// 如果传入populate 则重新查找

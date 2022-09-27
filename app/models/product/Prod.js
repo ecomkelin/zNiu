@@ -13,12 +13,14 @@ const dbSchema = new Schema({
 
 	/* 为批发商做的 */
 	Supplier: {type: ObjectId, ref: 'Shop'},		// 产品所属供应商
-	codeFlag: String,								// codeFlag 所属供应商唯一
-	codeLen: Number,								// [只读] codeFlag 的长度
-	codeMatchs: [{type: ObjectId, ref: 'Prod'}], 	// 相关同codeFlag的产品，为了前端缓存
+
+	codeLen: Number,								// [只读] code 的长度
+	codeMatchs: [{type: ObjectId, ref: 'Prod'}], 	// 相关同code的产品，为了前端缓存
 
 	/* 如果 Pd 不为空则 只读*/
 	code: String, 									// [if(Pd !== null)只读] 产品条形码
+	codeNote: String,
+
 	nome: String,									// [if(Pd !== null)只读] 产品名称
 	nomeTR: String,									// [if(Pd !== null)只读] 其他名称
 	unit: String,									// [if(Pd !== null)只读] 产品名称
@@ -28,6 +30,8 @@ const dbSchema = new Schema({
 	Brand: {type: ObjectId, ref: 'Brand'},			// [if(Pd !== null)只读] 产品品牌
 	Nation: {type: ObjectId, ref: 'Nation'},		// [if(Pd !== null)只读] 产品国家 比如 中国货 意大利货 日本货 韩国货
 	Categs: [{type: ObjectId, ref: 'Categ'}],			// [if(Pd !== null)只读] 
+	categNote: String,
+
 	is_quick: {type:Boolean, default: false},
 
 	weight: Float,
