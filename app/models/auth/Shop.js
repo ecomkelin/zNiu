@@ -19,8 +19,9 @@ const dbSchema = new Schema({
 
 	able_MBsell: {type: Boolean, default: true},	// 销售端 可以使用手机版,
 	able_PCsell: {type: Boolean, default: true},	// 销售端 可以使用PC版
-	
+
 	allow_codeDuplicate: {type: Boolean, default: false}, // 是否允许重复code, 重复code需要添加 codeMatchs
+	allow_Supplier: {type: Boolean, default: false},
 	is_Pnome: {type: Boolean, default: false},	// 是否使用 Pnome
 	cassa_auth: {
 		hide_orders: Boolean,
