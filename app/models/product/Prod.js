@@ -58,15 +58,11 @@ const dbSchema = new Schema({
 
 	/* 如果 is_simple 为 true */
 	purchase_note: String,
-	Batchs: [{
-		quantity: Number,	// 采购数量
-		at_pur: Date,		// 采购时间
-		at_exp: Date,		// 过期时间
-	}],
+
 	is_controlStock: {type: Boolean, default: true},
 	quantity: {type:Number, default: 0},
 	quantity_alert: {type: Number, default: 0},
-	allow_backorder: {type: Boolean, default: true},
+	allow_backorder: {type: Boolean, default: true},	// 允许缺货下单
 
 	/* 如果 is_simple 为 false 则[只读 相对 Sku] 如果 为true[只读 绝对] */
 	price_unit: Float,								// [只读] 产品价格统一

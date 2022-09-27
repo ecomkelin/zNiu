@@ -1,3 +1,4 @@
+1.93	Prod code可重复
 1.922	Prod is_quick 筛选
 1.921	Prod is_quick ShopPut Firm
 1.92	ProdPut iva
