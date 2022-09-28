@@ -18,6 +18,7 @@ exports.SupplierPost = async(req, res) => {
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 
 		obj.Firm = payload.Firm._id || payload.Firm;
+		obj.Shop = payload.Shop._id || payload.Shop;
 
 		obj.User_crt = payload._id;
 
@@ -104,6 +105,7 @@ const Supplier_general = async(res, obj, Supplier, payload) => {
 			Supplier.code = obj.code;
 		}
 
+		if(obj.nome) Supplier.nome = obj.nome;
 		if(obj.contact) Supplier.contact = obj.contact;
 		if(obj.tel) Supplier.tel = obj.tel;
 		if(obj.addr) Supplier.addr = obj.addr;
