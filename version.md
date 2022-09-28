@@ -1,3 +1,4 @@
+1.933	批量上传
 1.932	Shop allow_Supplier
 1.93	Prod code可重复
 1.922	Prod is_quick 筛选

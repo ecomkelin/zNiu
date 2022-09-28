@@ -15,10 +15,10 @@ const PdDB = require(path.resolve(process.cwd(), 'app/models/product/Pd'));
 const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 
 module.exports = (app) => {
-	let BP_Nations = null;
+
 	app.post('/excel_Brand', AderIsLogin, postForm, async(req, res) => {
 		console.log("Ader Brand excel");
-		if(!BP_Nations) BP_Nations = await NationDB.find();
+		let BP_Nations = await NationDB.find() || [];
 		try{
 			const Firm = req.body.obj.Firm;
 			const fileData = req.files.mulFile;
@@ -75,16 +75,15 @@ module.exports = (app) => {
 		}
 	});
 
-	let P_Brands = null;
-	let P_Categs = null;
+
 	app.post('/excel_Pd', AderIsLogin, postForm, async(req, res) => {
 		console.log("Ader Pd excel");
 		try{
 			const Firm = req.body.obj.Firm;
 
-			if(!P_Brands) P_Brands = await BrandDB.find({Firm});
-			if(!P_Categs) P_Categs = await CategDB.find({Firm});
-			if(!BP_Nations) BP_Nations = await NationDB.find({Firm});
+			let P_Brands = await BrandDB.find({Firm}) || [];
+			let P_Categs = await CategDB.find({Firm}) || [];
+			let BP_Nations = await NationDB.find({Firm}) || [];
 
 			const fileData = req.files.mulFile;
 			if(!fileData) return res.redirect('/?error=!req.files.mulFile');
@@ -169,9 +168,9 @@ module.exports = (app) => {
 			const Firm = req.body.obj.Firm;
 			const Shop = req.body.obj.Shop;
 
-			if(!P_Brands) P_Brands = await BrandDB.find({Firm});
-			if(!P_Categs) P_Categs = await CategDB.find({Firm, Shop});
-			if(!BP_Nations) BP_Nations = await NationDB.find({Firm});
+			let P_Brands = await BrandDB.find({Firm}) || [];
+			let P_Categs = await CategDB.find({Firm, Shop}) || [];
+			let BP_Nations = await NationDB.find({Firm}) || [];
 
 			const fileData = req.files.mulFile;
 			if(!fileData) return res.redirect('/?error=!req.files.mulFile');
@@ -185,20 +184,19 @@ module.exports = (app) => {
 			const excel = require('node-xlsx').parse(filePath)[0];
 			const arrs = excel.data;
 
-			let codes = [];			// 检查相同code用的
 			for(let i=1; i<arrs.length; i++) {
 				const arr = arrs[i];
 
 				// if(i<3) {
 				// 	console.log(arr);
 				// 	continue;
-				// } else {
-				// 	break;
 				// }
+				// break;
 
 				const obj = {};
 				// const xuhao = String(arr[0]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
 				const xuhao = i+1;
+				/* A */
 				let col = 0;
 				obj.code = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
 				if(obj.code === 'undefined') {
@@ -210,27 +208,30 @@ module.exports = (app) => {
 					console.log(i+2, xuhao, errorInfo, obj.code);
 					continue;
 				}
-				if(codes.includes(obj.code)) {
-					console.log(i+2, xuhao, '已经有相同的编号', obj.code);
-					continue;
-				} else {
-					codes.push(obj.code);
-				}
+				/* B */
+				obj.codice = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				if(obj.codice === 'undefined') delete obj.codice;
+
+
 				// const objSame = await PdDB.findOne({'code': obj.code, Shop});
 				// if(objSame) {
 				// 	console.log(i+2, xuhao, '已经有相同的编号', obj.code);
 				// 	continue;
 				// }
-
-				obj.nomeTR = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				/* C */
 				obj.nome = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				if(obj.nome === 'undefined') delete obj.nome;
+				/* D */
+				obj.nomeTR = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				if(obj.nomeTR === 'undefined') delete obj.nomeTR;
 
+				/* E */
 				obj.unit = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				if(obj.unit === 'undefined') delete obj.unit;
 
-				let CategPreCode = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
-
+				/* F */
 				let CategCode = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
-				if(!CategCode) CategCode = CategPreCode;
+				if(obj.CategCode === 'undefined') delete obj.CategCode;
 				if(CategCode) {
 					let Categ = P_Categs.find(item => item.code === CategCode);
 					if(!Categ) {
@@ -244,33 +245,45 @@ module.exports = (app) => {
 					obj.Categ = Categ._id;
 				}
 
+				/* G */
+				let noteCateg = String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, '');
+				if(obj.noteCateg === 'undefined') delete obj.noteCateg;
+
+				/* H */
 				obj.price_cost = parseFloat(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
 				if(isNaN(obj.price_cost) || obj.price_cost < 0) obj.price_cost = 0;
 
+				/* I */
 				obj.price_regular = parseFloat(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
-				if(isNaN(obj.price_regular) || obj.price_regular <= 0) {
+				if(isNaN(obj.price_regular) || obj.price_regular < 0) {
 					console.log(i+2, xuhao, '标价错误', obj.price_regular);
 					continue;
 				}
-
+				/* J */
 				obj.price_sale = parseFloat(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
 				if(isNaN(obj.price_sale) || obj.price_sale <= 0) obj.price_sale = obj.price_regular;
 
+				/* K */
 				obj.iva = parseInt(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
 				if(isNaN(obj.iva) || obj.iva < 0) obj.iva = 22;
 
+				/* L */
 				obj.weight = parseFloat(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
 				if(isNaN(obj.weight) || obj.weight < 0) obj.weight = 0;
 
+				/* M */
 				obj.num_batch = parseInt(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
 				if(isNaN(obj.num_batch) || obj.num_batch < 0) obj.num_batch = 1;
 
+				/* N */
 				obj.quantity = parseInt(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
 				if(isNaN(obj.quantity)) obj.quantity = 0;
 
+				/* O */
 				obj.quantity_alert = parseInt(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
 				if(isNaN(obj.quantity_alert) || obj.quantity < 0) obj.quantity_alert = 0;
 
+				/* P */
 				obj.sort = parseInt(String(arr[col++]).replace(/(\s*$)/g, "").replace( /^\s*/, ''));
 				if(isNaN(obj.sort)) obj.sort = 0;
 

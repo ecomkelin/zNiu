@@ -19,7 +19,7 @@ const dbSchema = new Schema({
 
 	/* 如果 Pd 不为空则 只读*/
 	code: String, 									// [if(Pd !== null)只读] 产品条形码
-	codeNote: String,
+	codice: String,
 
 	nome: String,									// [if(Pd !== null)只读] 产品名称
 	nomeTR: String,									// [if(Pd !== null)只读] 其他名称
@@ -30,7 +30,7 @@ const dbSchema = new Schema({
 	Brand: {type: ObjectId, ref: 'Brand'},			// [if(Pd !== null)只读] 产品品牌
 	Nation: {type: ObjectId, ref: 'Nation'},		// [if(Pd !== null)只读] 产品国家 比如 中国货 意大利货 日本货 韩国货
 	Categs: [{type: ObjectId, ref: 'Categ'}],			// [if(Pd !== null)只读] 
-	categNote: String,
+	noteCateg: String,
 
 	is_quick: {type:Boolean, default: false},
 

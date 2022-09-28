@@ -1,5 +1,5 @@
 module.exports = {
-	code: {min: 2, max: 13, errMsg: {
+	code: {min: 2, max: 20, errMsg: {
 		nullMsg: '产品条形码不能为空',
 		minMsg: '产品条形码的位数不能小于: ',
 		maxMsg: '产品条形码的位数不能大于: '
