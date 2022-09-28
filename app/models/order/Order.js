@@ -10,7 +10,7 @@ const dbSchema = new Schema({
 
 	Client: {type: ObjectId, ref: 'Client'},			// [只读 权限 Client只读]
 	type_Order: Number, 								// [post写(Client[-1]) put只读] enum: [1, -1] 采购 销售
-	Supplier: {type: ObjectId, ref: 'Shop'},			// 供应商
+	Supplier: {type: ObjectId, ref: 'Supplier'},		// 供应商
 
 	is_offline: {type: Boolean, default: false},		// 是否为离线订单 可能没有用
 	is_virtual: {type: Boolean, default: false},		// 是否为虚拟订单

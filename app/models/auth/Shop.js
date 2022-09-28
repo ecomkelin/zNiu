@@ -7,7 +7,7 @@ const Float = require('mongoose-float').loadType(mongoose, 2);
 
 const colection = 'Shop';
 const dbSchema = new Schema({
-	code: String,									// 店铺编号
+	code: String,									// 店铺编号	必须是字母
 
 	nome: String,									// 店铺名称
 	addr: String,									// 店铺地址

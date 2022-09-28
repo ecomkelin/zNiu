@@ -8,7 +8,7 @@ const colection = 'Bill';
 const dbSchema = new Schema({
 	type_Bill: Number, 							// [只读 绝对] enum: [1, -1]
 	Client: {type: ObjectId, ref: 'Client'},
-	Supplier: {type: ObjectId, ref: 'Shop'},
+	Supplier: {type: ObjectId, ref: 'Supplier'},
 	code: String,
 
 	// typeBill: Number 							// 客户欠款1 还款-1。  或者 对供应商欠款 1 还款 -1

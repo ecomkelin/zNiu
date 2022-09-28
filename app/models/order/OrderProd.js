@@ -12,7 +12,7 @@ const dbSchema = new Schema({
 	
 	is_virtual: {type: Boolean, default: false},		// 是否为虚拟订单
 
-	Supplier: {type: ObjectId, ref: 'Shop'},			// 供应商
+	Supplier: {type: ObjectId, ref: 'Supplier'},		// 供应商
 	// 基本信息
 	Prod: {type: ObjectId, ref: "Prod"},				// [只读 绝对]
 	is_simple: Boolean,									// [只读 绝对]

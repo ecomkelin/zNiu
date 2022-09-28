@@ -22,13 +22,6 @@ exports.ShopPost = async(req, res) => {
 		if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Shop", field: "img_url"});
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 
-		if(obj.Firm === 'Supplier') {
-			obj.typeShop = 'Supplier';
-			obj.Firm = payload.Firm._id;
-		} else {
-			return MdFilter.jsonFailed(res, {message: '您没有添加商铺的权限'});
-		}
-
 		// 判断参数是否符合要求
 		const errorInfo = MdFilter.objMatchStint(StintShop, obj, ['code', 'nome']);
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
@@ -305,11 +298,7 @@ const obtFilterObj = (req, id) => {
 
 const Shop_path_Func = (pathObj, payload, queryObj) => {
 	if(payload.Firm) {
-		if(queryObj && queryObj.Firm === "Supplier") {
-			pathObj["Firm"] = {$eq: null};
-		} else {
-			pathObj.Firm = payload.Firm;
-		}
+ 		pathObj.Firm = payload.Firm._id || payload.Firm;
 		if(payload.role > ConfUser.role_set.manager) {
 			pathObj.is_usable = 1;
 		}

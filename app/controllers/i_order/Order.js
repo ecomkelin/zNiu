@@ -7,6 +7,7 @@ const ConfOrder = require(path.resolve(process.cwd(), 'app/config/conf/ConfOrder
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
 const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
+const SupplierDB = require(path.resolve(process.cwd(), 'app/models/auth/Supplier'));
 const StepDB = require(path.resolve(process.cwd(), 'app/models/order/Step'));
 const OrderDB = require(path.resolve(process.cwd(), 'app/models/order/Order'));
 const OrderProdDB = require(path.resolve(process.cwd(), 'app/models/order/OrderProd'));
@@ -154,7 +155,7 @@ exports.OrderPost = async(req, res) => {
 			obj_Order.Client = null;
 			if(!ConfUser.role_Arrs.includes(payload.role)) return MdFilter.jsonFailed(res, {message: "您无权采购"});
 			if(!MdFilter.isObjectId(obj_Order.Supplier)) return MdFilter.jsonFailed(res, {message: "请传递供应商信息"});
-			const Supplier = await ShopDB.findOne({_id: obj_Order.Supplier, Firm: null});
+			const Supplier = await SupplierDB.findOne({_id: obj_Order.Supplier, Firm: null});
 			if(!Supplier)  return MdFilter.jsonFailed(res, {message: "找不到此供应商"});
 		} else {
 			obj_Order.Supplier = null;

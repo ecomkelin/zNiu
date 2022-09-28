@@ -12,7 +12,7 @@ const dbSchema = new Schema({
 	is_virtual: {type: Boolean, default: false},		// 是否为虚拟订单
 
 	Client: {type: ObjectId, ref: 'Client'},			// [只读 权限 Client只读]
-	Supplier: {type: ObjectId, ref: 'Shop'},			// 供应商
+	Supplier: {type: ObjectId, ref: 'Supplier'},		// 供应商
 	status: Number,										// enum: ConfOrder;
 	// 基本信息
 	Sku: {type: ObjectId, ref: "Sku"},					// [post写, put只读]

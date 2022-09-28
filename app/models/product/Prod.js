@@ -12,7 +12,7 @@ const dbSchema = new Schema({
 	Pd: {type: ObjectId, ref: 'Pd'},				// [post写, put只读] 不可修改 商品所属产品
 
 	/* 为批发商做的 */
-	Supplier: {type: ObjectId, ref: 'Shop'},		// 产品所属供应商
+	Supplier: {type: ObjectId, ref: 'Supplier'},	// 产品所属供应商
 
 	codeLen: Number,								// [只读] code 的长度
 	codeMatchs: [{type: ObjectId, ref: 'Prod'}], 	// 相关同code的产品，为了前端缓存

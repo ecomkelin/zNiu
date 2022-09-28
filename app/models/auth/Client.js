@@ -4,7 +4,7 @@ const ObjectId = Schema.Types.ObjectId;
 
 const colection = 'Client';
 const dbSchema = new Schema({
-	code: String,										// 只读 如果后续做code可修改, code字符串中不得有 Conf 中的月份字母
+	code: String,										// 只读 如果后续做code可修改, 必须是数字
 	is_changed: {type: Boolean, default: false}, 		// 只读 如果账号被修改过 则为 true 否则为 false
 	at_last_codeUpd: Date,								// 只读 上次账户修改时间
 

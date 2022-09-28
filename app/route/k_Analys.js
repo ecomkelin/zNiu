@@ -167,7 +167,7 @@ const dbs_obj = {
 			'Firm': 'firms',
 			'Shop': 'shops',
 			'Client': 'clients',
-			'Supplier': 'shops',
+			'Supplier': 'suppliers',
 			'Paidtype': 'paidtypes',
 		}
 	},
@@ -178,7 +178,7 @@ const dbs_obj = {
 		lookupObj: {
 			'Shop': 'shops',
 			'Client': 'clients',
-			'Supplier': 'shops',
+			'Supplier': 'suppliers',
 			'Prod': 'prods'
 		}
 	},

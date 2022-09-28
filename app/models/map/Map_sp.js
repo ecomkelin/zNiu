@@ -6,7 +6,7 @@ const Float = require('mongoose-float').loadType(mongoose, 2);
 
 const colection = 'Map_sp';
 const dbSchema = new Schema({
-	Supplier: {type: ObjectId, ref: 'Shop'},	// [只读 绝对]
+	Supplier: {type: ObjectId, ref: 'Supplier'},// [只读 绝对]
 
 
 	Pd: {type: ObjectId, ref: 'Pd'},			// [只读 绝对]

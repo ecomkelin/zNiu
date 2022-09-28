@@ -10,7 +10,7 @@ module.exports = {
 		trimMsg: '电话号码的长度只能为: ',
 	}},
 
-	code: {regexp: '^[a-zA-Z0-9]*$', min: 4, max: 20, errMsg: {
+	code: {regexp: '^[0-9]*$', min: 4, max: 20, errMsg: {
 		nullMsg: '成员账号不能为空',
 		regexpMsg: '成员账号只能由数字和字母组成',
 		minMsg: '成员账号的位数不能小于: ',

@@ -5,27 +5,28 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const Float = require('mongoose-float').loadType(mongoose, 2);
 
-const colection = 'Shop';
+const colection = 'Supplier';
 const dbSchema = new Schema({
 	is_plat: Boolean,								// 是否为平台关联
 
 	/* 平台信息 */
-	plat_code: String,								// 此供应商的平台编号 比如 0342SHP**** 0342位平台好 SHP为店铺号
-	// let plat_code = "1234SHOP234";
+	plat_code: String,								// 此供应商的平台编号 比如 0342SHP**** 0342位平台号 SHP为店铺号
+	// let plat_code = "0342SHP234";
 	// let dns_code = plat_code.match(/^[0-9]+/gi)[0];
-	// console.log("dns_code: ", dns_code);
+	// console.log("dns_code: ", dns_code); 	// 0342
 	// plat_code = plat_code.slice(dns_code.length);
 	// let shop_code = plat_code.match(/^[a-z|A-Z]+/gi);
-	// console.log(111, shop_code[0]);
+	// console.log(111, shop_code[0]);			// SHP
+	// 234 为Client code
 
 	/* 基本信息 */
-	code: String,									// 店铺编号
-	nome: String,									// 店铺名称
-	addr: String,									// 店铺地址
-	zip: String,									// 店铺区号
+	code: String,									// 供应商编号 [自动]
+	nome: String,									// 供应商名称
+	addr: String,									// 供应商地址
+	zip: String,									// 供应商区号
 	tel: String,
-	img_url: String,								// 店铺logo
-	img_urls: [String],								// 店铺照片
+	img_url: String,								// 供应商logo
+	img_urls: [String],								// 供应商照片
 	contact: String, 
 
 	is_usable: { type: Boolean, default: true },	// 是否可用
