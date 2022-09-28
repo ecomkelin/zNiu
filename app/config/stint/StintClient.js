@@ -12,7 +12,7 @@ module.exports = {
 
 	code: {regexp: '^[0-9]*$', min: 4, max: 20, errMsg: {
 		nullMsg: '成员账号不能为空',
-		regexpMsg: '成员账号只能由数字和字母组成',
+		regexpMsg: '成员账号只能由数字组成',
 		minMsg: '成员账号的位数不能小于: ',
 		maxMsg: '成员账号的位数不能大于: '
 	}},
