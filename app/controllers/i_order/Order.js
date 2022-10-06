@@ -155,7 +155,7 @@ exports.OrderPost = async(req, res) => {
 			obj_Order.Client = null;
 			if(!ConfUser.role_Arrs.includes(payload.role)) return MdFilter.jsonFailed(res, {message: "您无权采购"});
 			if(!MdFilter.isObjectId(obj_Order.Supplier)) return MdFilter.jsonFailed(res, {message: "请传递供应商信息"});
-			const Supplier = await SupplierDB.findOne({_id: obj_Order.Supplier, Firm: null});
+			const Supplier = await SupplierDB.findOne({_id: obj_Order.Supplier, Shop: Shop._id});
 			if(!Supplier)  return MdFilter.jsonFailed(res, {message: "找不到此供应商"});
 		} else {
 			obj_Order.Supplier = null;

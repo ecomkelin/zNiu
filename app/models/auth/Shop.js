@@ -14,9 +14,6 @@ const dbSchema = new Schema({
 	zip: String,									// 店铺区号
 	tel: String,
 
-	/* ader 控制  */
-	typeShop: String,	// V pre
-
 	able_MBsell: {type: Boolean, default: true},	// 销售端 可以使用手机版,
 	able_PCsell: {type: Boolean, default: true},	// 销售端 可以使用PC版
 

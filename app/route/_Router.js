@@ -9,6 +9,8 @@ module.exports = (app) => {
 	require('./ader/ader4_Firm')(app);
 	require('./ader/ader5_Shop')(app);
 	require('./ader/ader51_Step')(app);
+	require('./ader/ader52_Pnome')(app);
+	require('./ader/ader53_Prod_codeMatchs')(app);
 	require('./ader/ader6_User')(app);
 	require('./ader/ader9_multi')(app);
 	require('./c_Conf')(app);
