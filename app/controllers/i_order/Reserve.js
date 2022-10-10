@@ -1,7 +1,6 @@
 const path = require('path');
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
 const ReserveDB = require(path.resolve(process.cwd(), 'app/models/order/Reserve'));
 const TableDB = require(path.resolve(process.cwd(), 'app/models/order/Table'));
@@ -11,7 +10,6 @@ exports.ReservePost = async(req, res) => {
 	console.log("/ReservePost");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		// 判断 基本参数 是否正确
 		const obj = req.body.obj;
@@ -103,7 +101,6 @@ exports.ReservePut = async(req, res) => {
 	console.log("/ReservePut");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Reserve的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
@@ -208,7 +205,6 @@ exports.ReserveDelete = async(req, res) => {
 	console.log("/ReserveDelete");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Reserve的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});

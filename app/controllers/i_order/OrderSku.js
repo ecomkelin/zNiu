@@ -4,7 +4,6 @@ const path = require('path');
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const ConfOrder = require(path.resolve(process.cwd(), 'app/config/conf/ConfOrder'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const OrderDB = require(path.resolve(process.cwd(), 'app/models/order/Order'));
 const OrderProdDB = require(path.resolve(process.cwd(), 'app/models/order/OrderProd'));
 const OrderSkuDB = require(path.resolve(process.cwd(), 'app/models/order/OrderSku'));
@@ -23,7 +22,6 @@ exports.OrderSkuPost = async(req, res) => {
 	console.log("/OrderPost");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 		// 判断前端给的参数是否 正确 并根据前端给的 _id 从数据库中找到到所需数据
 		const obj = req.body.obj;
 		if(isNaN(obj.quantity)) return MdFilter.jsonFailed(res, {message: '请正确的输入产品出售数量'});
@@ -114,7 +112,6 @@ exports.OrderSkuDelete = async(req, res) => {
 	console.log("/vOrderSkuDelete");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Order的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据 _id"});
@@ -193,7 +190,6 @@ exports.OrderSkuPut = async(req, res) => {
 	console.log("/OrderSkuPut");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Order的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});

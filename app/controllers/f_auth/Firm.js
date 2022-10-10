@@ -2,7 +2,6 @@ const path = require('path');
 
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const FirmDB = require(path.resolve(process.cwd(), 'app/models/auth/Firm'));
 const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
@@ -12,7 +11,6 @@ exports.FirmPut = async(req, res) => {
 	console.log("/FirmPut");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const pathObj = {_id: payload.Firm};
 

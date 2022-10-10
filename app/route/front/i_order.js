@@ -1,5 +1,6 @@
 const path = require('path');
 const Order = require(path.resolve(process.cwd(), 'app/controllers/i_order/Order'));
+const Order_post = require(path.resolve(process.cwd(), 'app/controllers/i_order/Order_post'));
 const Order_status = require(path.resolve(process.cwd(), 'app/controllers/i_order/Order_status'));
 const Order_Step = require(path.resolve(process.cwd(), 'app/controllers/i_order/Order_Step'));
 const Step = require(path.resolve(process.cwd(), 'app/controllers/i_order/Step'));
@@ -8,7 +9,7 @@ const MdAuth = require(path.resolve(process.cwd(), 'app/middle/MdAuth'));
 module.exports = (app) => {
 
 	/* ============================== Order ============================== */
-	app.post('/api/v1/Order', MdAuth.path_Client, Order.OrderPost);
+	app.post('/api/v1/Order', MdAuth.path_Client, Order_post.OrderPost);
 	app.put('/api/v1/Order/:id', MdAuth.path_Client, Order.OrderPut);
 	app.get('/api/v1/Orders', MdAuth.path_Client, Order.Orders);
 

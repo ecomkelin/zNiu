@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = (app) => {
 
-	app.get('PnomeRevise', AderIsLogin, async(req, res) => {
+	app.get('Prod_codeMatchs', AderIsLogin, async(req, res) => {
 		try{
 			const curAder = req.session.curAder;
 			

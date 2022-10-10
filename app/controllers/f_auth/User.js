@@ -4,7 +4,6 @@ const path = require('path');
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const StintUser = require(path.resolve(process.cwd(), 'app/config/stint/StintUser'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
 const UserDB = require(path.resolve(process.cwd(), 'app/models/auth/User'));
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
@@ -15,7 +14,6 @@ exports.UserPost = async(req, res) => {
 	console.log("/UserPost");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const obj = req.body.obj;
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
@@ -91,7 +89,6 @@ exports.UserPut = async(req, res) => {
 	console.log("/UserPut");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的User的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});

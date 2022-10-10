@@ -1,5 +1,6 @@
 const path = require('path');
 const Order = require(path.resolve(process.cwd(), 'app/controllers/i_order/Order'));
+const Order_post = require(path.resolve(process.cwd(), 'app/controllers/i_order/Order_post'));
 const OrderProd = require(path.resolve(process.cwd(), 'app/controllers/i_order/OrderProd'));
 const OrderSku = require(path.resolve(process.cwd(), 'app/controllers/i_order/OrderSku'));
 const Order_status = require(path.resolve(process.cwd(), 'app/controllers/i_order/Order_status'));
@@ -19,7 +20,7 @@ module.exports = (app) => {
 
 	/* =============================== Order =============================== */
 	app.delete('/api/b1/Order/:id', MdAuth.path_bser, Order.OrderDelete);
-	app.post('/api/b1/Order', MdAuth.path_User, Order.OrderPost);
+	app.post('/api/b1/Order', MdAuth.path_User, Order_post.OrderPost);
 	app.get('/api/b1/Orders', MdAuth.path_User, Order.Orders);
 	app.get('/api/b1/Order/:id', MdAuth.path_User, Order.Order);
 	app.put('/api/b1/Order/:id', MdAuth.path_bser, Order.OrderPutBack);

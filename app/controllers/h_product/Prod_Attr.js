@@ -3,7 +3,6 @@ const _ = require('underscore');
 const path = require('path');
 const StintAttr = require(path.resolve(process.cwd(), 'app/config/stint/StintAttr'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 const SkuDB = require(path.resolve(process.cwd(), 'app/models/product/Sku'));
 const AttrDB = require(path.resolve(process.cwd(), 'app/models/product/internal/Attr'));
@@ -13,7 +12,6 @@ exports.AttrPost = async(req, res) => {
 	console.log("/AttrPost");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const obj = req.body.obj;
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
@@ -56,7 +54,6 @@ exports.AttrDelete = async(req, res) => {
 	console.log("/AttrDelete");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
@@ -86,7 +83,6 @@ exports.AttrPut = async(req, res) => {
 	console.log("/AttrPut");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});

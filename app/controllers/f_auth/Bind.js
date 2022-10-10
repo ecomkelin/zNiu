@@ -2,7 +2,6 @@ const _ = require('underscore');
 
 const path = require('path');
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const BindDB = require(path.resolve(process.cwd(), 'app/models/auth/Bind'));
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
@@ -10,7 +9,6 @@ exports.BindPut = async(req, res) => {
 	console.log("/BindPut");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Bind的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
@@ -35,7 +33,6 @@ exports.BindDelete = async(req, res) => {
 	console.log("/BindDelete");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Bind的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据 _id"});

@@ -6,7 +6,6 @@ exports.limitSelect = (dbName, payload) => {
 	if(!dbName) return [];
 	if(dbName === 'User') return ['refreshToken', 'pwd'];
 	if(dbName === 'Shop') {
-		if(!payload.Firm) return ['strip', 'User_upd', 'User_crt', 'at_upd'];
 		if(payload.role != ConfUser.role_set.boss) return ['strip'];
 		return [];
 	}

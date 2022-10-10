@@ -2,7 +2,6 @@ const _ = require('underscore');
 
 const path = require('path');
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const ClientDB = require(path.resolve(process.cwd(), 'app/models/auth/Client'));
 const StintClient = require(path.resolve(process.cwd(), 'app/config/stint/StintClient'));
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));

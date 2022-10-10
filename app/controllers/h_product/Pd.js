@@ -4,7 +4,6 @@ const path = require('path');
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const StintPd = require(path.resolve(process.cwd(), 'app/config/stint/StintPd'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const MdFiles = require(path.resolve(process.cwd(), 'app/middle/MdFiles'));
 const NationDB = require(path.resolve(process.cwd(), 'app/models/address/Nation'));
 const BrandDB = require(path.resolve(process.cwd(), 'app/models/complement/Brand'));
@@ -18,7 +17,6 @@ exports.PdDelete = async(req, res) => {
 	console.log("/PdDelete")
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Pd的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据 _id"});
@@ -50,7 +48,6 @@ exports.PdPost = async(req, res) => {
 	console.log("/PdPost");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 		let obj = req.body.obj;
 		if(!obj) {
 			res_PdImg = await MdFiles.PdImg_sm(req, "/Pd");
@@ -95,7 +92,6 @@ exports.PdPut = async(req, res) => {
 	console.log("/PdPut");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Pd的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});

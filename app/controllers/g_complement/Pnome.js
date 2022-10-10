@@ -3,7 +3,6 @@ const path = require('path');
 
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
 const PnomeDB = require(path.resolve(process.cwd(), 'app/models/complement/Pnome'));
-const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
@@ -58,16 +57,6 @@ exports.PnomeMenus_prom = (payload, code) => new Promise(async(resolve, reject) 
 
 
 
-
-
-
-
-
-
-
-
-
-
 const dbPnome = 'Pnome';
 exports.Pnomes = async(req, res) => {
 	console.log("/Pnomes");
@@ -86,65 +75,3 @@ exports.Pnomes = async(req, res) => {
 		return MdFilter.json500(res, {message: "Pnomes", error});
 	}
 }
-
-
-
-exports.PnomeRevise = async(req, res) => {
-	try {
-		const payload = req.payload;
-		let Firm = payload.Firm;
-		if(Firm._id) Firm = Firm._id;
-		const Prods = await ProdDB.find({Firm: payload.Firm },{nome: 1});
-
-		await PnomeDB.deleteMany({Firm: payload.Firm});
-
-		setPnomes(req, res, Prods, 0)
-		return MdFilter.jsonSuccess(res, {status: 200, message: "success"});
-	} catch(e) {
-		return MdFilter.json500(res, {message: "PnomeRevise", e});
-	}
-}
-const setPnomes = async(req, res, Prods, n) => {
-	try {
-		if(n == Prods.length) return res.redirect('/bsNomes')
-
-		let payload = req.payload;
-		let Prod = Prods[n];
-
-		// 如果Prod 没有名称就跳过
-		if(!Prod.nome || Prod.nome.length == 0) return setPnomes(req, res, Prods, n+1);
-
-		// 统一名称 如果名称不统一则修改产品名称并保存
-		pnome = Prod.nome.replace(/\s+/g,"").toUpperCase();
-		if(pnome != Prod.nome) {
-			Prod.nome = pnome;
-			await Prod.save();
-		}
-
-		const Pnome = await PnomeDB.findOne({'Firm': payload.Firm, 'code': pnome});
-		if(Pnome) {
-			Pnome.sort += 1;
-			await Pnome.save()
-		} else {
-			let _Pnome = new PnomeDB();	// 创建nome
-			_Pnome.code = pnome;
-			_Pnome.sort = 1;
-			_Pnome.Firm = payload.Firm;
-			await _Pnome.save();
-		}
-		return setPnomes(req, res, Prods, n+1);
-
-	} catch(e) {
-		console.log("eeee:", e)
-		return setPnomes(req, res, Prods, n+1);
-	}
-}
-
-
-
-
-
-
-
-
-

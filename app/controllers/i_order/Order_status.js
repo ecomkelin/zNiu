@@ -3,7 +3,6 @@ const moment = require('moment');
 const path = require('path');
 const ConfOrder = require(path.resolve(process.cwd(), 'app/config/conf/ConfOrder'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const OrderDB = require(path.resolve(process.cwd(), 'app/models/order/Order'));
 const OrderProdDB = require(path.resolve(process.cwd(), 'app/models/order/OrderProd'));
 const OrderSkuDB = require(path.resolve(process.cwd(), 'app/models/order/OrderSku'));
@@ -12,7 +11,6 @@ exports.Order_change_status = async(req, res) => {
 	console.log("/Order_change_status");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据 _id"});
@@ -259,7 +257,6 @@ exports.Order_proof = async(req, res) => {
 	console.log("/Order_proof");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
  
 		const id = req.params.id;
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据 _id"});

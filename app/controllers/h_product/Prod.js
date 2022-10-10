@@ -5,7 +5,6 @@ const path = require('path');
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const StintPd = require(path.resolve(process.cwd(), 'app/config/stint/StintPd'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const MdFiles = require(path.resolve(process.cwd(), 'app/middle/MdFiles'));
 const NationDB = require(path.resolve(process.cwd(), 'app/models/address/Nation'));
 const BrandDB = require(path.resolve(process.cwd(), 'app/models/complement/Brand'));

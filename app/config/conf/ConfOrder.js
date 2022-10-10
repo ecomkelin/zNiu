@@ -55,7 +55,6 @@ module.exports = {
 	type_ship_obj: {
 		sClient:	{num: 0, 	val: '自取' 		},
 		sShop:		{num: 1, 	val: '店铺配送' 	},
-		// sFirm:		{num: 2, 	val: '公司配送' 	},
 		// sThird:		{num: 3, 	val: '第三方' 	}
 	},
 }

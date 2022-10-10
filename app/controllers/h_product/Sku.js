@@ -5,7 +5,6 @@ const {ProdUpd_fromSku_Prom} = require("./Prod")
 const path = require('path');
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 const SkuDB = require(path.resolve(process.cwd(), 'app/models/product/Sku'));
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
@@ -59,7 +58,6 @@ exports.SkuPost = async(req, res) => {
 	console.log("/SkuPost");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		let obj = req.body.obj;
 
@@ -136,7 +134,6 @@ exports.SkuDelete = async(req, res) => {
 	console.log("/SkuDelete");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Sku的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据 _id"});
@@ -169,7 +166,6 @@ exports.SkuPut = async(req, res) => {
 	console.log("/SkuPut");
 	try{
 		const payload = req.payload;
-		if(MdSafe.fq_spanTimes1_Func(payload._id)) return MdFilter.jsonFailed(res, {message: "您刷新太过频繁"});
 
 		const id = req.params.id;		// 所要更改的Sku的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});

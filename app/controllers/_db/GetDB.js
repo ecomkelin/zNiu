@@ -1,6 +1,5 @@
 const path = require('path');
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const MdSafe = require(path.resolve(process.cwd(), 'app/middle/MdSafe'));
 const dbFilter = require(path.resolve(process.cwd(), 'app/config/dbFilter'));
 
 exports.db = (GetDB_Filter) => {
@@ -8,7 +7,6 @@ exports.db = (GetDB_Filter) => {
 	return new Promise(async(resolve) => {
 		try{
 			const {id, payload, queryObj, objectDB, path_Callback, dbName} = GetDB_Filter;
-			if(MdSafe.fq_spanTimes1_Func((payload&&payload._id)?payload._id:payload)) resolve({status: 400, message: "您刷新太过频繁"});
 			if(!id || !MdFilter.isObjectId(id)) resolve({status: 400, message: "请传递正确的数据 _id"});
 
 			const pathObj = {_id: id};
@@ -41,7 +39,6 @@ exports.dbs = (GetDB_Filter) => {
 	return new Promise(async(resolve) => {
 		try{
 			const {payload, queryObj, objectDB, path_Callback, dbName} = GetDB_Filter;
-			if(MdSafe.fq_spanTimes1_Func((payload&&payload._id)?payload._id:payload)) resolve({status: 400, message: "您刷新太过频繁"});
 
 			// 确定数据的页码和每夜条目数
 			const {page, pagesize, skip} = MdFilter.page_Func(parseInt(queryObj.page), parseInt(queryObj.pagesize));
