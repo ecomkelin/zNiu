@@ -1,3 +1,4 @@
+2.2		Categ 优化
 2.1		OrderPost 分离 MfSave删除
 2.01	OrderPost Supplier
 2.0		Supplier

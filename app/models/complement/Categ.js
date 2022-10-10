@@ -5,7 +5,9 @@ const ObjectId = Schema.Types.ObjectId;
 
 const colection = 'Categ';
 const dbSchema = new Schema({
+
 	code: String,
+
 	nome: String,
 
 	img_url: String,
@@ -17,6 +19,13 @@ const dbSchema = new Schema({
 
 	is_usable: { type: Boolean, default: true },
 	sort: {type: Number, default: 0},
+
+	level: Number, 									// 只读;
+	Categ_far: {type: ObjectId, ref: 'Categ'},
+
+	Categ_sons: [{type: ObjectId, ref: 'Categ'}],	// 只读
+	num_sons: {type: Number, default: 0},			// 只读 子分类的个数 子分类个数为0的分类 可添加商品
+
 
 	User_upd: {type: ObjectId, ref: 'User'},		// [只读 绝对]
 	User_crt: {type: ObjectId, ref: 'User'},		// [只读 绝对]
