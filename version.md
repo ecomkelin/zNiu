@@ -1,3 +1,5 @@
+2.3		Categ 优化 ProdPut Categ query
+2.2		Categ 优化 Prod能否添加
 2.2		Categ 优化
 2.1		OrderPost 分离 MfSave删除
 2.01	OrderPost Supplier

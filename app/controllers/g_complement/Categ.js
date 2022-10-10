@@ -27,13 +27,13 @@ exports.CategPost = async(req, res) => {
 		let errorInfo = MdFilter.objMatchStint(StintCateg, obj, ['code']);
 		if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 
+		/** 基础赋值 */
 		obj.Firm = Firm;
 		obj.Shop = Shop;
 		obj.User_crt = payload._id;
 
-		let paramCateg = {'code': obj.code}
+		let paramCateg = {'code': obj.code}	// 判断是否已经存在
 		paramCateg.Shop = Shop;
-
 		let objSame = await CategDB.findOne(paramCateg);
 		if(objSame) return MdFilter.jsonFailed(res, {message: '分类编号或名称相同'});
 
@@ -42,7 +42,6 @@ exports.CategPost = async(req, res) => {
 
 		obj.Categ_sons = [];	// 赋值子分类
 		obj.num_sons = 0;		// 只读 子分类的个数 子分类个数为0的分类 可添加商品
-
 		if(!MdFilter.isObjectId(obj.Categ_far)) {
 			obj.Categ_far = null;
 			obj.level = 1;
@@ -186,7 +185,7 @@ const Categ_general = async(res, obj, Categ, payload) => {
 			const Org_far = await CategDB.findOne({_id: Categ.Categ_far});
 			if(!Org_far) return res.json({status: 400, message: "原父分类信息错误"});
 			let isEOF = ArrayDeleteManyElem(Org_far.Categ_sons, id);
-			if(isEOF === -1) return MdFilter.jsonFailed(res, {message: "原父分类删除 Categ_sons 元素错误"});
+			if(isEOF === false) return MdFilter.jsonFailed(res, {message: "原父分类删除 Categ_sons 元素错误"});
 
 			/** 保存信息 */
 			const Categ_farSave = await Categ_far.save();
@@ -222,6 +221,17 @@ const Categs_path_Func = (pathObj, payload, queryObj) => {
 	}
 
 	if(!queryObj) return;
+	if(!isNaN(queryObj.level)) {
+		pathObj["level"] = parseInt(queryObj.level);
+	}
+	if(queryObj.Categ_fars) {
+		let ids = MdFilter.stringToObjectIds(queryObj.Categ_fars);
+		pathObj["Categ_far"] = {$in: ids};
+	}
+	if(queryObj.Categ_sons) {
+		let ids = MdFilter.stringToObjectIds(queryObj.Categ_sons);
+		pathObj["Categ_sons"] = {$in: ids};
+	}
 }
 const Categ_path_Func = (pathObj, payload, queryObj) => {
 	pathObj.Firm = payload.Firm._id || payload.Firm;

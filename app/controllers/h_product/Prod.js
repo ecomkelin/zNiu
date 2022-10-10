@@ -201,7 +201,13 @@ const Prod_PdNull = async(res, obj, payload) => {
 		if(!MdFilter.isObjectId(obj.Brand)) obj.Brand = null;
 		if(!MdFilter.isObjectId(obj.Nation)) obj.Nation = null;
 		if(!MdFilter.ArrIsObjectId(obj.Categs)) obj.Categs = [];
-
+		for(i in obj.Categs) {
+			let Categ_id = obj.Categs[i];
+			let Categ = await CategDB.findOne({_id: Categ_id, Shop: payload.Shop._id || payload.Shop});
+			if(!Categ) return MdFilter.jsonFailed(res, {message: "没有找到此 Categ"});
+			if(Categ.num_sons) return MdFilter.jsonFailed(res, {message: "此 Categ 有子分类 不能被添加产品"});
+		}
+ 
 		if(!isNaN(obj.quantity)) obj.quantity = parseInt(obj.quantity);
 		if(!isNaN(obj.quantity_alert)) obj.quantity_alert = parseInt(obj.quantity_alert);
 		if(!isNaN(obj.num_batch)) obj.num_batch = parseInt(obj.num_batch);
@@ -461,10 +467,30 @@ exports.ProdPut = async(req, res) => {
 
 			Prod.nomeTR = obj.nomeTR;
 			if(Prod.nomeTR) Prod.nomeTR = Prod.nomeTR.replace(/^\s*/g,"");	// 注意 Pd nomeTR 没有转大写
+			if(!isNaN(parseFloat(obj.weight))) Prod.weight = parseFloat(obj.weight);
+
 			if(MdFilter.isObjectId(obj.Nation)) Prod.Nation = obj.Nation;
 			if(MdFilter.isObjectId(obj.Brand)) Prod.Brand = obj.Brand;
-			if(MdFilter.ArrIsObjectId(obj.Categs)) Prod.Categs = obj.Categs;
-			if(!isNaN(parseFloat(obj.weight))) Prod.weight = parseFloat(obj.weight);
+			if(MdFilter.ArrIsObjectId(obj.Categs)) {
+				let isSameCategs = true;
+				if(!Prod.Categs) {
+					Prod.Categs = obj.Categs;
+					isSameCategs = false;
+				} else {
+					isSameCategs = ArrayCompare(obj.Categs, Prod.Categs); // 如果完全相同则为真 否则为假的
+				}
+				if(!isSameCategs) {
+					Prod.Categs = [];
+					for(i in obj.Categs) {
+						let Categ_id = obj.Categs[i];
+						let Categ = await CategDB.findOne({_id: Categ_id, Shop: payload.Shop._id || payload.Shop});
+						if(!Categ) return MdFilter.jsonFailed(res, {message: "没有找到此 Categ"});
+						if(Categ.num_sons) return MdFilter.jsonFailed(res, {message: "此 Categ 有子分类 不能被添加产品"});
+						Prod.Categs.push(Categ._id);
+					}
+				}
+			}
+			
 
 			if(obj.price_regular || obj.price_regular == 0) {
 				obj.price_regular = parseFloat(obj.price_regular);
