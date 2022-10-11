@@ -127,15 +127,15 @@ ArrayObjDelField = (array, field) => {
  * 获取 ids 服务于 ArrayDelChild 方法
  * @param {*} array 
  * @param {*} value 
- * @param {*} isRepeat 
+ * @param {*} is_repeat 
  * @param {*} ids 
  */
-const obtIds = (array, value, isRepeat, ids, field) => {
+const obtIds = (array, value, ids, is_repeat, is_strict, field) => {
 	let i = 0;
 	for (; i < array.length; i++) {
 		let val = field ? array[i][field] : array[i];
-		if (val === value) {
-			if (isRepeat) { // 重复删除
+		if ((is_strict && val === value) || (!is_strict && String(val) == String(value))){
+			if (is_repeat) { // 重复删除
 				if(!ids.includes(i)) ids.unshift(i); // 如果i还不存在 ids中, 因为如果ids中有两个相同的数 则错误
 			} else {
 				break;
@@ -148,10 +148,11 @@ const obtIds = (array, value, isRepeat, ids, field) => {
  * 删除 简单数组 中的一个元素 或数组
  * @param {Array} array 要操作的数组
  * @param {Array} / {basic Type} values 要被删除的元素
- * @param {Boolean} isRepeat 是否重复的全部删除
+ * @param {Boolean} is_repeat 是否重复的全部删除
  * EX: ["aa", "bb", "aa"] 删除 "aa" 后 为 ["bb", "aa"], 如果是重复删除 则结果为 ["bb"];
  */
-ArrayDelChild = (array, values, isRepeat=true, field) => {
+ArrayDelChild = (array, values, options={}) => {
+	let {is_repeat=true, is_strict=true, field} = options;
 	if (!(array instanceof Array)) return -2;
 
 	if (!values) return -2;
@@ -159,7 +160,8 @@ ArrayDelChild = (array, values, isRepeat=true, field) => {
 
 	if (!isArray && String(typeof (values)) === "object") return -2;  // 如果不为数组 但为其他对象 则错误
 
-	if(isRepeat !== true && isRepeat !== false) return -2;
+	if(is_repeat !== true && is_repeat !== false) return -2;
+	if(is_strict !== true && is_strict !== false) return -2;
 
 	/** 如果有 field 检测 */
 	if (field) {
@@ -171,17 +173,16 @@ ArrayDelChild = (array, values, isRepeat=true, field) => {
 	if(isArray) {   // 如果 elems是数组
 		for(k in values) {   
 			value = values[k];// 为每一个要删除的元素遍历
-			if (!field && String(typeof (value)) === "object") return -2;
-			if (field && String(typeof (value)) !== "object") return -2;
+			if (!field && String(typeof (array[0])) === "object") return -2;
+			if (field && String(typeof (array[0])) !== "object") return -2;
 
-			obtIds(array, value, isRepeat, ids, field);
+			obtIds(array, value, ids, is_repeat, is_strict, field);
 		}
 	} else {    // 如果elems 只是一个基本元素
 		let value = values;
-		if (!field && String(typeof (value)) === "object") return -2;
-		if (field && String(typeof (value)) !== "object") return -2;
-
-		obtIds(array, value, isRepeat, ids, field);
+		if (!field && String(typeof (array[0])) === "object") return -2;
+		if (field && String(typeof (array[0])) !== "object") return -2;
+		obtIds(array, value, ids, is_repeat, is_strict,  field);
 	}
 	for (i in ids) {
 		array.splice(ids[i], 1);
@@ -189,3 +190,21 @@ ArrayDelChild = (array, values, isRepeat=true, field) => {
 
 	return array;
 }
+
+// let arrs = 
+// [
+//  {_id: 1, code: 123},
+//  {_id: 2, code: "123"},
+//  {_id: 3, code: 456},
+//  {_id: 4, code: "456"},
+//  {_id: 5, code: 123},
+//  {_id: 6, code: "123"}
+// ];
+
+// let arrs = [123, "123", 456, "456", 123, "123"];
+// let field;
+// // field = "id";
+
+// let val = 123;
+// let arrs1 = ArrayDelChild(arrs, val, {is_repeat:true, is_strict: false, field});
+// console.log(111, arrs1)
