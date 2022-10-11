@@ -1,3 +1,4 @@
+2.4		Prod 批量打折 / Prod 返回原价
 2.31	CategPut But 和 rewriteMethd.js 优化
 2.3		Categ 优化 ProdPut Categ query
 2.2		Categ 优化 Prod能否添加

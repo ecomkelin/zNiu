@@ -38,7 +38,6 @@ SortParam = (field, flag = 1) => { //这是比较函数
 
 	/** field 检测 */
 	if (!field) return -2;
-	if (String(typeof (field)) === "object") return -2;
 	field = String(field);  // 强行转为 String类型
 
 	if(flag !== -1) flag = 1; // flag 赋值
@@ -70,23 +69,15 @@ isArraySame = (array, arr, field) => {
 	if(array.length !== arr.length) return false;   // 如果长度不同 肯定不相同
 
 	/** field 检测 */
-	if (!field) {
-		/** 判定为简单数组 */
-		if (String(typeof (array[0])) === "object") return -2;
-		if (String(typeof (arr[0])) === "object") return -2;
-
-		array.sort();
-		arr.sort();
-	} else {
+	if (field) {
 		/** 判定为对象数组 */
-		if (String(typeof (array[0])) !== "object") return -2;
-		if (String(typeof (arr[0])) !== "object") return -2;
-
-		if (String(typeof (field)) === "object") return -2;
 		field = String(field);  // 强行转为 String类型
 
 		array = sortArrayObj(array, field, 1, true);
 		arr = sortArrayObj(arr, field, 1, true);
+	} else {
+		array.sort();
+		arr.sort();
 	}
 
 	return JSON.stringify(array) === JSON.stringify(arr);
@@ -104,7 +95,6 @@ ArrayObjDelField = (array, field) => {
 
 	/** field 检测 */
 	if (!field) return -2;
-	if (String(typeof (field)) === "object") return -2;
 	field = String(field);  // 强行转为 String类型
 
 
@@ -162,10 +152,7 @@ ArrayDelChild = (array, values, options={}) => {
 	if(is_strict !== true && is_strict !== false) return -2;
 	
 	/** 如果有 field 检测 */
-	if (field) {
-		if (String(typeof (field)) === "object") return -2;
-		field = String(field);  // 强行转为 String类型
-	}
+	if (field) field = String(field);  // 强行转为 String类型
 	
 	let ids = [];
 	if(isArray) {   // 如果 elems是数组
@@ -184,21 +171,3 @@ ArrayDelChild = (array, values, options={}) => {
 
 	return array;
 }
-
-// let arrs = 
-// [
-//  {_id: 1, code: 123},
-//  {_id: 2, code: "123"},
-//  {_id: 3, code: 456},
-//  {_id: 4, code: "456"},
-//  {_id: 5, code: 123},
-//  {_id: 6, code: "123"}
-// ];
-
-// let arrs = [123, "123", 456, "456", 123, "123"];
-// let field;
-// // field = "id";
-
-// let val = 123;
-// let arrs1 = ArrayDelChild(arrs, val, {is_repeat:true, is_strict: false, field});
-// console.log(111, arrs1)
