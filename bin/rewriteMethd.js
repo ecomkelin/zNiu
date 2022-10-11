@@ -152,35 +152,43 @@ const obtIds = (array, value, ids, is_repeat, is_strict, field) => {
  * EX: ["aa", "bb", "aa"] 删除 "aa" 后 为 ["bb", "aa"], 如果是重复删除 则结果为 ["bb"];
  */
 ArrayDelChild = (array, values, options={}) => {
-	let {is_repeat=true, is_strict=true, field} = options;
+	let {is_repeat=true, is_strict=false, field} = options;
+	console.log(111);
 	if (!(array instanceof Array)) return -2;
-
+	
+	console.log(222);
 	if (!values) return -2;
 	let isArray = (values instanceof Array) ? true: false;    // values 是否为数组
-
+	
+	console.log(333);
 	if (!isArray && String(typeof (values)) === "object") return -2;  // 如果不为数组 但为其他对象 则错误
-
+	
+	console.log(444);
 	if(is_repeat !== true && is_repeat !== false) return -2;
+	console.log(555);
 	if(is_strict !== true && is_strict !== false) return -2;
-
+	
+	console.log(666);
 	/** 如果有 field 检测 */
 	if (field) {
 		if (String(typeof (field)) === "object") return -2;
 		field = String(field);  // 强行转为 String类型
 	}
-
+	
 	let ids = [];
 	if(isArray) {   // 如果 elems是数组
 		for(k in values) {   
 			value = values[k];// 为每一个要删除的元素遍历
 			if (!field && String(typeof (array[0])) === "object") return -2;
 			if (field && String(typeof (array[0])) !== "object") return -2;
-
+			
 			obtIds(array, value, ids, is_repeat, is_strict, field);
 		}
 	} else {    // 如果elems 只是一个基本元素
+		console.log(777);
 		let value = values;
 		if (!field && String(typeof (array[0])) === "object") return -2;
+		console.log(888);
 		if (field && String(typeof (array[0])) !== "object") return -2;
 		obtIds(array, value, ids, is_repeat, is_strict,  field);
 	}
