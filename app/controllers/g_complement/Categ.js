@@ -149,13 +149,13 @@ const Categ_general = async(res, obj, Categ, payload) => {
 				const errorInfo = MdFilter.objMatchStint(StintCateg, obj, ['code']);
 				if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 
-				if(objSame) return MdFilter.jsonFailed(res, {message: '此分类编号已被占用, 请查看'});
 				let match = {_id: {$ne: Categ._id}, code: obj.code};
 				match.Firm = payload.Firm;
 				if(payload.Shop) match.Shop = payload.Shop;
 				const objSame = await CategDB.findOne(match);
-				Categ.code = Categ.nome = obj.code;
+				if(objSame) return MdFilter.jsonFailed(res, {message: '此分类编号已被占用, 请查看'});
 
+				Categ.code = Categ.nome = obj.code;
 			}
 		}
 
@@ -169,7 +169,7 @@ const Categ_general = async(res, obj, Categ, payload) => {
 		if(obj.Categ_far && (obj.Categ_far != Categ.Categ_far)) {
 
 			// 新的父分类添加子分类 _id
-			if(!MdFilter.is_ObjectId_Func(obj.Categ_far)) return res.json({status: 400, message: "[server] 请传递正确的数据 _id"});
+			if(!MdFilter.isObjectId(obj.Categ_far)) return res.json({status: 400, message: "[server] 请传递正确的数据 _id"});
 			const Categ_far = await CategDB.findOne({_id: obj.Categ_far, Shop});
 			if(!Categ_far) return res.json({status: 400, message: "没有找到要改变的父分类"});
 
@@ -184,8 +184,8 @@ const Categ_general = async(res, obj, Categ, payload) => {
 			// 原父分类删除子分类 _id
 			const Org_far = await CategDB.findOne({_id: Categ.Categ_far});
 			if(!Org_far) return res.json({status: 400, message: "原父分类信息错误"});
-			let isEOF = ArrayDeleteManyElem(Org_far.Categ_sons, id);
-			if(isEOF === false) return MdFilter.jsonFailed(res, {message: "原父分类删除 Categ_sons 元素错误"});
+			let isEOF = ArrayDelChild(Org_far.Categ_sons, id);
+			if(isEOF === -2) return MdFilter.jsonFailed(res, {message: "原父分类删除 Categ_sons 元素错误"});
 
 			/** 保存信息 */
 			const Categ_farSave = await Categ_far.save();

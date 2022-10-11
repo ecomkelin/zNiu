@@ -477,7 +477,7 @@ exports.ProdPut = async(req, res) => {
 					Prod.Categs = obj.Categs;
 					isSameCategs = false;
 				} else {
-					isSameCategs = ArrayCompare(obj.Categs, Prod.Categs); // 如果完全相同则为真 否则为假的
+					isSameCategs = isArraySame(obj.Categs, Prod.Categs); // 如果完全相同则为真 否则为假的
 				}
 				if(!isSameCategs) {
 					Prod.Categs = [];
