@@ -153,26 +153,14 @@ const obtIds = (array, value, ids, is_repeat, is_strict, field) => {
  */
 ArrayDelChild = (array, values, options={}) => {
 	let {is_repeat=true, is_strict=false, field} = options;
-	console.log(111);
 	if (!(array instanceof Array)) return -2;
 	
-	console.log(222);
 	if (!values) return -2;
 	let isArray = (values instanceof Array) ? true: false;    // values 是否为数组
-	
-	console.log(333);
-	console.log("isArray", isArray);
-	console.log("values", values);
-	console.log("typeof (values)", typeof (values));
-	console.log("boolean", String(typeof (values)) === "object");
-	if (!isArray && (String(typeof (values)) === "object")) return -2;  // 如果不为数组 但为其他对象 则错误
 
-	console.log(444);
 	if(is_repeat !== true && is_repeat !== false) return -2;
-	console.log(555);
 	if(is_strict !== true && is_strict !== false) return -2;
 	
-	console.log(666);
 	/** 如果有 field 检测 */
 	if (field) {
 		if (String(typeof (field)) === "object") return -2;
@@ -183,17 +171,11 @@ ArrayDelChild = (array, values, options={}) => {
 	if(isArray) {   // 如果 elems是数组
 		for(k in values) {   
 			value = values[k];// 为每一个要删除的元素遍历
-			if (!field && String(typeof (array[0])) === "object") return -2;
-			if (field && String(typeof (array[0])) !== "object") return -2;
 			
 			obtIds(array, value, ids, is_repeat, is_strict, field);
 		}
 	} else {    // 如果elems 只是一个基本元素
-		console.log(777);
 		let value = values;
-		if (!field && String(typeof (array[0])) === "object") return -2;
-		console.log(888);
-		if (field && String(typeof (array[0])) !== "object") return -2;
 		obtIds(array, value, ids, is_repeat, is_strict,  field);
 	}
 	for (i in ids) {
