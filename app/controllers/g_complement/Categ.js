@@ -174,7 +174,7 @@ const Categ_general = async(res, obj, Categ, payload) => {
 			if(!Categ_far) return res.json({status: 400, message: "没有找到要改变的父分类"});
 
 			if(!Categ_far.Categ_sons) Categ_far.Categ_sons = [];
-			Categ_far.Categ_sons.push(id);
+			Categ_far.Categ_sons.push(Categ._id);
 			Categ_far.num_sons = Categ_far.Categ_sons.length;
 			
 
