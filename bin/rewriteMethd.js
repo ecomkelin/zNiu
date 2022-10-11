@@ -161,8 +161,12 @@ ArrayDelChild = (array, values, options={}) => {
 	let isArray = (values instanceof Array) ? true: false;    // values 是否为数组
 	
 	console.log(333);
-	if (!isArray && String(typeof (values)) === "object") return -2;  // 如果不为数组 但为其他对象 则错误
-	
+	console.log("isArray", isArray);
+	console.log("values", values);
+	console.log("typeof (values)", typeof (values));
+	console.log("boolean", String(typeof (values)) === "object");
+	if (!isArray && (String(typeof (values)) === "object")) return -2;  // 如果不为数组 但为其他对象 则错误
+
 	console.log(444);
 	if(is_repeat !== true && is_repeat !== false) return -2;
 	console.log(555);
