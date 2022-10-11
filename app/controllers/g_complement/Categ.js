@@ -184,7 +184,7 @@ const Categ_general = async(res, obj, Categ, payload) => {
 			// 原父分类删除子分类 _id
 			const Org_far = await CategDB.findOne({_id: Categ.Categ_far});
 			if(!Org_far) return res.json({status: 400, message: "原父分类信息错误"});
-			let isEOF = ArrayDelChild(Org_far.Categ_sons, id);
+			let isEOF = ArrayDelChild(Org_far.Categ_sons, Categ._id);
 			if(isEOF === -2) return MdFilter.jsonFailed(res, {message: "原父分类删除 Categ_sons 元素错误"});
 
 			/** 保存信息 */
