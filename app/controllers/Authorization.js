@@ -11,6 +11,7 @@ const ClientDB = require(path.resolve(process.cwd(), 'app/models/auth/Client'));
 const getObject = async(objectDB, param) => new Promise(async(resolve, reject) => {
 	try {
 		param.is_usable = true;
+		console.log(555, param);
 		let object = await objectDB.findOne(param)
 			.populate({path: "Shop", select: "able_MBsell able_PCsell allow_Supplier allow_codeDuplicate is_Pnome cassa_auth"});
 		return resolve(object);
@@ -21,13 +22,16 @@ const getObject = async(objectDB, param) => new Promise(async(resolve, reject) =
 /* 用refreshToken刷新 accessToken */
 exports.refreshtoken = async(req, res, objectDB) => {
 	try {
+		console.log(333, token, req.headers['authorization']);
 		const refresh_res = await MdJwt.token_VerifyProm(req.headers['authorization']);
 		if(refresh_res.status !== 200) return MdFilter.jsonRes(res, refresh_res);
 		const payload = refresh_res.data.payload;
-		const reToken = refresh_res.data.token;
+		// const orgReToken = refresh_res.data.token;
+		console.log(444, payload._id);
 		let object = await getObject(objectDB, {_id: payload._id});
+		console.log(666, object);
 		if(!object) return MdFilter.jsonFailed(res, {message: "授权错误, 请重新登录"});
-		// const match_res = await MdFilter.matchBcryptProm(reToken, object.refreshToken);
+		// const match_res = await MdFilter.matchBcryptProm(orgReToken, object.refreshToken);
 		// if(match_res.status != 200) return MdFilter.jsonFailed(res, {message: "refreshToken 不匹配"});
 
 		const accessToken = MdJwt.generateToken(object);
@@ -78,6 +82,9 @@ exports.login = async(req, res, objectDB) => {
 		if(!payload) return MdFilter.jsonFailed(res, {message: "登陆失败"});
 		const accessToken = MdJwt.generateToken(payload);
 		const refreshToken = MdJwt.generateToken(payload, true);
+
+		console.log(111, "access", accessToken);
+		console.log(222, "refresh", refreshToken);
 
 		payload.at_last_login = Date.now();
 		payload.refreshToken = refreshToken;
