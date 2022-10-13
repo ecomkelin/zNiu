@@ -22,7 +22,7 @@ const getObject = async(objectDB, param) => new Promise(async(resolve, reject) =
 /* 用refreshToken刷新 accessToken */
 exports.refreshtoken = async(req, res, objectDB) => {
 	try {
-		console.log(333, token, req.headers['authorization']);
+		console.log(333, "token", req.headers['authorization']);
 		const refresh_res = await MdJwt.token_VerifyProm(req.headers['authorization']);
 		if(refresh_res.status !== 200) return MdFilter.jsonRes(res, refresh_res);
 		const payload = refresh_res.data.payload;
