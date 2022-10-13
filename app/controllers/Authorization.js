@@ -10,6 +10,7 @@ const ClientDB = require(path.resolve(process.cwd(), 'app/models/auth/Client'));
 
 const getObject = async(objectDB, param) => new Promise(async(resolve, reject) => {
 	try {
+		param.is_usable = true;
 		let object = await objectDB.findOne(param)
 			.populate({path: "Shop", select: "able_MBsell able_PCsell allow_Supplier allow_codeDuplicate is_Pnome cassa_auth"});
 		return resolve(object);
