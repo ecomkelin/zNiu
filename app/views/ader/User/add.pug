@@ -71,6 +71,18 @@ block content
 							option(value=Lang.num) #{Lang.val}
 				.offset-4.col-8.col-form-label.text-danger
 			.form-group.row
+				label.col-3.col-form-label(for="able_MBsell") 手机销售
+				.col-9
+					.form-check.form-check-inline
+						input#able_MBsell.form-check-input(type="checkbox", name="obj[able_MBsell]" checked)
+						label.form-check-label
+			.form-group.row
+				label.col-3.col-form-label(for="able_PCsell") PC销售
+				.col-9
+					.form-check.form-check-inline
+						input#able_PCsell.form-check-input(type="checkbox", name="obj[able_PCsell]" checked)
+						label.form-check-label
+			.form-group.row
 				label.col-4.col-sm-2.col-form-label(for="nomeIpt") 用户姓名
 				.col-8.col-sm-6
 					input#nomeIpt.form-control(type="text", name="obj[nome]")

@@ -363,7 +363,7 @@ exports.OrderPost = async(req, res) => {
 		_Order.order_regular = _Order.goods_regular*tax + (_Order.ship_regular || 0);
 		_Order.order_sale = _Order.goods_sale*tax + (_Order.ship_sale || 0);
 		// 判断是客户下单 或者员工没有给order_imp 则 order_imp= goods_price+ship_sale
-		if(ConfUser.role_Arrs.includes(payload.role)) {
+		if(ConfUser.role_Arrs.includes(payload.role)) {	// 如果是员工处理
 			_Order.order_imp = _Order.price_coin / _Order.rate;
 		} else {
 			_Order.order_imp = _Order.goods_price + ((_Order.ship_sale)?_Order.ship_sale:0);

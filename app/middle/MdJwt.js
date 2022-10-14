@@ -50,5 +50,8 @@ const generatePayload = (obj)=> {
 	if(obj.phonePre) payload.phonePre = obj.phonePre;
 	if(obj.phone) payload.phone = obj.phone;
 	if(obj.email) payload.email = obj.email;
+
+	if(obj.able_MBsell === true) payload.able_MBsell = true;
+	if(obj.able_PCsell === true) payload.able_PCsell = true;
 	return payload;
 }

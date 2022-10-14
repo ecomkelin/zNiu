@@ -11,6 +11,20 @@ table.mt-3.table.table-hover
 		td: strong 角色:
 		td #{Conf.User.role[User.role].cn}
 	tr
+		td: strong 允许手机销售:
+		td
+			if User.able_MBsell === true
+				span 是
+			else
+				span 否
+	tr
+		td: strong 允许电脑销售:
+		td
+			if User.able_PCsell === true
+				span 是
+			else
+				span 否
+	tr
 		td: strong 姓名:
 		td #{User.nome}
 	//- tr

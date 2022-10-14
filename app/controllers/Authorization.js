@@ -12,7 +12,7 @@ const getObject = async(objectDB, param) => new Promise(async(resolve, reject) =
 	try {
 		param.is_usable = true;
 		let object = await objectDB.findOne(param)
-			.populate({path: "Shop", select: "able_MBsell able_PCsell allow_Supplier allow_codeDuplicate is_Pnome cassa_auth"});
+			.populate({path: "Shop", select: "allow_Supplier allow_codeDuplicate is_Pnome cassa_auth"});
 		return resolve(object);
 	} catch(error) {
 		return reject(error);
@@ -82,6 +82,7 @@ exports.login = async(req, res, objectDB) => {
 		payload.at_last_login = Date.now();
 		payload.refreshToken = refreshToken;
 		const objSave = await payload.save();
+		if(!objSave) return MdFilter.jsonFailed(res, {message: "登录时 数据保存错误"})
 
 		return MdFilter.jsonSuccess(res, {
 			message: "login 登录成功",

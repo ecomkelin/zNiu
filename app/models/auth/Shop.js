@@ -13,12 +13,13 @@ const dbSchema = new Schema({
 	addr: String,									// 店铺地址
 	zip: String,									// 店铺区号
 	tel: String,
-
+	
+	note: String,									// 我们自己看的
 	able_MBsell: {type: Boolean, default: true},	// 销售端 可以使用手机版,
 	able_PCsell: {type: Boolean, default: true},	// 销售端 可以使用PC版
 
 	allow_codeDuplicate: {type: Boolean, default: false}, // 是否允许重复code, 重复code需要添加 codeMatchs
-	allow_Supplier: {type: Boolean, default: false},
+	allow_Supplier: {type: Boolean, default: false},	// 在产品上 是否加入默认供应商 产品code显示为 code(产品)-code(供应商)
 	is_Pnome: {type: Boolean, default: false},	// 是否使用 Pnome
 	cassa_auth: {
 		hide_orders: Boolean,

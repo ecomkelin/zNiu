@@ -1,3 +1,4 @@
+2.43	User 属性： able_MBsell able_PCsell
 2.42	登录 需要 is_usable = true
 2.41	Prod 批量打折 优化 updataMany使用 pipeline
 2.4		Prod 批量打折 / Prod 返回原价

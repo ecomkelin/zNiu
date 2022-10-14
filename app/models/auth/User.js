@@ -18,6 +18,8 @@ const dbSchema = new Schema({
 	Lang: {type: ObjectId, ref:"Lang"},
 
 	is_usable: { type: Boolean, default: true },
+	able_MBsell: {type: Boolean, default: true},	// 销售端 可以使用手机版,
+	able_PCsell: {type: Boolean, default: true},	// 销售端 可以使用PC版
 
 	sort: Number,
 

@@ -77,6 +77,9 @@ module.exports = (app) => {
 				return res.redirect('/?error='+errorInfo+'&reUrl=/adUserAdd');
 			}
 
+			obj.able_MBsell = obj.able_MBsell ? true : false;	// 是否能够手机售卖
+			obj.able_PCsell = obj.able_PCsell ? true : false;	// 是否能够pc售卖
+
 			const _object = new UserDB(obj)
 			const objSave = await _object.save();
 			return res.redirect('/adUsers')
@@ -126,6 +129,10 @@ module.exports = (app) => {
 				User.pwd = await MdFilter.encrypt_Prom(obj.pwd);
 				const objSave = await User.save();
 			} else {
+
+				obj.able_MBsell = obj.able_MBsell ? true : false;
+				obj.able_PCsell = obj.able_PCsell ? true : false;
+
 				const _object = _.extend(User, obj);
 				const objSave = await _object.save();
 			}

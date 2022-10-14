@@ -35,6 +35,22 @@ a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upInfo") 修改�
 									else
 										option(value=Lang.num) #{Lang.val}
 					.form-group.row
+						label.col-3.col-form-label(for="able_MBsell") 手机销售
+						.col-9
+							.form-check.form-check-inline
+								if User.able_MBsell
+									input#able_MBsell.form-check-input(type="checkbox", name="obj[able_MBsell]" checked)
+								else
+									input#able_MBsell.form-check-input(type="checkbox", name="obj[able_MBsell]")
+					.form-group.row
+						label.col-3.col-form-label(for="able_PCsell") PC销售
+						.col-9
+							.form-check.form-check-inline
+								if User.able_PCsell
+									input#able_PCsell.form-check-input(type="checkbox", name="obj[able_PCsell]" checked)
+								else
+									input#able_PCsell.form-check-input(type="checkbox", name="obj[able_PCsell]")
+					.form-group.row
 						label.col-3.col-form-label(for="nomeIpt") 姓名
 						.col-9
 							input#nomeIpt.form-control(type="text", name="obj[nome]" value=User.nome)

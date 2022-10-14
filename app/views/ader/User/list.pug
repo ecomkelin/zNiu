@@ -17,6 +17,8 @@ block content
 						tr
 							th 角色
 							th 账户
+							th 手机销售
+							th PC销售
 							th 名字
 							th 是否可用
 							th 公司
@@ -26,6 +28,16 @@ block content
 							tr(class="User-id-"+User._id)
 								td #{Conf.User.role[User.role].cn}
 								td: a(href="/adUser/"+User._id) #{User.code}
+								td
+									if User.able_MBsell === true
+										span 是
+									else
+										span 否
+								td
+									if User.able_PCsell === true
+										span 是
+									else
+										span 否
 								td #{User.nome}
 								td
 									if User.is_usable
