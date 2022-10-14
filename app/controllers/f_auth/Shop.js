@@ -151,8 +151,6 @@ const Shop_general = async(res, obj, Shop, payload) => {
 			// if(mainShop) return MdFilter.jsonFailed(res, {message: "只能有一个主店铺, 需要把主店铺关闭, 再开启此主店铺"})
 		}
 
-		if(obj.allow_Supplier) Shop.allow_Supplier = (obj.allow_Supplier == 1 || obj.allow_Supplier === 'true') ? true : false;
-
 		if(obj.Cita && (obj.Cita != Shop.Cita)) {
 			if(!MdFilter.isObjectId(obj.Cita)) obj.Cita = null;
 

@@ -18,9 +18,9 @@ block content
 							th 账户
 							th 编号
 							th 是否可用
-							th 手机销售
-							th PC销售
+							th(title="是否允许店铺加入虚拟订单") 虚拟订单
 							th(title="是否允许不同供应商有相同的产品号") 同产品号
+							th(title="是否允许加入专属供应商") 专属供应商
 							th(title="是否存储产品名称, 暂时全部存储 只是前台显不显示") 存产品名
 							th 所属公司
 							th.del_show 删除
@@ -35,17 +35,17 @@ block content
 									else
 										span.text-warning 禁用
 								td
-									if Shop.able_MBsell === true
-										span 是
-									else
-										span 否
-								td
-									if Shop.able_PCsell === true
+									if Shop.allow_virtualOrder === true
 										span 是
 									else
 										span 否
 								td
 									if Shop.allow_codeDuplicate === true
+										span 是
+									else
+										span 否
+								td
+									if Shop.allow_Supplier === true
 										span 是
 									else
 										span 否

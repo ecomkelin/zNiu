@@ -22,16 +22,9 @@ table.mt-3.table.table-hover
 		td #{moment(Shop.at_crt).format('DD/MM/YYYY HH:mm:ss')}
 
 	tr
-		td: strong 允许手机销售:
+		td: strong 允许虚拟订单:
 		td
-			if Shop.able_MBsell === true
-				span 是
-			else
-				span 否
-	tr
-		td: strong 允许电脑销售:
-		td
-			if Shop.able_PCsell === true
+			if Shop.allow_virtualOrder === true
 				span 是
 			else
 				span 否
@@ -39,6 +32,13 @@ table.mt-3.table.table-hover
 		td: strong 允许不同供应商下有相同编号的产品:
 		td
 			if Shop.allow_codeDuplicate === true
+				span 是
+			else
+				span 否
+	tr
+		td: strong 允许添加专属供应商:
+		td
+			if Shop.allow_Supplier === true
 				span 是
 			else
 				span 否

@@ -35,22 +35,22 @@ block content
 						option(value="true") 可用
 						option(value="false") 禁用
 			.form-group.row
-				label.col-3.col-form-label(for="able_MBsell") 手机销售
+				label.col-3.col-form-label(for="allow_virtualOrder", title="允许生成虚拟订单") 允许生成虚拟订单
 				.col-9
 					.form-check.form-check-inline
-						input#able_MBsell.form-check-input(type="checkbox", name="obj[able_MBsell]" checked)
-						label.form-check-label
-			.form-group.row
-				label.col-3.col-form-label(for="able_PCsell") PC销售
-				.col-9
-					.form-check.form-check-inline
-						input#able_PCsell.form-check-input(type="checkbox", name="obj[able_PCsell]" checked)
+						input#allow_virtualOrder.form-check-input(type="checkbox", name="obj[allow_virtualOrder]")
 						label.form-check-label
 			.form-group.row
 				label.col-3.col-form-label(for="allow_codeDuplicate", title="允许不同的供应商存在相同的产品号") 同产品号
 				.col-9
 					.form-check.form-check-inline
 						input#allow_codeDuplicate.form-check-input(type="checkbox", name="obj[allow_codeDuplicate]")
+						label.form-check-label
+			.form-group.row
+				label.col-3.col-form-label(for="allow_Supplier", title="允许有专有供应商") 允许有专属供应商
+				.col-9
+					.form-check.form-check-inline
+						input#allow_Supplier.form-check-input(type="checkbox", name="obj[allow_Supplier]")
 						label.form-check-label
 			.form-group.row
 				label.col-3.col-form-label(for="is_Pnome") 存产品名

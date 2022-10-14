@@ -13,22 +13,24 @@ const dbSchema = new Schema({
 	addr: String,									// 店铺地址
 	zip: String,									// 店铺区号
 	tel: String,
-	
+
 	note: String,									// 我们自己看的
-	able_MBsell: {type: Boolean, default: true},	// 销售端 可以使用手机版,
-	able_PCsell: {type: Boolean, default: true},	// 销售端 可以使用PC版
-
+	/** ader 管理 */
+	allow_virtualOrder: {type: Boolean, default: false},		// 是否允许生成虚拟订单
 	allow_codeDuplicate: {type: Boolean, default: false}, // 是否允许重复code, 重复code需要添加 codeMatchs
-	allow_Supplier: {type: Boolean, default: false},	// 在产品上 是否加入默认供应商 产品code显示为 code(产品)-code(供应商)
-	is_Pnome: {type: Boolean, default: false},	// 是否使用 Pnome
-	cassa_auth: {
-		hide_orders: Boolean,
-		hide_clients: Boolean
-	},
+	allow_Supplier: {type: Boolean, default: false},	// 在产品上 是否允许专属供应商 产品code显示为 code(产品)-code(供应商)
 
+	is_Pnome: {type: Boolean, default: false},	// 是否使用 Pnome
 	is_main: {type: Boolean, default: false},	// 是否为公司主店
 	is_boutique: {type: Boolean, default: false},	// 是否为精品店
 	is_usable: { type: Boolean, default: true },	// 是否可用
+
+	/** ader 管理 */
+
+	cassa_auth: {				// 老板给收银员的权限
+		hide_orders: Boolean,
+		hide_clients: Boolean
+	},
 
 	img_url: String,								// 店铺logo
 

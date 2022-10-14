@@ -54,9 +54,10 @@ module.exports = (app) => {
 				return res.redirect('/?error='+errorInfo+'&reUrl=/adShopAdd');
 			}
 
-			obj.able_MBsell = obj.able_MBsell ? true : false;	// 是否能够手机售卖
-			obj.able_PCsell = obj.able_PCsell ? true : false;	// 是否能够pc售卖
+			obj.allow_virtualOrder = obj.allow_virtualOrder ? true : false;	// 是否允许生成虚拟订单
 			obj.allow_codeDuplicate = obj.allow_codeDuplicate ? true : false;	// 是否允许多code
+			obj.allow_Supplier = obj.allow_Supplier ? true : false;	// 是否允许 有专属供应商
+
 			obj.is_Pnome = obj.is_Pnome ? true : false;			// 是否存储产品名称
 
 			const _object = new ShopDB(obj)
@@ -76,9 +77,9 @@ module.exports = (app) => {
 			if(obj.firm) return res.redirect('/?error=不允许修改公司&reUrl=/adShop/'+id);
 
 			// 注释 看 Post
-			obj.able_MBsell = obj.able_MBsell ? true : false;
-			obj.able_PCsell = obj.able_PCsell ? true : false;
+			obj.allow_virtualOrder = obj.allow_virtualOrder ? true : false;
 			obj.allow_codeDuplicate = obj.allow_codeDuplicate ? true : false;
+			obj.allow_Supplier = obj.allow_Supplier ? true : false;
 			obj.is_Pnome = obj.is_Pnome ? true : false;
 
 			if(obj.code) {

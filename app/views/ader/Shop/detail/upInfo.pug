@@ -22,21 +22,13 @@ a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upInfo") 修改�
 							input#nomeIpt.form-control(type="text", name="obj[nome]" value=Shop.nome)
 						.offset-3.col-9.col-form-label.text-danger
 					.form-group.row
-						label.col-3.col-form-label(for="able_MBsell") 手机销售
+						label.col-3.col-form-label(for="allow_virtualOrder") 是否允许虚拟订单
 						.col-9
 							.form-check.form-check-inline
-								if Shop.able_MBsell
-									input#able_MBsell.form-check-input(type="checkbox", name="obj[able_MBsell]" checked)
+								if Shop.allow_virtualOrder
+									input#allow_virtualOrder.form-check-input(type="checkbox", name="obj[allow_virtualOrder]" checked)
 								else
-									input#able_MBsell.form-check-input(type="checkbox", name="obj[able_MBsell]")
-					.form-group.row
-						label.col-3.col-form-label(for="able_PCsell") PC销售
-						.col-9
-							.form-check.form-check-inline
-								if Shop.able_PCsell
-									input#able_PCsell.form-check-input(type="checkbox", name="obj[able_PCsell]" checked)
-								else
-									input#able_PCsell.form-check-input(type="checkbox", name="obj[able_PCsell]")
+									input#allow_virtualOrder.form-check-input(type="checkbox", name="obj[allow_virtualOrder]")
 					.form-group.row
 						label.col-3.col-form-label(for="allow_codeDuplicate", title="允许不同的供应商存在相同的产品号") 同产品号
 						.col-9
@@ -45,6 +37,14 @@ a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upInfo") 修改�
 									input#allow_codeDuplicate.form-check-input(type="checkbox", name="obj[allow_codeDuplicate]" checked)
 								else
 									input#allow_codeDuplicate.form-check-input(type="checkbox", name="obj[allow_codeDuplicate]")
+					.form-group.row
+						label.col-3.col-form-label(for="allow_Supplier") 是否允许专属供应商
+						.col-9
+							.form-check.form-check-inline
+								if Shop.allow_Supplier
+									input#allow_Supplier.form-check-input(type="checkbox", name="obj[allow_Supplier]" checked)
+								else
+									input#allow_Supplier.form-check-input(type="checkbox", name="obj[allow_Supplier]")
 					.form-group.row
 						label.col-3.col-form-label(for="is_Pnome") 存产品名
 						.col-9
