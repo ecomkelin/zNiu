@@ -47,7 +47,7 @@ exports.OrderPost = async(req, res) => {
 		let paramStep = {};
 		if(ConfUser.role_Arrs.includes(payload.role)) {
 			if(payload.role < ConfUser.role_set.boss) return MdFilter.jsonFailed(res, {message: "您的身份不是店铺工作人员"});
-			obj_Order.Shop = payload.Shop._id;
+			obj_Order.Shop = payload.Shop._id || payload.Shop;
 			obj_Order.User_Oder = payload._id;
 
 			paramStep.is_initUser = true;

@@ -1,3 +1,4 @@
+2.61	Bug: OrderPost 找不到Shop
 2.6		Shop 加入发票信息
 2.5		Shop 属性 	去掉[able_MBsell able_PCsell]
 					加入[allow_virtualOrder]
