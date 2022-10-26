@@ -214,8 +214,20 @@ exports.ClientPut = async(req, res) => {
 		if(obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') Client.is_usable = true;
 		if(obj.is_usable == 0 || obj.is_usable === false || obj.is_usable === 'false') Client.is_usable = false;
 
-		if(obj.contact) Client.contact = obj.contact;
 		if(obj.sort && !isNaN(parseInt(obj.sort))) Client.sort = parseInt(obj.sort);
+
+		if(obj.addr) Client.addr = obj.addr;
+		if(obj.zip) Client.zip = obj.zip;
+
+		if(obj.tel) Client.tel = obj.tel;
+		if(obj.mail) Client.mail = obj.mail;
+
+		if(obj.city) Client.city = obj.city;
+		if(obj.province) Client.province = obj.province;
+		if(obj.country) Client.country = obj.country;
+		if(obj.vat) Client.vat = obj.vat;
+		if(obj.fc) Client.fc = obj.fc;
+		if(obj.name) Client.name = obj.name;
 
 		const objSave = await Client.save();
 		return MdFilter.jsonSuccess(res, {message: "ClientPut", data: {object: objSave}});

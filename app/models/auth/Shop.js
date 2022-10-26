@@ -8,11 +8,21 @@ const Float = require('mongoose-float').loadType(mongoose, 2);
 const colection = 'Shop';
 const dbSchema = new Schema({
 	code: String,									// 店铺编号	必须是字母
-
 	nome: String,									// 店铺名称
+
+	// 发票信息
 	addr: String,									// 店铺地址
-	zip: String,									// 店铺区号
-	tel: String,
+	zip: String,									// 店铺邮编
+	city: String, 									// 店铺 commune
+	province: String,								// 省份 两个字符
+	country: String,								// 国家 两个字符
+
+	vat: String,									// P.iva
+	fc: String,										// fiscal code 税号
+	name: String,									// 给发票用的正规名称
+
+	tel: String,									// 发票 电话
+	mail: String,
 
 	note: String,									// 我们自己看的
 	/** ader 管理 */
@@ -36,8 +46,7 @@ const dbSchema = new Schema({
 
 	phonePre: String,
 	phoneNum: String,
-	phone: String,										// [只读 绝对]
-	contact: String, 
+	phone: String,										// [只读 绝对]	// 登录信息 电话
 
 	Cita: {type: ObjectId, ref: 'Cita'},			// 所属城市	如果更换 需要检查服务城市列表是否有此城市
 

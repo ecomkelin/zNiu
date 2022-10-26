@@ -13,7 +13,6 @@ const dbSchema = new Schema({
 	phonePre: String,
 	phoneNum: String,
 	phone: String,										// [只读 绝对]
-	contact: String,
 
 	pwd: String, 										// md5 加密
 
@@ -23,6 +22,20 @@ const dbSchema = new Schema({
 	}],
 
 	nome: String,
+
+	// 发票信息
+	addr: String,									// 店铺地址
+	zip: String,									// 店铺邮编
+	city: String, 									// 店铺 commune
+	province: String,								// 省份 两个字符
+	country: String,								// 国家 两个字符
+
+	vat: String,									// P.iva
+	fc: String,										// fiscal code 税号
+	name: String,									// 给发票用的正规名称
+
+	tel: String,									// 发票 电话
+	mail: String,
 
 	Paidtype: {type: ObjectId, ref: "Paidtype"},		// 默认支付方式 为客户自动选择支付方式
 	Lang: {type: ObjectId, ref:"Lang"},

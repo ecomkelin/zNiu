@@ -163,10 +163,18 @@ const Shop_general = async(res, obj, Shop, payload) => {
 				Shop.Cita = obj.Cita;
 			}
 		}
-		if(obj.contact) Shop.contact = obj.contact;
-		if(obj.tel) Shop.tel = obj.tel;
 		if(obj.addr) Shop.addr = obj.addr;
 		if(obj.zip) Shop.zip = obj.zip;
+
+		if(obj.tel) Shop.tel = obj.tel;
+		if(obj.mail) Shop.mail = obj.mail;
+
+		if(obj.city) Shop.city = obj.city;
+		if(obj.province) Shop.province = obj.province;
+		if(obj.country) Shop.country = obj.country;
+		if(obj.vat) Shop.vat = obj.vat;
+		if(obj.fc) Shop.fc = obj.fc;
+		if(obj.name) Shop.name = obj.name;
 
 		if(obj.img_url && (obj.img_url != Shop.img_url) && Shop.img_url && Shop.img_url.split("Shop").length > 1){
 			await MdFiles.rmPicture(Shop.img_url);
