@@ -34,7 +34,6 @@ exports.OrderPost = async(req, res) => {
 	console.log("/OrderPost");
 	try{
 		const payload = req.payload;
-		console.log(111, payload);
 		// 判断 基本参数 是否正确
 		const obj_Order = req.body.obj;
 		if(!obj_Order) return MdFilter.jsonFailed(res, {message: "请传递正确的obj数据"});
@@ -55,7 +54,6 @@ exports.OrderPost = async(req, res) => {
 			if(!MdFilter.isObjectId(obj_Order.Shop)) return MdFilter.jsonFailed(res, {message: "请传递正确的Shop_id信息"});
 			paramStep.is_initClient = true;
 		}
-		console.log(222, obj_Order.Shop);
 		const Shop = await ShopDB.findOne({_id: obj_Order.Shop, is_usable: true}, {code:1, serve_Citas: 1, Firm: 1})
 			.populate({path: 'serve_Citas.Cita'});
 		if(!Shop) return MdFilter.jsonFailed(res, {message: "没有找到此商店信息"});
@@ -394,7 +392,7 @@ exports.OrderPost = async(req, res) => {
 				id: OrderSave._id,
 				payload,
 				queryObj: req.query,
-				objectDB: OrderDB,
+				objectDB: "Order",
 				path_Callback: null,
 				dbName: dbOrder,
 			};
