@@ -392,9 +392,9 @@ exports.OrderPost = async(req, res) => {
 				id: OrderSave._id,
 				payload,
 				queryObj: req.query,
-				objectDB: "Order",
+				objectDB: OrderDB,
 				path_Callback: null,
-				dbName: dbOrder,
+				dbName: "Order",
 			};
 			const db_res = await GetDB.db(GetDB_Filter);
 			console.log("post getDB");
