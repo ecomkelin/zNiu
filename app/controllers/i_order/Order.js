@@ -1,4 +1,6 @@
 const path = require('path');
+const RecordDB = require(path.resolve(process.cwd(), 'app/models/complement/Record'));
+
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const ConfOrder = require(path.resolve(process.cwd(), 'app/config/conf/ConfOrder'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
@@ -159,13 +161,34 @@ const OrderDelete_Prom = (payload, id) => {
 			};
 			if(payload.Shop) pathObj.Shop = payload.Shop._id;
 
-			const Order = await OrderDB.findOne(pathObj, {OrderProds: 1, type_Order: 1})
+			const Order = await OrderDB.findOne(pathObj, {code: 1, order_imp: 1, OrderProds: 1, type_Order: 1})
 				.populate({
 					path: "OrderProds",
 					select: "is_simple Prod quantity OrderSkus",
 					populate: {path: "OrderSkus", select: "Sku quantity"}
 				});
 			if(!Order) return resolve({status: 400, message: "没有找到此订单信息"});
+
+			/** 删除日志 记录 */
+			let obj = {};
+			obj.dbname = "Order";
+			obj.is_Delete = true;
+			obj.del_datas = [{
+				field: 'code',
+				fieldTR: '编号',
+				valPre: Order.code
+			},{
+				field: 'type_Order',
+				fieldTR: '订单类型',
+				valPre: 1? '采购' : '销售'
+			},{
+				field: 'order_imp',
+				fieldTR: '订单价格',
+				valPre: Order.order_imp
+			}];
+			let _object = new RecordDB(obj);
+			_object.save();
+
 			// console.log(Order)
 			let sign = -parseInt(Order.type_Order);
 			for(let i=0; i<Order.OrderProds.length; i++) {

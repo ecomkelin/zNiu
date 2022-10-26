@@ -2,6 +2,7 @@ const path = require('path');
 const Brand = require(path.resolve(process.cwd(), 'app/controllers/g_complement/Brand'));
 const Categ = require(path.resolve(process.cwd(), 'app/controllers/g_complement/Categ'));
 const Pnome = require(path.resolve(process.cwd(), 'app/controllers/g_complement/Pnome'));
+const Record = require(path.resolve(process.cwd(), 'app/controllers/g_complement/Record'));
 const MdAuth = require(path.resolve(process.cwd(), 'app/middle/MdAuth'));
 
 module.exports = (app) => {
@@ -22,4 +23,7 @@ module.exports = (app) => {
 
 	/* ------------------------ Pnome ------------------------ */
 	app.get('/api/b1/Pnomes', MdAuth.path_User, Pnome.Pnomes);
+
+	/* ------------------------ Record ------------------------ */
+	app.get('/api/b1/Records', MdAuth.path_User, Record.Records);
 };
