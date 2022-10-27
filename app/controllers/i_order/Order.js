@@ -140,6 +140,8 @@ exports.OrderDelete = async(req, res) => {
 
 		const res_del = await OrderDelete_Prom(payload, id);
 
+		console.log(1111, res_del.data.object);
+
 		await OrderSkuDB.deleteMany({Order: id});
 		await OrderProdDB.deleteMany({Order: id});
 
@@ -207,11 +209,12 @@ const OrderDelete_Prom = (payload, id) => {
 					}
 				}
 			}
+
 			OrderSkuDB.deleteMany({Order: id});
 			OrderProdDB.deleteMany({Order: id});
 			await OrderDB.deleteOne({_id: id});
 
-			return resolve({status: 200, message: "OrderDelete"});
+			return resolve({status: 200, message: "OrderDelete", data: {object: Order}});
 		} catch(error) {
 			return resolve({status: 500, message: "OrderDelete", error});
 		}
