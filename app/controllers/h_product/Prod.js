@@ -388,7 +388,7 @@ exports.ProdPut = async(req, res) => {
 		const Prod = await ProdDB.findOne(pathObj);
 		if(!Prod) return MdFilter.jsonFailed(res, {message: "没有找到此商品信息"});
 
-		let ProdObj = {...Prod};
+		let ProdObj = {...Prod._doc};
 
 		let obj = null;
 		if(req.body.general) {
