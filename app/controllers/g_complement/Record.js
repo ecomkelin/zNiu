@@ -16,6 +16,7 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 	}
 
 	recordObj.datas = [];
+
 	if(is_Delete) {
 		let fields = [];
 		if(dbName === "Order") fields = ["code", "type_Order", "order_imp"];
@@ -30,28 +31,26 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 			recordObj.datas.push(data);
 		}
 	} else {
-		// let basicFields = [];
-		// if(dbName === "Prod") basicFields = ["code", "nome", "nomeTR", "price_regular", "price_sale", "price_cost", "quantity"];
+		let basicFields = [];
+		if(dbName === "Prod") basicFields = ["code", "nome", "nomeTR", "price_regular", "price_sale", "price_cost", "quantity"];
 
 		let fields = Object.keys(obj);
 		if(fields.length === 0) {
 			console.log("Error RecordPost_func, dbName: "+dbName)
 			return;
 		}
-		let flag = false;
+		
 		for(i in fields) {
 			let field = fields[i];
-			// if(!basicFields.includes(field)) {
-			// 	continue;
-			// }
+			if(!basicFields.includes(field)) {
+				continue;
+			}
 			if(obj[field] instanceof Object) {
 				continue;
 			}
 			if(obj[field] == object[field]){
 				continue;
 			}
-			console.log(111, obj[field]);
-			console.log(222, object[field]);
 
 			let data = {
 				field,
@@ -61,11 +60,13 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 			recordObj.datas.push(data);
 		}
 	}
+	if(recordObj.datas.length > 0) {
+		recordObj.User_crt = payload._id;
+		recordObj.Shop = payload.Shop._id || payload.Shop;
+		let _object = new RecordDB(recordObj);
+		_object.save();
+	}
 
-	recordObj.User_crt = payload._id;
-	recordObj.Shop = payload.Shop._id || payload.Shop;
-	let _object = new RecordDB(recordObj);
-	_object.save();
 }
 
 const dbRecord = 'Record';
