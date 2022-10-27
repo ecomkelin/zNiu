@@ -228,9 +228,9 @@ const OrderDelete_Prom = (payload, id) => {
 
 const Order_path_Func = (pathObj, payload, queryObj) => {
 	if(payload.Firm) {
-		pathObj.Firm = payload.Firm;
+		pathObj.Firm = payload.Firm._id || payload.Firm;
 		if(payload.role >= ConfUser.role_set.printer) {
-			pathObj.Shop = payload.Shop._id;
+			pathObj.Shop = payload.Shop._id || payload.Shop;
 			if(payload.role > ConfUser.role_set.boss) {
 				pathObj.User_Oder = payload._id;
 			}
@@ -275,9 +275,9 @@ const Order_path_Func = (pathObj, payload, queryObj) => {
 const dbOrder = 'Order';
 exports.Orders = async(req, res) => {
 	console.log("/Orders");
-	console.log(111, req.query)
-	const ods = await OrderDB.find({}).limit(5);
-	console.log(222, ods);
+	// console.log(111, req.query)
+	// const ods = await OrderDB.find({}).limit(5);
+	// console.log(222, ods);
 	try {
 		const payload = req.payload
 		const GetDB_Filter = {
