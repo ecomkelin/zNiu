@@ -14,8 +14,7 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 		console.log("Error RecordPost_func non dbName");
 		return;
 	}
-	console.log(11, obj);
-	console.log(22, object);
+
 	recordObj.datas = [];
 	if(is_Delete) {
 		let fields = [];
@@ -31,8 +30,8 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 			recordObj.datas.push(data);
 		}
 	} else {
-		let basicFields = [];
-		if(dbName === "Prod") basicFields = ["code", "nome", "nomeTR", "price_regular", "price_sale", "price_cost", "quantity"];
+		// let basicFields = [];
+		// if(dbName === "Prod") basicFields = ["code", "nome", "nomeTR", "price_regular", "price_sale", "price_cost", "quantity"];
 
 		let fields = Object.keys(obj);
 		if(fields.length === 0) {
@@ -42,9 +41,9 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 		let flag = false;
 		for(i in fields) {
 			let field = fields[i];
-			if(!basicFields.includes(field)) {
-				continue;
-			}
+			// if(!basicFields.includes(field)) {
+			// 	continue;
+			// }
 			if(obj[field] instanceof Object) {
 				continue;
 			}
