@@ -64,6 +64,7 @@ exports.dbs = (GetDB_Filter) => {
 				.skip(skip).limit(pagesize)
 				.populate(populateObjs);
 			let object = null;
+			console.log(333, objects);
 			let len_Objs = objects.length;
 			if(len_Objs > 0 && queryObj.search) {
 				pathObj.code = queryObj.search.replace(/(\s*$)/g, "").replace( /^\s*/, '').toUpperCase();
