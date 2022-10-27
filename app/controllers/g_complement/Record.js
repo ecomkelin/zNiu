@@ -14,7 +14,8 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 		console.log("Error RecordPost_func non dbName");
 		return;
 	}
-
+	console.log(11, obj);
+	console.log(22, object);
 	recordObj.datas = [];
 	if(is_Delete) {
 		let fields = [];
@@ -50,6 +51,9 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 			if(obj[field] == object[field]){
 				continue;
 			}
+			console.log(111, obj[field]);
+			console.log(222, object[field]);
+
 			let data = {
 				field,
 				valPre: object[field],
