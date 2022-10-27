@@ -1,18 +1,16 @@
-const ObjectId = require('mongodb').ObjectId;
-
 const _ = require('underscore');
 const path = require('path');
+
+const RecordCT = require(path.resolve(process.cwd(), 'app/controllers/g_complement/Record'));
+
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const StintPd = require(path.resolve(process.cwd(), 'app/config/stint/StintPd'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
 const MdFiles = require(path.resolve(process.cwd(), 'app/middle/MdFiles'));
-const NationDB = require(path.resolve(process.cwd(), 'app/models/address/Nation'));
-const BrandDB = require(path.resolve(process.cwd(), 'app/models/complement/Brand'));
 const CategDB = require(path.resolve(process.cwd(), 'app/models/complement/Categ'));
 const PdDB = require(path.resolve(process.cwd(), 'app/models/product/Pd'));
 const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 const SkuDB = require(path.resolve(process.cwd(), 'app/models/product/Sku'));
-const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
 
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
@@ -370,6 +368,8 @@ exports.ProdDelete = async(req, res) => {
 		if(Prod.img_url && Prod.img_url.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_url);
 		if(Prod.img_xs && Prod.img_xs.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_xs);
 
+		RecordCT.RecordPost_func(payload, {dbName: dbProd, is_Delete: true}, Prod);
+
 		return MdFilter.jsonSuccess(res, {message: "ProdDelete"});
 	} catch(error) {
 		return MdFilter.json500(res, {message: "ProdDelete", error});
@@ -387,6 +387,8 @@ exports.ProdPut = async(req, res) => {
 		Prod_path_Func(pathObj, payload);
 		const Prod = await ProdDB.findOne(pathObj);
 		if(!Prod) return MdFilter.jsonFailed(res, {message: "没有找到此商品信息"});
+
+		let ProdObj = {...Prod};
 
 		let obj = null;
 		if(req.body.general) {
@@ -530,6 +532,8 @@ exports.ProdPut = async(req, res) => {
 			change_codeMatchs_Prod(orgCode, payload.Shop._id || payload.Shop);
 			change_codeMatchs_Prod(newCode, payload.Shop._id || payload.Shop);
 		}
+
+		RecordCT.RecordPost_func(payload, {dbName: dbProd}, ProdObj, obj);
 
 		if(req.query.populateObjs) {	// 如果传入populate 则重新查找
 			const GetDB_Filter = {
