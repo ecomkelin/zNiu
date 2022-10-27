@@ -19,7 +19,7 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 	if(is_Delete) {
 		let fields = [];
 		if(dbName === "Order") fields = ["code", "type_Order", "order_imp"];
-		else if(dbName === "Prod") fields = ["code", "nome", "price_regular"];
+		else if(dbName === "Prod") fields = ["code", "nome", "desp", "price_regular"];
 
 		for(i in fields) {
 			let field = fields[i];
@@ -30,6 +30,9 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 			recordObj.datas.push(data);
 		}
 	} else {
+		let basicFields = [];
+		if(dbName === "Prod") basicFields = ["code", "nome", "nomeTR", "price_regular", "price_sale", "price_cost", "quantity"];
+
 		let fields = Object.keys(obj);
 		if(fields.length === 0) {
 			console.log("Error RecordPost_func, dbName: "+dbName)
@@ -38,12 +41,13 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 		let flag = false;
 		for(i in fields) {
 			let field = fields[i];
+			if(!basicFields.includes(field)) {
+				continue;
+			}
 			if(obj[field] instanceof Object) {
-				console.log(`111, ${obj[field]}`);
 				continue;
 			}
 			if(obj[field] == object[field]){
-				console.log(`222, ${obj[field]}`);
 				continue;
 			}
 			let data = {
