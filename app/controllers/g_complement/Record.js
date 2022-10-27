@@ -38,14 +38,20 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 		let flag = false;
 		for(i in fields) {
 			let field = fields[i];
-			if(object[field] !== obj[field]) {
-				let data = {
-					field,
-					valPre: object[field],
-					val: obj[field]
-				};
-				recordObj.datas.push(data);
+			if(obj[field] instanceof Object) {
+				console.log(`111, ${obj[field]}`);
+				continue;
 			}
+			if(obj[field] == object[field]){
+				console.log(`222, ${obj[field]}`);
+				continue;
+			}
+			let data = {
+				field,
+				valPre: object[field],
+				val: obj[field]
+			};
+			recordObj.datas.push(data);
 		}
 	}
 
