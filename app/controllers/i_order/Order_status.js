@@ -64,7 +64,7 @@ exports.Order_change_status = async(req, res) => {
 const Order_status_confirm = async(id, payload) => {
 	return new Promise(async(resolve) => {
 		try{
-			const pathObj = {_id: id, status: ConfOrder.status_obj.responding.num, Shop: payload.Shop._id};
+			const pathObj = {_id: id, status: ConfOrder.status_obj.responding.num, Shop: payload.Shop._id || payload.Shop};
 			const Order = await OrderDB.findOne(pathObj);
 			if(!Order) return resolve({status: 400, message: "没有找到此订单"});
 
@@ -82,7 +82,7 @@ const Order_status_confirm = async(id, payload) => {
 const Order_status_done = async(id, payload) => {
 	return new Promise(async(resolve) => {
 		try{
-			const pathObj = {_id: id, status: ConfOrder.status_obj.preparing.num, Shop: payload.Shop._id};
+			const pathObj = {_id: id, status: ConfOrder.status_obj.preparing.num, Shop: payload.Shop._id || payload.Shop};
 			const Order = await OrderDB.findOne(pathObj);
 			if(!Order) return resolve({status: 400, message: "没有找到此订单"});
 
@@ -101,7 +101,7 @@ const Order_status_done = async(id, payload) => {
 const Order_status_complete = async(id, payload) => {
 	return new Promise(async(resolve) => {
 		try{
-			const pathObj = {_id: id, status: ConfOrder.status_obj.shipping.num, Shop: payload.Shop._id};
+			const pathObj = {_id: id, status: ConfOrder.status_obj.shipping.num, Shop: payload.Shop._id || payload.Shop};
 			const Order = await OrderDB.findOne(pathObj);
 			if(!Order) return resolve({status: 400, message: "没有找到此订单"});
 

@@ -159,7 +159,7 @@ const OrderDelete_Prom = (payload, id) => {
 				Firm: payload.Firm,
 				// is_hide_client: true,
 			};
-			if(payload.Shop) pathObj.Shop = payload.Shop._id;
+			if(payload.Shop) pathObj.Shop = payload.Shop._id || payload.Shop;
 
 			const Order = await OrderDB.findOne(pathObj, {code: 1, order_imp: 1, OrderProds: 1, type_Order: 1})
 				.populate({
@@ -342,8 +342,7 @@ exports.addTicket = async(req, res) => {
 	try {
 		let payload = req.payload;
 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
-		let Shop = payload.Shop;
-		if(Shop._id) Shop = Shop._id;
+		let Shop = payload.Shop._id || payload.Shop;
 		let typePrint = req.query.typePrint;	// 什么类型的打印
 
 		let GetDB_Filter = {
@@ -372,8 +371,7 @@ exports.getTickets = (req, res) => {
 	try {
 		let payload = req.payload;
 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
-		let Shop = payload.Shop;
-		if(Shop._id) Shop = Shop._id;
+		let Shop = payload.Shop._id || payload.Shop;
 
 		let objects = [];
 		tickets.forEach(item => {
@@ -388,8 +386,7 @@ exports.clearTicket = (req, res) => {
 	try {
 		let payload = req.payload;
 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
-		let Shop = payload.Shop;
-		if(Shop._id) Shop = Shop._id;
+		let Shop = payload.Shop._id || payload.Shop;
 		let objects = [];
 		tickets.forEach(item => {
 			if(item.Shop !== Shop) objects.push(item);
@@ -405,8 +402,7 @@ exports.printTicket = (req, res) => {
 	try {
 		let payload = req.payload;
 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "需要店铺身份打印"});
-		let Shop = payload.Shop;
-		if(Shop._id) Shop = Shop._id;
+		let Shop = payload.Shop._id || payload.Shop;
 
 		let status = 400;
 		let message = "暂无数据";

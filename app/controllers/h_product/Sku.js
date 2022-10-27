@@ -246,7 +246,7 @@ const Sku_path_Func = (pathObj, payload, queryObj) => {
 		if(payload) pathObj.Firm = payload.Firm;
 
 		if(payload && payload.role >= ConfUser.role_set.boss) {
-			pathObj.Shop = payload.Shop._id;
+			pathObj.Shop = payload.Shop._id || payload.Shop;
 		} else {
 			if(queryObj.Shops) {
 				const ids = MdFilter.stringToObjectIds(queryObj.Shops);

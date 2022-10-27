@@ -171,6 +171,7 @@ const change_codeMatchs_Prod = (code, Shop_id) => new Promise(async(resolve, rej
 const Prod_PdNull = async(res, obj, payload) => {
 	console.log("/Prod_PdNull")
 	try {
+		let Shop_id = payload.Shop._id || payload.Shop;
 		obj.Pd = null;
 
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
@@ -183,7 +184,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 
 		// code是否可重复
 		if(payload.Shop.allow_codeDuplicate !== true) {
-			const objSame = await ProdDB.findOne({'code': obj.code, Shop: payload.Shop._id});
+			const objSame = await ProdDB.findOne({'code': obj.code, Shop: Shop_id});
 			if(objSame) return MdFilter.jsonFailed(res, {message: "已经有此产品编号相同"});
 		}
 
@@ -203,7 +204,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 		if(!MdFilter.ArrIsObjectId(obj.Categs)) obj.Categs = [];
 		for(i in obj.Categs) {
 			let Categ_id = obj.Categs[i];
-			let Categ = await CategDB.findOne({_id: Categ_id, Shop: payload.Shop._id || payload.Shop});
+			let Categ = await CategDB.findOne({_id: Categ_id, Shop: Shop_id});
 			if(!Categ) return MdFilter.jsonFailed(res, {message: "没有找到此 Categ"});
 			if(Categ.num_sons) return MdFilter.jsonFailed(res, {message: "此 Categ 有子分类 不能被添加产品"});
 		}
@@ -217,7 +218,7 @@ const Prod_PdNull = async(res, obj, payload) => {
 		if(save_res.status !== 200) return MdFilter.jsonFailed(res, {message: "数据库 保存错误"});
 		// 如果允许重复code 则需要给这些重复code的产品 匹配到一起
 		if(payload.Shop.allow_codeDuplicate) {
-			await change_codeMatchs_Prod(obj.code, payload.Shop._id);
+			await change_codeMatchs_Prod(obj.code, Shop_id);
 		}
 
 		return MdFilter.jsonSuccess(res, save_res);
@@ -232,7 +233,7 @@ const Prod_PdSynchronize = async(res, Pd_id, payload) => {
 		Pd = await PdDB.findOne({_id: Pd_id, Firm: payload.Firm});
 		if(!Pd) return MdFilter.jsonFailed(res, {message: "没有找到此同步产品信息"});
 
-		const objSame = await ProdDB.findOne({Pd: Pd_id, Shop: payload.Shop._id, Firm: payload.Firm});
+		const objSame = await ProdDB.findOne({Pd: Pd_id, Shop: payload.Shop._id || payload.Shop, Firm: payload.Firm});
 		if(objSame) return MdFilter.jsonFailed(res, {message: '此商品之前已经被同步', data: {object: objSame}});
 		const obj = Pd_to_Prod(Pd);
 		const save_res = await Prod_save_Prom(obj, payload, Pd);
@@ -258,7 +259,7 @@ const Prods_PdSynchronize = async(res, Pds, payload) => {
 				continue;
 			}
 
-			const objSame = await ProdDB.findOne({Pd: Pd_id, Shop: payload.Shop._id, Firm: payload.Firm});
+			const objSame = await ProdDB.findOne({Pd: Pd_id, Shop: payload.Shop._id || payload.Shop, Firm: payload.Firm});
 			if(objSame) {
 				console.log('Prods_PdSynchronize: ['+Pd_id+'] 此商品之前已经被同步');
 				continue;
@@ -303,7 +304,7 @@ const Prod_save_Prom = async(obj, payload, Pd) => {
 			obj.Skus = [];
 			obj.is_usable = (obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') ? true: false;
 			obj.Firm = payload.Firm;
-			obj.Shop = payload.Shop._id;
+			obj.Shop = payload.Shop._id || payload.Shop;
 			obj.User_crt = obj.User_upd = payload._id;
 			const _object = new ProdDB(obj);
 
@@ -363,7 +364,7 @@ exports.ProdDelete = async(req, res) => {
 		setModify_Prods(Prod._id, true);	// 缓存变化
 
 		if(payload.Shop.allow_codeDuplicate) {
-			await change_codeMatchs_Prod(code, payload.Shop._id);
+			await change_codeMatchs_Prod(code, payload.Shop._id || payload.Shop);
 		}
 
 		if(Prod.img_url && Prod.img_url.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_url);
@@ -442,7 +443,7 @@ exports.ProdPut = async(req, res) => {
 					if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 					const objSame = await ProdDB.findOne({
 						'code': obj.code,
-						Shop: payload.Shop._id,
+						Shop: payload.Shop._id || payload.Shop,
 						_id: {'$ne': Prod._id}
 					});
 					if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
@@ -526,8 +527,8 @@ exports.ProdPut = async(req, res) => {
 		setModify_Prods(Prod._id); // 缓存变化
 
 		if(need_matchs) {
-			change_codeMatchs_Prod(orgCode, payload.Shop._id);
-			change_codeMatchs_Prod(newCode, payload.Shop._id);
+			change_codeMatchs_Prod(orgCode, payload.Shop._id || payload.Shop);
+			change_codeMatchs_Prod(newCode, payload.Shop._id || payload.Shop);
 		}
 
 		if(req.query.populateObjs) {	// 如果传入populate 则重新查找
@@ -646,7 +647,7 @@ const fNiu_zNiu = async(payload) => {
 		const p = ps[i];
 
 		p.Firm = payload.Firm;
-		p.Shop = payload.Shop._id;
+		p.Shop = payload.Shop._id || payload.Shop;
 		p.is_simple = true;
 		p.Attrs = [];
 		p.Skus = [];

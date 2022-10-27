@@ -17,7 +17,7 @@ exports.TablePost = async(req, res) => {
 
 		obj.Firm = payload.Firm;
 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "您的个人信息错误 您的payload.Shop 不存在"});
-		obj.Shop = payload.Shop._id;
+		obj.Shop = payload.Shop._id || payload.Shop;
 
 
 		// 基本信息赋值
@@ -61,7 +61,7 @@ exports.TablePut = async(req, res) => {
 		const id = req.params.id;		// 所要更改的Table的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
-		const Table = await TableDB.findOne({_id: id, Shop: payload.Shop._id});
+		const Table = await TableDB.findOne({_id: id, Shop: payload.Shop._id || payload.Shop});
 		if(!Table) return MdFilter.jsonFailed(res, {message: "没有找到此Table信息"});
 
 		if(obj.code) {
@@ -120,7 +120,7 @@ exports.TableDelete = async(req, res) => {
 		const id = req.params.id;		// 所要更改的Table的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
-		const Table = await TableDB.findOne({_id: id, Shop: payload.Shop._id});
+		const Table = await TableDB.findOne({_id: id, Shop: payload.Shop._id || payload.Shop});
 		if(!Table) return MdFilter.jsonFailed(res, {message: "没有找到此Table信息"});
 
 		const objDel = await TableDB.deleteOne({_id: id});
@@ -140,7 +140,7 @@ exports.TableDelete = async(req, res) => {
 const Table_path_Func = (pathObj, payload, queryObj) => {
 	pathObj.Firm = payload.Firm;
 	if(payload.role >= ConfUser.role_set.printer) {
-		pathObj.Shop = payload.Shop._id;
+		pathObj.Shop = payload.Shop._id || payload.Shop;
 	}
 
 	if(!queryObj) return;

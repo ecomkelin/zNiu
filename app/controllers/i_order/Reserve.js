@@ -17,7 +17,7 @@ exports.ReservePost = async(req, res) => {
 
 		obj.Firm = payload.Firm;
 		if(!payload.Shop) return MdFilter.jsonFailed(res, {message: "您的个人信息错误 您的payload.Shop不存在"});
-		obj.Shop = payload.Shop._id;
+		obj.Shop = payload.Shop._id || payload.Shop;
 
 		if(!obj.Client) obj.Client = null;
 
@@ -105,7 +105,7 @@ exports.ReservePut = async(req, res) => {
 		const id = req.params.id;		// 所要更改的Reserve的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
-		const Reserve = await ReserveDB.findOne({_id: id, Shop: payload.Shop._id});
+		const Reserve = await ReserveDB.findOne({_id: id, Shop: payload.Shop._id || payload.Shop});
 		if(!Reserve) return MdFilter.jsonFailed(res, {message: "没有找到此Reserve信息"});
 
 		if(obj.at_arrive) {
@@ -209,7 +209,7 @@ exports.ReserveDelete = async(req, res) => {
 		const id = req.params.id;		// 所要更改的Reserve的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
-		const Reserve = await ReserveDB.findOne({_id: id, Shop: payload.Shop._id});
+		const Reserve = await ReserveDB.findOne({_id: id, Shop: payload.Shop._id || payload.Shop});
 		if(!Reserve) return MdFilter.jsonFailed(res, {message: "没有找到此预定信息请刷新重试"});
 
 		if(Reserve.Table) {
@@ -239,7 +239,7 @@ exports.ReserveDelete = async(req, res) => {
 const Reserve_path_Func = (pathObj, payload, queryObj) => {
 	pathObj.Firm = payload.Firm;
 	if(payload.role >= ConfUser.role_set.printer) {
-		pathObj.Shop = payload.Shop._id;
+		pathObj.Shop = payload.Shop._id || payload.Shop;
 	}
 
 	if(!queryObj) return;
