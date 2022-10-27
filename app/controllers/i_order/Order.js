@@ -1,5 +1,5 @@
 const path = require('path');
-const RecordDB = require(path.resolve(process.cwd(), 'app/models/complement/Record'));
+const RecordCT = require(path.resolve(process.cwd(), 'app/controllers/g_complement/Record'));
 
 const ConfUser = require(path.resolve(process.cwd(), 'app/config/conf/ConfUser'));
 const ConfOrder = require(path.resolve(process.cwd(), 'app/config/conf/ConfOrder'));
@@ -140,11 +140,29 @@ exports.OrderDelete = async(req, res) => {
 
 		const res_del = await OrderDelete_Prom(payload, id);
 
-		console.log(1111, res_del.data.object);
-
-		await OrderSkuDB.deleteMany({Order: id});
-		await OrderProdDB.deleteMany({Order: id});
-
+		RecordCT.RecordPost_func(payload, {dbName: dbOrder, is_Delete: true}, res_del.data.object);
+		// /** 删除日志 记录 */
+		// let obj = {};
+		// obj.dbName = "Order";
+		// obj.is_Delete = true;
+		// obj.del_datas = [{
+		// 	field: 'code',
+		// 	fieldTR: '编号',
+		// 	valPre: Order.code
+		// },{
+		// 	field: 'type_Order',
+		// 	fieldTR: '订单类型',
+		// 	valPre: 1? '采购' : '销售'
+		// },{
+		// 	field: 'order_imp',
+		// 	fieldTR: '订单价格',
+		// 	valPre: Order.order_imp
+		// }];
+		// obj.User_crt = payload._id;
+		// obj.Shop = payload.Shop._id || payload.Shop;
+		// let _object = new RecordDB(obj);
+		// _object.save();
+		
 		return MdFilter.jsonRes(res, res_del);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "OrderDelete", error});
@@ -170,26 +188,6 @@ const OrderDelete_Prom = (payload, id) => {
 					populate: {path: "OrderSkus", select: "Sku quantity"}
 				});
 			if(!Order) return resolve({status: 400, message: "没有找到此订单信息"});
-
-			/** 删除日志 记录 */
-			let obj = {};
-			obj.dbname = "Order";
-			obj.is_Delete = true;
-			obj.del_datas = [{
-				field: 'code',
-				fieldTR: '编号',
-				valPre: Order.code
-			},{
-				field: 'type_Order',
-				fieldTR: '订单类型',
-				valPre: 1? '采购' : '销售'
-			},{
-				field: 'order_imp',
-				fieldTR: '订单价格',
-				valPre: Order.order_imp
-			}];
-			let _object = new RecordDB(obj);
-			_object.save();
 
 			// console.log(Order)
 			let sign = -parseInt(Order.type_Order);

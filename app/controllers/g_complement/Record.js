@@ -7,7 +7,53 @@ const RecordDB = require(path.resolve(process.cwd(), 'app/models/complement/Reco
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
 
+exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
+	/** 删除日志 记录 */
+	let {dbName, is_Delete} = recordObj;
+	if(!dbName) {
+		console.log("Error RecordPost_func non dbName");
+		return;
+	}
 
+	recordObj.datas = [];
+	if(is_Delete) {
+		let fields = [];
+		if(dbName === "Order") fields = ["code", "type_Order", "order_imp"];
+		else if(dbName === "Prod") fields = ["code", "nome", "price_regular"];
+
+		for(i in fields) {
+			let field = fields[i];
+			let data = {
+				field,
+				valPre: object[field]
+			};
+			recordObj.datas.push(data);
+		}
+	} else {
+		let fields = Object.keys(obj);
+		if(fields.length === 0) {
+			console.log("Error RecordPost_func, dbName: "+dbName)
+			return;
+		}
+		let flag = false;
+		for(i in fields) {
+			let field = fields[i];
+			if(object[field] !== obj[field]) {
+				let data = {
+					field,
+					valPre: object[field],
+					val: obj[field]
+				};
+				recordObj.datas.push(data);
+			}
+		}
+	}
+
+	recordObj.User_crt = payload._id;
+	recordObj.Shop = payload.Shop._id || payload.Shop;
+	let _object = new RecordDB(recordObj);
+	_object.save();
+}
 
 const dbRecord = 'Record';
 exports.Records = async(req, res) => {
