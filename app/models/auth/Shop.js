@@ -24,6 +24,10 @@ const dbSchema = new Schema({
 	tel: String,									// 发票 电话
 	mail: String,
 
+	// 发票 最新信息
+	invoice_code: String, 								// 6个纯数字
+	invoice_fileName: String,
+
 	note: String,									// 我们自己看的
 	/** ader 管理 */
 	allow_virtualOrder: {type: Boolean, default: false},		// 是否允许生成虚拟订单
@@ -55,10 +59,6 @@ const dbSchema = new Schema({
 		Cita: {type: ObjectId, ref: 'Cita'},			// 服务城市
 		price_ship: Float,								// 额外运费, 如果无则为0 
 	}],
-
-	// 发票 最新信息
-	invoice_code: String, 								// 6个纯数字
-	invoice_fileName: String,
 
 	sort: Number,									// 排序
 	tot_reserves: Number, 							// 可预定人数(餐馆用的)
