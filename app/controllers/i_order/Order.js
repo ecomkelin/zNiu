@@ -430,3 +430,35 @@ exports.printTicket = (req, res) => {
 		return MdFilter.json500(res, {message: "printTicket", error});
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+exports.invoiceOrder = async(req, res) => { 
+	console.log("/invoiceOrder");
+	try{
+		let payload = req.payload;
+		let {invoice_code, invoice_fileName, Order_id} = req.body;
+
+		if(!MdFilter.isObjectId(Order_id)) return MdFilter.jsonFailed(res, {message: "Order_id 请传递正确的数据_id"});
+		let Order = await OrderDB.findOne({_id: Order_id, Shop: payload.Shop._id || payload.Shop});
+		if(!Order) return MdFilter.jsonFailed(res, {message: "没有找到此订单信息"});
+		await OrderDB.updateOne({_id: Order_id}, {invoice_code});
+		
+		let Shop = await ShopDB.findOne({_id: payload.Shop._id || payload.Shop});
+		if(!Shop) return MdFilter.jsonFailed(res, {message: "没有找到此订店铺"});
+		await ShopDB.updateOne({_id: payload.Shop._id || payload.Shop}, {invoice_code, invoice_fileName});
+
+		return MdFilter.jsonSuccess(res, {message: "invoiceOrder", data: {object: objSave}});		
+	} catch(error) {
+		console.log("invoiceOrder Error: ", error);
+		return MdFilter.json500(res, {message: "invoiceOrder", error});
+	}
+}

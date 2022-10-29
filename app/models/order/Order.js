@@ -32,6 +32,8 @@ const dbSchema = new Schema({
 	code: String,										// 只读 产品名称
 	// path_crt: Number,								// enum: [1: 'online', 2: 'shop']
 
+	invoice_code: String, 								// 6个纯数字
+
 	is_payAfter: {type: Boolean, default: false},		// 是否货到付款
 
 	paid_info: {

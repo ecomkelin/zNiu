@@ -30,6 +30,9 @@ module.exports = (app) => {
 	app.get('/api/b1/printTicket', MdAuth.path_User, Order.printTicket);
 	app.get('/api/b1/getTickets', MdAuth.path_User, Order.getTickets);
 
+	/** 发票 */
+	app.post('/api/b1/invoiceOrder', MdAuth.path_User, Order.invoiceOrder);
+
 	/* ------------------- Order_status ------------------- */
 	app.put('/api/b1/Order_change_status/:id', MdAuth.path_User, Order_status.Order_change_status);
 

@@ -69,6 +69,23 @@ exports.RecordPost_func = (payload, recordObj, object, obj={}) => {
 
 }
 
+
+const Record_path_Func = (pathObj, payload, queryObj) => {
+	pathObj.Shop = payload.Shop._id || payload.Shop;
+
+	if(!queryObj) return;
+	
+	let r_dbNames = ["Prod", "Order"];
+	if(r_dbNames.includes(queryObj.dbName)) {
+		pathObj["dbName"] = queryObj.dbName;
+	}
+	if(queryObj.is_Delete) {
+		let is_Delete = (queryObj.is_Delete == 1 || queryObj.is_Delete === 'true') ? true : false;
+		pathObj["is_Delete"] = is_Delete;
+	}
+}
+
+
 const dbRecord = 'Record';
 exports.Records = async(req, res) => {
 	console.log("/Records");
@@ -78,7 +95,7 @@ exports.Records = async(req, res) => {
 			payload: payload,
 			queryObj: req.query,
 			objectDB: RecordDB,
-			path_Callback: null,
+			path_Callback: Record_path_Func,
 			dbName: dbRecord,
 		};
 		const dbs_res = await GetDB.dbs(GetDB_Filter);

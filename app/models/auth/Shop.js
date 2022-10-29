@@ -56,6 +56,10 @@ const dbSchema = new Schema({
 		price_ship: Float,								// 额外运费, 如果无则为0 
 	}],
 
+	// 发票 最新信息
+	invoice_code: String, 								// 6个纯数字
+	invoice_fileName: String,
+
 	sort: Number,									// 排序
 	tot_reserves: Number, 							// 可预定人数(餐馆用的)
 
