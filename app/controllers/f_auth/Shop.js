@@ -7,7 +7,6 @@ const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
 const MdFiles = require(path.resolve(process.cwd(), 'app/middle/MdFiles'));
 const UserDB = require(path.resolve(process.cwd(), 'app/models/auth/User'));
 const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
-const FirmDB = require(path.resolve(process.cwd(), 'app/models/auth/Firm'));
 const CitaDB = require(path.resolve(process.cwd(), 'app/models/address/Cita'));
 const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));

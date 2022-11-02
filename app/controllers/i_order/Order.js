@@ -440,6 +440,7 @@ exports.printTicket = (req, res) => {
 
 
 
+const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
 
 exports.invoiceOrder = async(req, res) => { 
 	console.log("/invoiceOrder");
