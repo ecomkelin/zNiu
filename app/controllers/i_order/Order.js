@@ -457,7 +457,7 @@ exports.invoiceOrder = async(req, res) => {
 		if(!Shop) return MdFilter.jsonFailed(res, {message: "没有找到此订店铺"});
 		await ShopDB.updateOne({_id: payload.Shop._id || payload.Shop}, {invoice_code, invoice_fileName});
 
-		return MdFilter.jsonSuccess(res, {message: "invoiceOrder", data: {object: objSave}});		
+		return MdFilter.jsonSuccess(res, {message: "invoiceOrder success 订单 及 店铺 的发票信息已经修改成功"});		
 	} catch(error) {
 		console.log("invoiceOrder Error: ", error);
 		return MdFilter.json500(res, {message: "invoiceOrder", error});
