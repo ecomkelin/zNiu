@@ -197,6 +197,14 @@ const Prod_PdNull = async(res, obj, payload) => {
 		obj.price_regular = parseFloat(obj.price_regular);
 		obj.price_sale = isNaN(obj.price_sale) ? obj.price_regular : parseFloat(obj.price_sale);
 
+		let Supplier = null;
+		if(!MdFilter.isObjectId(obj.Supplier)) {
+			obj.Supplier = null;
+		} else {
+			Supplier = await SupplierDB.findOne({_id: obj.Supplier, Shop: Shop_id}, {code: 1, nome: 1});
+			if(!Supplier) return MdFilter.jsonFailed(res, {message: "obj.Supplier 没有次供应商"});
+		}
+
 		if(!MdFilter.isObjectId(obj.Brand)) obj.Brand = null;
 		if(!MdFilter.isObjectId(obj.Nation)) obj.Nation = null;
 		if(!MdFilter.ArrIsObjectId(obj.Categs)) obj.Categs = [];
@@ -218,7 +226,9 @@ const Prod_PdNull = async(res, obj, payload) => {
 		if(payload.Shop.allow_codeDuplicate) {
 			await change_codeMatchs_Prod(obj.code, Shop_id);
 		}
-
+		if(Supplier) {
+			save_res.data.Supplier = Supplier;
+		}
 		return MdFilter.jsonSuccess(res, save_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Prod_PdNull", error});
