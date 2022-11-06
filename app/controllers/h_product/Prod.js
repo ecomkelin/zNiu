@@ -139,7 +139,7 @@ exports.ProdPost = async(req, res) => {
 			obj = res_PdImg.data.obj;
 		}
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
-		Prod_PdNull(res, obj, payload);
+		Prod_PdNull(res, req.query, obj, payload);
 
 		} catch(error) {
 		return MdFilter.json500(res, {message: "ProdPost", error});
@@ -161,7 +161,7 @@ const change_codeMatchs_Prod = (code, Shop_id) => new Promise(async(resolve, rej
 	}
 })
 // 自己添加
-const Prod_PdNull = async(res, obj, payload) => {
+const Prod_PdNull = async(res, queryObj, obj, payload) => {
 	console.log("/Prod_PdNull")
 	try {
 		let Shop_id = payload.Shop._id || payload.Shop;
@@ -225,11 +225,11 @@ const Prod_PdNull = async(res, obj, payload) => {
 			await change_codeMatchs_Prod(obj.code, Shop_id);
 		}
 
-		if(req.query.populateObjs) {	// 如果传入populate 则重新查找
+		if(queryObj.populateObjs) {	// 如果传入populate 则重新查找
 			const GetDB_Filter = {
 				id: objSave._id,
 				payload,
-				queryObj: req.query,
+				queryObj,
 				objectDB: ProdDB,
 				path_Callback: Prod_path_Func,
 				dbName: dbProd,
