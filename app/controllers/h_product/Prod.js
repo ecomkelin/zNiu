@@ -132,21 +132,16 @@ exports.ProdPost = async(req, res) => {
 		const payload = req.payload;
 		if(payload.role < ConfUser.role_set.boss || !payload.Shop) return MdFilter.jsonFailed(res, {message: "您没有所属商店"});
 
-		if(req.body.Pd) {		// 从总公司同步
-			Prod_PdSynchronize(res, req.body.Pd, payload);
-		} else if(req.body.Pds) {	// 从公司批量同步
-			Prods_PdSynchronize(res, req.body.Pds, payload);
-		} else {	// 自己添加
-			let obj = req.body.obj;
-			if(!obj) {
-				res_PdImg = await MdFiles.PdImg_sm(req, "/Prod");
-				if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
-				obj = res_PdImg.data.obj;
-			}
-			if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
-			Prod_PdNull(res, obj, payload);
+		let obj = req.body.obj;
+		if(!obj) {
+			res_PdImg = await MdFiles.PdImg_sm(req, "/Prod");
+			if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
+			obj = res_PdImg.data.obj;
 		}
-	} catch(error) {
+		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
+		Prod_PdNull(res, obj, payload);
+
+		} catch(error) {
 		return MdFilter.json500(res, {message: "ProdPost", error});
 	}
 }
@@ -197,14 +192,8 @@ const Prod_PdNull = async(res, obj, payload) => {
 		obj.price_regular = parseFloat(obj.price_regular);
 		obj.price_sale = isNaN(obj.price_sale) ? obj.price_regular : parseFloat(obj.price_sale);
 
-		let Supplier = null;
-		if(!MdFilter.isObjectId(obj.Supplier)) {
-			obj.Supplier = null;
-		} else {
-			Supplier = await SupplierDB.findOne({_id: obj.Supplier, Shop: Shop_id}, {code: 1, nome: 1});
-			if(!Supplier) return MdFilter.jsonFailed(res, {message: "obj.Supplier 没有次供应商"});
-		}
 
+		if(!MdFilter.isObjectId(obj.Supplier)) obj.Supplier = null;
 		if(!MdFilter.isObjectId(obj.Brand)) obj.Brand = null;
 		if(!MdFilter.isObjectId(obj.Nation)) obj.Nation = null;
 		if(!MdFilter.ArrIsObjectId(obj.Categs)) obj.Categs = [];
@@ -220,118 +209,42 @@ const Prod_PdNull = async(res, obj, payload) => {
 		if(!isNaN(obj.num_batch)) obj.num_batch = parseInt(obj.num_batch);
 
 		obj.allow_backorder = (obj.allow_backorder == 1 || obj.allow_backorder === 'true') ? true : false; 
-		const save_res = await Prod_save_Prom(obj, payload, null);
-		if(save_res.status !== 200) return MdFilter.jsonFailed(res, {message: "数据库 保存错误"});
+
+		obj.Skus = [];
+		obj.is_usable = (obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') ? true: false;
+		obj.Firm = payload.Firm;
+		obj.Shop = payload.Shop._id || payload.Shop;
+		obj.User_crt = obj.User_upd = payload._id;
+		const _object = new ProdDB(obj);
+		const objSave = await _object.save();
+		if(!objSave) return MdFilter.jsonFailed(res, {message: "商品保存失败"});
+		setModify_Prods(objSave._id);	// 缓存变化
+
 		// 如果允许重复code 则需要给这些重复code的产品 匹配到一起
 		if(payload.Shop.allow_codeDuplicate) {
 			await change_codeMatchs_Prod(obj.code, Shop_id);
 		}
-		if(Supplier) {
-			save_res.data.Supplier = Supplier;
+
+		if(req.query.populateObjs) {	// 如果传入populate 则重新查找
+			const GetDB_Filter = {
+				id: objSave._id,
+				payload,
+				queryObj: req.query,
+				objectDB: ProdDB,
+				path_Callback: Prod_path_Func,
+				dbName: dbProd,
+			};
+			const db_res = await GetDB.db(GetDB_Filter);
+			db_res.message = "Prod 添加成功"
+			return MdFilter.jsonSuccess(res, db_res);
+		} else {
+			return MdFilter.jsonSuccess(res, {message: "ProdPost", data: {object: objSave}});
 		}
-		return MdFilter.jsonSuccess(res, save_res);
 	} catch(error) {
 		return MdFilter.json500(res, {message: "Prod_PdNull", error});
 	}
 }
-// 从公司同步
-const Prod_PdSynchronize = async(res, Pd_id, payload) => {
-	try {
-		if(!MdFilter.isObjectId(Pd_id)) return MdFilter.jsonFailed(res, {message: "请输入需要同步的产品_id"});
-		Pd = await PdDB.findOne({_id: Pd_id, Firm: payload.Firm});
-		if(!Pd) return MdFilter.jsonFailed(res, {message: "没有找到此同步产品信息"});
 
-		const objSame = await ProdDB.findOne({Pd: Pd_id, Shop: payload.Shop._id || payload.Shop, Firm: payload.Firm});
-		if(objSame) return MdFilter.jsonFailed(res, {message: '此商品之前已经被同步', data: {object: objSame}});
-		const obj = Pd_to_Prod(Pd);
-		const save_res = await Prod_save_Prom(obj, payload, Pd);
-		return MdFilter.jsonSuccess(res, save_res);
-	} catch(error) {
-		return MdFilter.json500(res, {message: "Prod_PdSynchronize", error});
-	}
-}
-// 从公司批量同步
-const Prods_PdSynchronize = async(res, Pds, payload) => {
-	try {
-		if(!MdFilter.ArrIsObjectId(Pds)) return MdFilter.jsonFailed(res, {message: "输入需要同步的产品 Pds 的 _id"});
-		for(let i = 0; i<Pds.length; i++) {
-			const Pd_id = Pds[i];
-			if(!MdFilter.isObjectId(Pd_id)) {
-				console.log('Prods_PdSynchronize: ['+Pd_id+'] 不是 _id');
-				continue;
-			}
-
-			Pd = await PdDB.findOne({_id: Pd_id, Firm: payload.Firm});
-			if(!Pd) {
-				console.log('Prods_PdSynchronize: ['+Pd_id+'] 没有找到产品信息');
-				continue;
-			}
-
-			const objSame = await ProdDB.findOne({Pd: Pd_id, Shop: payload.Shop._id || payload.Shop, Firm: payload.Firm});
-			if(objSame) {
-				console.log('Prods_PdSynchronize: ['+Pd_id+'] 此商品之前已经被同步');
-				continue;
-			}
-			const obj = Pd_to_Prod(Pd);
-			const save_res = await Prod_save_Prom(obj, payload, Pd);
-			if(save_res.status) console.log(save_res.message);
-		}
-		return MdFilter.jsonSuccess(res, {message: "Prods_PdSynchronize"});
-	} catch(error) {
-		return MdFilter.json500(res, {message: "Prods_PdSynchronize", error});
-	}
-}
-const Pd_to_Prod = (Pd) => {
-	const obj = {};
-	obj.Pd = Pd._id;
-	obj.sort = Pd.sort;
-
-	obj.code = Pd.code;
-	obj.nome = Pd.nome;
-	if(obj.nomeTR) obj.nomeTR = Pd.nomeTR;
-	if(obj.weight) obj.weight = Pd.weight;
-	obj.price_regular = Pd.price_regular;
-	obj.price_sale = Pd.price_sale;
-	obj.price_cost = Pd.price_cost;
-	obj.img_urls = Pd.img_urls;
-	obj.Brand = Pd.Brand;
-	obj.Nation = Pd.Nation;
-	obj.Categs = Pd.Categs;
-
-	obj.desp = Pd.desp;
-	obj.unit = Pd.unit;
-	obj.langs = Pd.langs;
-
-	obj.price_unit = obj.price_min = obj.price_max = Pd.price_regular;
-	return obj;
-}
-// 在添加 Prod 时, 店铺直接添加 公司总部同步和批量同步时 saveProd
-const Prod_save_Prom = async(obj, payload, Pd) => {
-	return new Promise(async(resolve) => {
-		try {
-			obj.Skus = [];
-			obj.is_usable = (obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') ? true: false;
-			obj.Firm = payload.Firm;
-			obj.Shop = payload.Shop._id || payload.Shop;
-			obj.User_crt = obj.User_upd = payload._id;
-			const _object = new ProdDB(obj);
-
-			const objSave = await _object.save();
-			if(!objSave) return resolve(res, {message: "商品保存失败"});
-
-			// 如果是同步 则需要把产品下的商品 _id 推送到产品中去
-			if(Pd) {
-				Pd.Prods.push(objSave._id);
-				await Pd.save();
-			}
-			setModify_Prods(objSave._id);	// 缓存变化
-			return resolve({status: 200, message: "Prod_save_Prom", data: {object: objSave}});
-		} catch(error) {
-			console.log("[resolve Prod_save_Prom]", error);
-			return resolve({status: 400, message: "[resolve Prod_save_Prom]"});
-		}
-	});
-}
 
 
 
