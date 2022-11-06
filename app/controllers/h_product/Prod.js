@@ -454,8 +454,6 @@ exports.ProdPut = async(req, res) => {
 				}
 			}
 
-			
-
 			if(obj.nome) obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();	// 注意 Pd nome 没有转大写
 			if(obj.nome !== Prod.nome) {
 				if(payload.Shop.is_Pnome) {
@@ -472,6 +470,7 @@ exports.ProdPut = async(req, res) => {
 			if(Prod.nomeTR) Prod.nomeTR = Prod.nomeTR.replace(/^\s*/g,"");	// 注意 Pd nomeTR 没有转大写
 			if(!isNaN(parseFloat(obj.weight))) Prod.weight = parseFloat(obj.weight);
 
+			if(MdFilter.isObjectId(obj.Supplier)) Prod.Supplier = obj.Supplier;
 			if(MdFilter.isObjectId(obj.Nation)) Prod.Nation = obj.Nation;
 			if(MdFilter.isObjectId(obj.Brand)) Prod.Brand = obj.Brand;
 			if(MdFilter.ArrIsObjectId(obj.Categs)) {
