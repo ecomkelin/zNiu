@@ -218,6 +218,7 @@ const OrderDelete_Prom = (payload, id) => {
 		}
 	})
 }
+exports.OrderDelete_Prom = OrderDelete_Prom;
 
 
 

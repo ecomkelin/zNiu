@@ -16,7 +16,7 @@ const CitaDB = require(path.resolve(process.cwd(), 'app/models/address/Cita'));
 const PaidtypeDB = require(path.resolve(process.cwd(), 'app/models/finance/Paidtype'));
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
-
+const {OrderDelete_Prom} = require("./Order");
 
 
 
