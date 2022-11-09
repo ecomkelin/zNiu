@@ -391,7 +391,7 @@ exports.ProdPut = async(req, res) => {
 			}
 
 			if(obj.nome) obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();	// 注意 Pd nome 没有转大写
-			if(obj.nome !== Prod.nome) {
+			if(obj.nome && obj.nome !== Prod.nome) {
 				if(Shop.is_Pnome) {
 					PdnomeCT.PnomePlus_prom(payload, obj.nome);
 					PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
