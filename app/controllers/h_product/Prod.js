@@ -11,6 +11,7 @@ const CategDB = require(path.resolve(process.cwd(), 'app/models/complement/Categ
 const PdDB = require(path.resolve(process.cwd(), 'app/models/product/Pd'));
 const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 const SkuDB = require(path.resolve(process.cwd(), 'app/models/product/Sku'));
+const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
 
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
@@ -164,8 +165,11 @@ const change_codeMatchs_Prod = (code, Shop_id) => new Promise(async(resolve, rej
 const Prod_PdNull = async(res, queryObj, obj, payload) => {
 	console.log("/Prod_PdNull")
 	try {
-		let Shop_id = payload.Shop._id || payload.Shop;
 		obj.Pd = null;
+		
+		let Shop_id = payload.Shop._id || payload.Shop;
+		let Shop = await ShopDB.findOne({_id: Shop_id}, {allow_codeDuplicate: 1, is_Pnome: 1});
+		if(!Shop) return MdFilter.jsonFailed(res, {message: "店铺信息错误 请联系管理员"});
 
 		obj.code = obj.code.replace(/^\s*/g,"").toUpperCase();
 		obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();
@@ -176,12 +180,12 @@ const Prod_PdNull = async(res, queryObj, obj, payload) => {
 		obj.is_quick = (obj.is_quick == 1 || obj.is_quick === 'true') ? true: false;
 
 		// code是否可重复
-		if(payload.Shop.allow_codeDuplicate !== true) {
+		if(Shop.allow_codeDuplicate !== true) {
 			const objSame = await ProdDB.findOne({'code': obj.code, Shop: Shop_id});
 			if(objSame) return MdFilter.jsonFailed(res, {message: "已经有此产品编号相同"});
 		}
 
-		if(payload.Shop.is_Pnome) PdnomeCT.PnomePlus_prom(payload, obj.nome);
+		if(Shop.is_Pnome) PdnomeCT.PnomePlus_prom(payload, obj.nome);
 
 		if(!isNaN(obj.weight)) obj.weight = parseFloat(obj.weight);
 
@@ -213,7 +217,7 @@ const Prod_PdNull = async(res, queryObj, obj, payload) => {
 		obj.Skus = [];
 		obj.is_usable = (obj.is_usable == 1 || obj.is_usable === true || obj.is_usable === 'true') ? true: false;
 		obj.Firm = payload.Firm;
-		obj.Shop = payload.Shop._id || payload.Shop;
+		obj.Shop = Shop_id;
 		obj.User_crt = obj.User_upd = payload._id;
 		const _object = new ProdDB(obj);
 		const objSave = await _object.save();
@@ -221,7 +225,7 @@ const Prod_PdNull = async(res, queryObj, obj, payload) => {
 		setModify_Prods(objSave._id);	// 缓存变化
 
 		// 如果允许重复code 则需要给这些重复code的产品 匹配到一起
-		if(payload.Shop.allow_codeDuplicate) {
+		if(Shop.allow_codeDuplicate) {
 			await change_codeMatchs_Prod(obj.code, Shop_id);
 		}
 
@@ -261,13 +265,17 @@ exports.ProdDelete = async(req, res) => {
 
 		const id = req.params.id;
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
+		
+		let Shop_id = payload.Shop._id || payload.Shop;
+		let Shop = await ShopDB.findOne({_id: Shop_id}, {allow_codeDuplicate: 1, is_Pnome: 1});
+		if(!Shop) return MdFilter.jsonFailed(res, {message: "店铺信息错误 请联系管理员"});
 
 		const pathObj = {_id: id};
 		Prod_path_Func(pathObj, payload);
 		const Prod = await ProdDB.findOne(pathObj);
 		if(!Prod) return MdFilter.jsonFailed(res, {message: "没有找到此商品信息,请刷新重试"});
 		
-		if(payload.Shop.is_Pnome) PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
+		if(Shop.is_Pnome) PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
 
 		const code = Prod.code;
 
@@ -284,8 +292,8 @@ exports.ProdDelete = async(req, res) => {
 
 		setModify_Prods(Prod._id, true);	// 缓存变化
 
-		if(payload.Shop.allow_codeDuplicate) {
-			await change_codeMatchs_Prod(code, payload.Shop._id || payload.Shop);
+		if(Shop.allow_codeDuplicate) {
+			await change_codeMatchs_Prod(code, Shop_id);
 		}
 
 		if(Prod.img_url && Prod.img_url.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_url);
@@ -299,12 +307,17 @@ exports.ProdDelete = async(req, res) => {
 	}
 }
 
+
 exports.ProdPut = async(req, res) => {
 	console.log("/ProdPut");
 	try{
 		const payload = req.payload;
 		const id = req.params.id;
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
+
+		let Shop_id = payload.Shop._id || payload.Shop;
+		let Shop = await ShopDB.findOne({_id: Shop_id}, {allow_codeDuplicate: 1, is_Pnome: 1});
+		if(!Shop) return MdFilter.jsonFailed(res, {message: "店铺信息错误 请联系管理员"});
 
 		const pathObj = {_id: id};
 		Prod_path_Func(pathObj, payload);
@@ -359,8 +372,8 @@ exports.ProdPut = async(req, res) => {
 			newCode = obj.code;
 
 			// code是否可重复
-			if(obj.code !== Prod.code) {
-				if(payload.Shop.allow_codeDuplicate){
+			if(obj.code && obj.code !== Prod.code) {
+				if(Shop.allow_codeDuplicate){
 					need_matchs = true;
 				} else {
 					// 如果输入了 编号 则编号必须是唯一;  注意 Prod code 没有转大写
@@ -368,7 +381,7 @@ exports.ProdPut = async(req, res) => {
 					if(errorInfo) return MdFilter.jsonFailed(res, {message: errorInfo});
 					const objSame = await ProdDB.findOne({
 						'code': obj.code,
-						Shop: payload.Shop._id || payload.Shop,
+						Shop: Shop_id,
 						_id: {'$ne': Prod._id}
 					});
 					if(objSame) return MdFilter.jsonFailed(res, {message: "产品编号相同"});
@@ -379,7 +392,7 @@ exports.ProdPut = async(req, res) => {
 
 			if(obj.nome) obj.nome = obj.nome.replace(/^\s*/g,"").toUpperCase();	// 注意 Pd nome 没有转大写
 			if(obj.nome !== Prod.nome) {
-				if(payload.Shop.is_Pnome) {
+				if(Shop.is_Pnome) {
 					PdnomeCT.PnomePlus_prom(payload, obj.nome);
 					PdnomeCT.PnomeMenus_prom(payload, Prod.nome);
 				}
@@ -408,7 +421,7 @@ exports.ProdPut = async(req, res) => {
 					Prod.Categs = [];
 					for(i in obj.Categs) {
 						let Categ_id = obj.Categs[i];
-						let Categ = await CategDB.findOne({_id: Categ_id, Shop: payload.Shop._id || payload.Shop});
+						let Categ = await CategDB.findOne({_id: Categ_id, Shop: Shop_id});
 						if(!Categ) return MdFilter.jsonFailed(res, {message: "没有找到此 Categ"});
 						if(Categ.num_sons) return MdFilter.jsonFailed(res, {message: "此 Categ 有子分类 不能被添加产品"});
 						Prod.Categs.push(Categ._id);
@@ -451,8 +464,8 @@ exports.ProdPut = async(req, res) => {
 		setModify_Prods(Prod._id); // 缓存变化
 
 		if(need_matchs) {
-			change_codeMatchs_Prod(orgCode, payload.Shop._id || payload.Shop);
-			change_codeMatchs_Prod(newCode, payload.Shop._id || payload.Shop);
+			change_codeMatchs_Prod(orgCode, Shop_id);
+			change_codeMatchs_Prod(newCode, Shop_id);
 		}
 
 		RecordCT.RecordPost_func(payload, {dbName: dbProd}, ProdObj, obj);
