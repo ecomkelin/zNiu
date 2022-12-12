@@ -1,5 +1,6 @@
 const path = require('path');
 const StintClient = require(path.resolve(process.cwd(), 'app/config/stint/StintClient'));
+const StintFirm = require(path.resolve(process.cwd(), 'app/config/stint/StintFirm'));
 const StintShop = require(path.resolve(process.cwd(), 'app/config/stint/StintShop'));
 const StintUser = require(path.resolve(process.cwd(), 'app/config/stint/StintUser'));
 const StintPd = require(path.resolve(process.cwd(), 'app/config/stint/StintPd'));
@@ -9,6 +10,7 @@ const StintBrand = require(path.resolve(process.cwd(), 'app/config/stint/StintBr
 
 module.exports = {
 	Client: StintClient,
+	Firm: StintFirm,
 	Shop: StintShop,
 	User: StintUser,
 	Pd: StintPd,
