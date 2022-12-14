@@ -165,6 +165,8 @@ const Categ_general = async(res, obj, Categ, payload) => {
 			Categ.img_url = obj.img_url;
 		}
 
+		if(isNaN(obj.sort)) Categ.sort = parseInt(obj.sort);
+
 		// 如果不是顶级分类 并且新的父分类与原父分类不同
 		if(obj.Categ_far && (obj.Categ_far != Categ.Categ_far)) {
 
