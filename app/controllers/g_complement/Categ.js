@@ -92,8 +92,7 @@ exports.CategDelete = async(req, res) => {
 		if(Categ_sons) return MdFilter.jsonFailed(res, {message: "请先删除其子分类"});
 
 		let Prods = await ProdDB.find({Categs: Categ._id});
-		console.log(111, Prods);
-		if(Prods) return MdFilter.jsonFailed(res, {message: "分类下还有产品, 尽量改名 别删除"});
+		if(Prods && Prods.length > 0) return MdFilter.jsonFailed(res, {message: "分类下还有产品, 尽量改名 别删除"});
 
 		if(Categ.img_url && Categ.img_url.split("Categ").length > 1) await MdFiles.rmPicture(Categ.img_url);
 		let objDel = await CategDB.deleteOne({_id: Categ._id});
