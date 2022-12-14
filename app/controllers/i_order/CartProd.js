@@ -187,6 +187,30 @@ exports.CartProdDelete = async(req, res) => {
 	}
 }
 
+/** 购物车删除 */
+exports.CartProdDeleteMany = async(req, res) => {
+	console.log("/CartProdDelete");
+	try{
+		const payload = req.payload;
+
+		const id = req.params.id;		// 所要更改的CartProd的id
+		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
+
+        const paramObj = {_id: id, Shop: payload.Shop._id || payload.Shop};
+        if(!payload.role) {
+            paramObj.Client = payload._id;
+        }
+        const CartProd = await CartProdDB.findOne(paramObj);
+		if(!CartProd) return MdFilter.jsonFailed(res, {message: "没有找到此CartProd信息"});
+
+		const objDel = await CartProdDB.deleteOne({_id: id});
+
+		return MdFilter.jsonSuccess(res, {message: "CartProdDelete"});
+	} catch(error) {
+		return MdFilter.json500(res, {message: "CartProdDelete", error});
+	}
+}
+
 /** 购物车修改 */
 exports.CartProdPut = async(req, res) => {
 	console.log("/CartProdPut");

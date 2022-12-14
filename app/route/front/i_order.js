@@ -18,6 +18,7 @@ module.exports = (app) => {
 	app.put('/api/v1/CartProd/:id', MdAuth.path_Client, CartProd.CartProdPut);
 	app.get('/api/v1/CartProds', MdAuth.path_Client, CartProd.CartProds);
 	app.delete('/api/v1/CartProd/:id', MdAuth.path_Client, CartProd.CartProdDelete);
+	app.delete('/api/v1/CartProdDeleteMany', MdAuth.path_Client, CartProd.CartProdDeleteMany);
 
 	/* ============================== Order ============================== */
 	app.post('/api/v1/Order', MdAuth.path_Client, Order_post.OrderPost_CartProd);

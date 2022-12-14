@@ -70,9 +70,11 @@ exports.logout = async(req, res, objectDB) => {
 exports.login = async(req, res, objectDB) => {
 	console.log("/login")
 	try{
-		// console.log(req.body)
+		/** 获取数据库数据 User / Client */
 		const Obj_res = await obtain_payload(req.body.system, req.body.social, objectDB);
 		if(Obj_res.status !== 200) return MdFilter.jsonRes(res, Obj_res);
+
+		/** 给数据token */
 		const payload = Obj_res.data.object;
 		if(!payload) return MdFilter.jsonFailed(res, {message: "登陆失败"});
 		const accessToken = MdJwt.generateToken(payload);
