@@ -140,6 +140,7 @@ const obtain_payload = (system_obj, social_obj, objectDB) => {
 				}
 				if(social_res.status !== 200) return resolve({status: social_res.status, message: social_res.message});
 				// 获取第三方的 唯一标识 user_id
+				console.log(social_res);
 				const user_id = social_res.data.user_id;
 				if(!user_id) return resolve({status: 400, message: "没有找到 user_id 请联系后端"});
 
