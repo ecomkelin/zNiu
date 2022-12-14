@@ -5,89 +5,83 @@ const ProdDB = require(path.resolve(process.cwd(), 'app/models/product/Prod'));
 
 const GetDB = require(path.resolve(process.cwd(), 'app/controllers/_db/GetDB'));
 
-/** 只有Client 控制 */
-exports.CartProdPost = async(req, res) => {
-	console.log("/CartProdPost");
+
+/** 加一个商品进入购物车 只有Client使用 */
+exports.CartProd_plusProd = async(req, res) => {
+	console.log("/CartProd_plusProd");
 	try{
 		const payload = req.payload;
 
-		// 判断 基本参数 是否正确
-		const obj = req.body.obj;
-		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的obj数据"});
-        obj.quantity = parseInt(obj.quantity);
-        if(isNaN(obj.quantity) || obj.quantity < 1) obj.quantity = 1;
-
-        obj.sort = parseInt(obj.sort);
-        if(isNaN(obj.sort) ) obj.sort = 0; 
-
-
-		if(!MdFilter.isObjectId(obj.Shop)) return MdFilter.jsonFailed(res, {message: "请传递 Shop _id 信息"});
-        obj.Client = payload._id;
-
-		if(!MdFilter.isObjectId(obj.Prod)) return MdFilter.jsonFailed(res, {message: "请传递 Prod _id 信息"});
-        const Prod = await ProdDB.findOne({_id: obj.Prod, Shop: obj.Shop}, {price_sale: 1});
-        if(!Prod) return MdFilter.jsonFailed(res, {message: "没有此商品信息"});
-        obj.is_delete_Prod = false;
-        
-        obj.price_sale = Prod.price_sale;
-        obj.is_priceChange = false;
-
-
-		const _CartProd = new CartProdDB(obj);
-
-		const objSave = await _CartProd.save();
-		if(!objSave) return MdFilter.jsonFailed(res, {message: "数据库保存错误"});
-
-		return MdFilter.jsonSuccess(res, {data: {object: objSave}});
-	} catch(error) {
-		return MdFilter.json500(res, {message: "CartProdPost", error});
-	}
-}
-
-exports.CartProdPut = async(req, res) => {
-	console.log("/CartProdPut");
-	try{
-		const payload = req.payload;
-
-		const id = req.params.id;		// 所要更改的CartProd的id
-		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
+		const Prod_id = req.params.Prod_id;		// 所要更改的Prod_id
+		if(!MdFilter.isObjectId(Prod_id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
         // 判断 基本参数 是否正确
-		const obj = req.body.general;
-		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的obj数据"});
+        const paramObj = {Shop: payload.Shop, Client: payload._id, Prod: Prod_id};
 
-        const paramObj = {_id: id};
-        if(payload.role) {
-            paramObj.Shop = payload.Shop._id || payload.Shop;
-        } else {
-            paramObj.Client = payload._id;
-        }
-        const CartProd = await CartProdDB.findOne(paramObj);
-		if(!CartProd) return MdFilter.jsonFailed(res, {message: "没有找到此CartProd信息"});
+		let object = null;
+		const CartProd = await CartProdDB.findOne(paramObj);
+		if(CartProd) {
+			CartProd.quantity += 1;
+			object = await CartProd.save();
+			if(!object) return MdFilter.jsonFailed(res, {message: "预定 数据库保存错误"});
+		} else {
+			// 判断 基本参数 是否正确
+			const obj = {};
+			obj.quantity = 1;
+			obj.sort = 0;
 
-		if(obj.quantity) {
-			obj.quantity = parseInt(obj.quantity);
-			if(isNaN(obj.quantity)) return MdFilter.jsonFailed(res, {message: "请输入桌子能容纳几人"});
-			CartProd.quantity = obj.quantity;
+			obj.Shop = payload.Shop;
+			obj.Client = payload._id;
+
+			const Prod = await ProdDB.findOne({_id: Prod_id, Shop: obj.Shop}, {price_sale: 1});
+			if(!Prod) return MdFilter.jsonFailed(res, {message: "没有此商品信息"});
+			obj.is_delete_Prod = false;
+			
+			obj.price_sale = Prod.price_sale;
+			obj.is_priceChange = false;
+
+			const _CartProd = new CartProdDB(obj);
+
+			object = await _CartProd.save();
+			if(!object) return MdFilter.jsonFailed(res, {message: "数据库保存错误"});
 		}
-
-		if(obj.sort) {
-			obj.sort = parseInt(obj.sort);
-			if(isNaN(obj.sort)) return MdFilter.jsonFailed(res, {message: "请输入桌子能容纳几人"});
-			CartProd.sort = obj.sort;
-		}
-
-		const objSave = await CartProd.save();
-		if(!objSave) return MdFilter.jsonFailed(res, {message: "预定 数据库保存错误"});
-
-		return MdFilter.jsonSuccess(res, {message: "CartProdPut", data: {object: objSave}});
+		return MdFilter.jsonSuccess(res, {message: "CartProd_plusProd", data: {object}});
 	} catch(error) {
-		return MdFilter.json500(res, {message: "CartProdPut", error});
+		return MdFilter.json500(res, {message: "CartProd_plusProd", error});
+	}
+}
+/** 减一个商品从购物车减去 只有Client使用 */
+exports.CartProd_menusProd = async(req, res) => {
+	console.log("/CartProd_menusProd");
+	try{
+		const payload = req.payload;
+
+		const Prod_id = req.params.Prod_id;		// 所要更改的Prod_id
+		if(!MdFilter.isObjectId(Prod_id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
+
+        // 判断 基本参数 是否正确
+        const paramObj = {Shop: payload.Shop, Client: payload._id, Prod: Prod_id};
+
+		const CartProd = await CartProdDB.findOne(paramObj);
+		if(CartProd) return MdFilter.jsonFailed(res, {message: "没有找到此CartProd信息"});
+
+		CartProd.quantity -= 1;
+		if(CartProd.quantity === 0) {		
+			const objDel = await CartProdDB.deleteOne({_id: id});
+			return MdFilter.jsonSuccess(res, {message: "CartProd_menusProd 成功 已从购物车中移除"});
+		} else {
+			const objSave = await CartProd.save();
+			if(!objSave) return MdFilter.jsonFailed(res, {message: "预定 数据库保存错误"});
+			return MdFilter.jsonSuccess(res, {message: "CartProd_menusProd", data: {object: objSave}});
+		}
+
+	} catch(error) {
+		return MdFilter.json500(res, {message: "CartProd_menusProd", error});
 	}
 }
 
-/** 只有Client 控制 */
-exports.CartProdPut_Prod = async(req, res) => {
+/** 购物车修改确认 只有Client 控制 */
+exports.CartProdPut_confirm = async(req, res) => {
 	console.log("/CartProdPut");
 	try{
 		const payload = req.payload;
@@ -120,7 +114,56 @@ exports.CartProdPut_Prod = async(req, res) => {
 	}
 }
 
-// 只有总部可以删除
+
+
+
+
+
+/** 只有Client 控制 */
+exports.CartProdPost = async(req, res) => {
+	console.log("/CartProdPost");
+	try{
+		const payload = req.payload;
+
+		// 判断 基本参数 是否正确
+		const obj = req.body.obj;
+		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的obj数据"});
+        obj.quantity = parseInt(obj.quantity);
+        if(isNaN(obj.quantity) || obj.quantity < 1) obj.quantity = 1;
+
+        obj.sort = parseInt(obj.sort);
+        if(isNaN(obj.sort) ) obj.sort = 0; 
+
+        obj.Client = payload._id;
+        obj.Shop = payload.Shop;
+
+		if(!MdFilter.isObjectId(obj.Prod)) return MdFilter.jsonFailed(res, {message: "请传递 Prod _id 信息"});
+
+		const existObj = await CartProdDB.findOne({Shop: obj.Shop, Client: obj.Client, Prod: obj.Prod});
+		if(existObj) return MdFilter.jsonFailed(res, {message: "已经加入了购物车"});
+
+        const Prod = await ProdDB.findOne({_id: obj.Prod, Shop: obj.Shop}, {price_sale: 1});
+        if(!Prod) return MdFilter.jsonFailed(res, {message: "没有此商品信息"});
+        obj.is_delete_Prod = false;
+        
+        obj.price_sale = Prod.price_sale;
+        obj.is_priceChange = false;
+
+
+		const _CartProd = new CartProdDB(obj);
+
+		const objSave = await _CartProd.save();
+		if(!objSave) return MdFilter.jsonFailed(res, {message: "数据库保存错误"});
+
+		return MdFilter.jsonSuccess(res, {data: {object: objSave}});
+	} catch(error) {
+		return MdFilter.json500(res, {message: "CartProdPost", error});
+	}
+}
+
+
+
+/** 购物车删除 */
 exports.CartProdDelete = async(req, res) => {
 	console.log("/CartProdDelete");
 	try{
@@ -129,10 +172,8 @@ exports.CartProdDelete = async(req, res) => {
 		const id = req.params.id;		// 所要更改的CartProd的id
 		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
-        const paramObj = {_id: id};
-        if(payload.role) {
-            paramObj.Shop = payload.Shop._id || payload.Shop;
-        } else {
+        const paramObj = {_id: id, Shop: payload.Shop._id || payload.Shop};
+        if(!payload.role) {
             paramObj.Client = payload._id;
         }
         const CartProd = await CartProdDB.findOne(paramObj);
@@ -143,6 +184,47 @@ exports.CartProdDelete = async(req, res) => {
 		return MdFilter.jsonSuccess(res, {message: "CartProdDelete"});
 	} catch(error) {
 		return MdFilter.json500(res, {message: "CartProdDelete", error});
+	}
+}
+
+/** 购物车修改 */
+exports.CartProdPut = async(req, res) => {
+	console.log("/CartProdPut");
+	try{
+		const payload = req.payload;
+
+		const id = req.params.id;		// 所要更改的CartProd的id
+		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
+
+        // 判断 基本参数 是否正确
+		const obj = req.body.general;
+		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的obj数据"});
+
+        const paramObj = {_id: id, Shop: payload.Shop._id || payload.Shop};
+        if(!payload.role) {
+            paramObj.Client = payload._id;
+        }
+        const CartProd = await CartProdDB.findOne(paramObj);
+		if(!CartProd) return MdFilter.jsonFailed(res, {message: "没有找到此CartProd信息"});
+
+		if(obj.quantity) {
+			obj.quantity = parseInt(obj.quantity);
+			if(isNaN(obj.quantity)) return MdFilter.jsonFailed(res, {message: "请输入桌子能容纳几人"});
+			CartProd.quantity = obj.quantity;
+		}
+
+		if(obj.sort) {
+			obj.sort = parseInt(obj.sort);
+			if(isNaN(obj.sort)) return MdFilter.jsonFailed(res, {message: "请输入桌子能容纳几人"});
+			CartProd.sort = obj.sort;
+		}
+
+		const objSave = await CartProd.save();
+		if(!objSave) return MdFilter.jsonFailed(res, {message: "预定 数据库保存错误"});
+
+		return MdFilter.jsonSuccess(res, {message: "CartProdPut", data: {object: objSave}});
+	} catch(error) {
+		return MdFilter.json500(res, {message: "CartProdPut", error});
 	}
 }
 

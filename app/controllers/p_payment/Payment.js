@@ -3,7 +3,6 @@ const paypal = require("@paypal/checkout-server-sdk");
 const path = require('path');
 const ConfOrder = require(path.resolve(process.cwd(), 'app/config/conf/ConfOrder'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
-const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
 const OrderDB = require(path.resolve(process.cwd(), 'app/models/order/Order'));
 const payPalClient = require(path.resolve(process.cwd(), 'app/controllers/p_payment/paypal/payPalClient'));
 
@@ -219,6 +218,318 @@ exports.stripePayment = async(req, res) => {
 
 
 
+
+
+
+
+
+
+const axios = require('axios');
+const fs = require('fs');
+const PRIMARY_PEM = fs.readFileSync(path.join(__dirname, './weixin/XXX_key.pem'));
+const { v4: uuidv4 } = require('uuid');
+const appid = process.env.WX_APPID;
+const mchid = process.env.WX_MCHID;
+const mchip = process.env.MCH_IP;
+const shop_key = process.env.WX_SHOP_KEY;
+const notify_url = process.env.NOTIFY_URL;
+const MD5 = require('md5');
+const ClientDB = require(path.resolve(process.cwd(), 'app/models/auth/Client'));
+
+/** 前台付款 叫此接口 此接口 给腾讯服务器 付款信息 */
+exports.wxPayment =  async (req, res) => {
+	console.log('/v1/wxPayment');
+	try {
+		let payload = req.payload;
+		
+		const Client = await ClientDB.findOne({_id: payload._id});
+		if(!Client) return res.json({status: 400, message: "没有找到客户"});
+		const {socials} = Client;
+		if(socials.length < 1) return res.json({status: 400, message: "没有用第三方登录"});
+		let openid = null;
+		// console.log(socials);
+		for(let i=0; i<socials.length; i++) {
+			let social = socials[i];
+			if(social.social_type === 'wx') {
+				openid = social.social_id;
+				break;
+			}
+		}
+
+		if(!openid) return res.json({status: 400, message: 'openid error'});
+		let {OrderId} = req.body;
+		let items_res = await getSkus_Prom(OrderId, payload);
+		if(items_res.status !== 200) return res.json(items_res);
+		let {order_items, Order} = items_res.data;
+		let out_trade_no = Order._id;
+		let total_fee = parseInt(Order.total_sale*100);
+
+		/* ======== 读取服务商接口 ============= */
+		let service = 'pay.weixin.jspay';							// 7
+		let mch_id = mchid;											// 4
+		let is_raw = 1;												// 2
+		// let out_trade_no = Order._id;							// 11
+		let body = 'body_description';								// 1
+		let sub_openid = openid;									// 9 	oz0WQ5FKV39_48Lf4Rcyo6Ux2TrY
+		let sub_appid = appid;										// 8	wx48c5ff852226c6ff
+		// let total_fee = 1;										// 10
+		let mch_create_ip = mchip;									// 3
+		// let notify_url = process.env.NOTIFY_URL					// 6 	https://unioncityitaly.com
+		let nonce_str = uuidv4().replace(/-/g, '').substr(0,16);	// 5  	1277e4e29f4240d2
+		let stringA = 'body='+body
+			stringA += '&is_raw='+is_raw
+			stringA += '&mch_create_ip='+mch_create_ip
+			stringA += '&mch_id='+mch_id
+			stringA += '&nonce_str='+nonce_str
+			stringA += '&notify_url='+notify_url
+			stringA += '&out_trade_no='+out_trade_no
+			stringA += '&service='+service
+			stringA += '&sub_appid='+sub_appid
+			stringA += '&sub_openid='+sub_openid
+			stringA += '&total_fee='+total_fee;
+
+		let key = shop_key;
+		let stringSignTemp = stringA+'&key='+key;
+		let sign = MD5(stringSignTemp).toUpperCase();
+		// console.log(111, 'stringSignTemp', stringSignTemp);
+		let xmls = `
+		<xml>
+		    <body>${body}</body>
+		    <is_raw>${is_raw}</is_raw>
+		    <mch_create_ip>${mch_create_ip}</mch_create_ip>
+		    <mch_id>${mch_id}</mch_id>
+		    <nonce_str>${nonce_str}</nonce_str>
+		    <notify_url>${notify_url}</notify_url>
+		    <out_trade_no>${out_trade_no}</out_trade_no>
+		    <service>${service}</service>
+		    <sub_appid>${sub_appid}</sub_appid>
+		    <sub_openid>${sub_openid}</sub_openid>
+		    <total_fee>${total_fee}</total_fee>
+		    <sign>${sign}</sign>
+		</xml>
+		`
+		// console.log(222, 'xmlTemp', xmls);
+
+		let result = await axios.post(
+			'https://pay.wepayez.com/pay/gateway', 
+			xmls, 
+			{
+				headers: {'Content-Type': 'text/xml'}
+			}
+		);
+		let {data} = result;
+		// console.log(333, 'result.data', data);
+		let pay_info = data.split('pay_info');
+		if(pay_info.length < 2) return res.json({status: 400, message: "付款失败 1"});
+		pay_info = pay_info[1].split('><![CDATA[');
+		if(pay_info.length < 2) return res.json({status: 400, message: "付款失败 2"});
+		pay_info = pay_info[1].split(']]><');
+		if(pay_info.length < 2) return res.json({status: 400, message: "付款失败 3"});
+		pay_info=JSON.parse(pay_info[0]);
+
+		return res.json({status: 200, data: {...pay_info}});
+	} catch (e) {
+		console.log("wxPayment error:   -------", e)
+		return res.json({ error: e.message })
+	}
+}
+/**  */
+exports.wxPaymentSuccess = async(req, res) => {
+	try {
+		let payload = req.payload;
+		let {OrderId} = req.body;
+		let Order = await OrderDB.findOne({_id: OrderId});
+		if(!Order) return res.json({status: 400, message: "没有找到订单"});
+
+		/* === 前端权限 === */
+		Order.status = ConfOrder.status_obj.responding.num;
+		Order.type_paid = ConfOrder.type_paid_obj.wx.num;
+		Order.is_paid = true;
+		const OrderSave = await Order.save();
+		if(!OrderSave) return res.json({status: 400, message: "[server] wxPaymentSuccess OrderSave Error"});
+		/* === 前端权限 === */
+
+		return res.json({ status: 200});
+	} catch(err) {
+		return res.json({status: 500, error: err.message})
+	}
+}
+/** 通知 */
+exports.wx_notify_url = async(req, res) => {
+	console.log("/v1/wx_notify_url");
+	try {
+		/* ===== 查询订单的正确性 ===== */
+		// let {xml} = req.body;
+		// let {out_trade_no , transaction_id} = xml;
+		/* *
+		let url = 'https://api.mch.weixin.qq.com/v3/pay/transactions/
+		url += out-trade-no/'+out_trade_no;
+		url += id/'+transaction_id;
+		url += +'?mchid='+appid;
+
+		let result = await axios.get(url);
+		let OrderId = result.out-trade-no;
+		let Order = await OrderDB.findOne({_id: OrderId});
+		if(!Order) return res.json({status: 400, message: "没有找到到Order"});
+		Order.status = ConfOrder.status_obj.responding.num;
+		let OrderSave = await Order.save();
+		if(!OrderSave) return res.json({status: 400, message: "业务更改失败"});
+		*/
+		/* ===== 查询订单的正确性 ===== */
+
+		res.header("Content-Type", "application/xml");
+		return res.status(200).send('success');
+	} catch(err) {
+		res.header("Content-Type", "application/xml");
+		return res.status(500).send('fail');
+	}
+}
+
+
+
+exports.wxPayment_simple =  async(req, res) => {
+	console.log("/v1/wxPayment");
+	try{
+		let {openid} = req.body;
+
+		let serial_no = 'XXX';
+		let description = out_trade_no = 'Order_id';
+		let total = 1;
+		let currency_XXX = 'CNY';
+
+		let bodyPrepay = {
+			appid, mchid, description, out_trade_no, notify_url,
+			amount: {
+				total,
+				currency: currency_XXX
+			},
+			payer: {
+				openid
+			},
+		};
+
+		let timestamp = Date.now();
+		let nonce_str = uuidv4();
+		let msgAuth = `POST\n
+			/v3/pay/transactions/jsapi\n
+			${timestamp}\n
+			${nonce_str}\n
+			${JSON.stringify(bodyPrepay)}\n`
+		// 签名 msgAuth, PRIMARY_PEM
+		let signature = sign(msgAuth, PRIMARY_PEM);
+
+		let result = await axios.post(
+			'https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi', 
+			bodyPrepay, 
+			{
+				headers: {
+					Authorization: `WECHATPAY2-SHA256-RSA2048 mchid="${mchid}",serial_no="${serial_no}",nonce_str="${nonce_str}",timestamp="${timestamp}",signature="${signature}`
+				}
+			}
+		)
+
+		const {prepay_id} = result.data;
+		const package = `prepay_id=${prepay_id}`;
+		return res.json({status: 200, data: {
+			timestamp: String(timestamp),
+			nonceStr: nonce_str,
+			package,
+			signType: 'RSA',
+			paySign: `${appid}\n${timestamp}\n${nonce_str}\n${package}\n`,
+			
+		}})
+	} catch(err) {
+		console.log(err);
+		return res.json({status: 500})
+	}
+};
+
+const {createSign} = require('crypto');
+const sign = (message, privateKey) => {
+    return createSign('sha256WithRSAEncryption').update(message).sign(
+        privateKey,
+        'base64',
+    );
+};
+
+
+exports.wxPayment_b =  async (req, res) => {
+	try {
+		let payload = req.payload;
+		
+		let {OrderId, openid} = req.body;
+		if(!openid) return res.json({status: 400, message: "没有传递openid"});
+
+		let items_res = await getSkus_Prom(OrderId, payload);
+		if(items_res.status !== 200) return res.json(items_res);
+		let {order_items, Order} = items_res.data;
+
+		let serial_no = 'XXX';
+		let description = out_trade_no = 'Order_id';
+		let total = 1;
+		let currency_XXX = 'CNY';
+
+		let bodyPrepay = {
+			appid, mchid, description, out_trade_no, notify_url,
+			amount: {
+				total,
+				currency: currency_XXX
+			},
+			payer: {
+				openid
+			},
+		};
+
+		let timestamp = Date.now();
+		let nonce_str = uuidv4();
+		let msgAuth = `POST\n
+			/v3/pay/transactions/jsapi\n
+			${timestamp}\n
+			${nonce_str}\n
+			${JSON.stringify(bodyPrepay)}\n`
+		// 签名 msgAuth, PRIMARY_PEM
+		let signature = sign(msgAuth, PRIMARY_PEM);
+
+		let result = await axios.post(
+			'https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi', 
+			bodyPrepay, 
+			{
+				headers: {
+					Authorization: `WECHATPAY2-SHA256-RSA2048 mchid="${mchid}",serial_no="${serial_no}",nonce_str="${nonce_str}",timestamp="${timestamp}",signature="${signature}`
+				}
+			}
+		)
+
+		const {prepay_id} = result.data;
+		const package = `prepay_id=${prepay_id}`;
+		return res.json({status: 200, data: {
+			timestamp: String(timestamp),
+			nonceStr: nonce_str,
+			package,
+			signType: 'RSA',
+			paySign: `${appid}\n${timestamp}\n${nonce_str}\n${package}\n`,
+			
+		}})
+	} catch (e) {
+		console.log("wxPayment_b error:   -------", e)
+		return res.json({ error: e.message })
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const getSkus_Prom = (OrderId, payload) => {
 	return new Promise(async(resolve) => {
 		try{
@@ -266,4 +577,23 @@ const getSkus_Prom = (OrderId, payload) => {
 			return resolve({status: 400, message: "[resolve getSkus_Prom]"});
 		}
 	})
+}
+
+/** 货到付款 */
+exports.payAfter =  async (req, res) => {
+	console.log("/v1/payAfter");
+	try {
+		const payload = req.payload;
+		const OrderId = req.body.OrderId;
+		const Order = await OrderDB.findOne({_id: OrderId, Client: payload._id});
+
+		Order.type_paid = ConfOrder.type_paid_obj.cash.num;
+		Order.status = ConfOrder.status_obj.responding.num;
+		const OrderSave = await Order.save();
+
+		return res.json({status: 200, data: {OrderSave}});
+	} catch (e) {
+		console.log("payAfter error:   -------", e)
+		return res.json({ error: e.message })
+	}
 }

@@ -9,14 +9,20 @@ const colection = 'Home';
 
 const dbSchema = new Schema({
     Shop: {type: ObjectId, ref: 'Shop'},
+
     // sources: [],
-    code: String,
+    title: String,
+    desc: String,
+    keywords: String,
 
     slides: [{
         img_url: String,
         title: String,
         desc: String,
         link: String,
+
+        at_crt: Date,								// [只读 绝对]
+        at_upd: Date,								// [只读 绝对]
     }],
 
     categs: [{
@@ -26,8 +32,6 @@ const dbSchema = new Schema({
         img_url: String,
         Prods: [{type: ObjectId, ref: 'Prod'}]
     }],
-	at_crt: Date,								// [只读 绝对]
-	at_upd: Date,								// [只读 绝对]
 });
 
 module.exports = mongoose.model(colection, dbSchema);

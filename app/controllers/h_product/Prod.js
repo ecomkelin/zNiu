@@ -428,7 +428,6 @@ exports.ProdPut = async(req, res) => {
 					}
 				}
 			}
-			
 
 			if(obj.price_regular || obj.price_regular == 0) {
 				obj.price_regular = parseFloat(obj.price_regular);

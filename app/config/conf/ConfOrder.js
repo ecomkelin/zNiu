@@ -1,7 +1,6 @@
 module.exports = {
 	status_Arrs: [10, 100, 200, 400, 700, 800],
 	status: {
-		// 0: 		'购物车',
 		10: 	'已取消',
 		// 70: 	'付款失败',
 		100: 	'客户正在下单',
@@ -11,14 +10,13 @@ module.exports = {
 		800: 	'已完成',
 	},
 	status_obj: {
-		// cart:	{num: 0, 	val: '购物车' 		},
 		cancel:		{num: 10, 	val: '已取消' 		},
-		// failPay:	{num: 70, 	val: '付款失败' 		},
+		// failPay:	{num: 70, 	val: '付款失败' 	},
 		placing:	{num: 100, 	val: '客户正在下单'	},
-		responding:	{num: 200, 	val: '等待商家接单' 	},
-		preparing:	{num: 400, 	val: '正在配货' 		},
-		shipping:	{num: 700, 	val: '正在发货' 		},
-		completed:	{num: 800, 	val: '已完成' 		},
+		responding:	{num: 200, 	val: '等待商家接单' },
+		preparing:	{num: 400, 	val: '正在配货' },
+		shipping:	{num: 700, 	val: '正在发货' },
+		completed:	{num: 800, 	val: '已完成' },
 	},
 	status_confirms: [10, 70],	// 从 购物车 取消订单 超时订单 失败订单 确认生成订单
 

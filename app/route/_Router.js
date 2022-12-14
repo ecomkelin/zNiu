@@ -22,6 +22,7 @@ module.exports = (app) => {
 	require('./back/h_product')(app);
 	require('./back/i_order')(app);
 	require('./back/j_finance')(app);
+	require('./back/v_page')(app);
 	require('./back/z_other')(app);
 
 	require('./front/b_authorization')(app);

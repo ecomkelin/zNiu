@@ -19,7 +19,7 @@ exports.Order_change_status = async(req, res) => {
 		if(!action) return MdFilter.jsonFailed(res, {message: "请传递您对订单的操作"});
 
 		let action_prom = null;
-		if(payload.Firm) {
+		if(payload.role) {
 			if(action === ConfOrder.action.back.confirm) {
 				action_prom = await Order_status_confirm(id, payload);
 			} else if(action === ConfOrder.action.back.done) {
@@ -28,9 +28,10 @@ exports.Order_change_status = async(req, res) => {
 				action_prom = await Order_status_complete(id, payload);
 			}
 		} else {
-			if(action === ConfOrder.action.front.place) { // 下单
-				action_prom = await Order_status_place(id, payload);
-			} else if(action === ConfOrder.action.front.trash) {	// 客户删除订单, 客户不可见
+			// if(action === ConfOrder.action.front.place) { // 下单
+			// 	action_prom = await Order_status_place(id, payload);
+			// } else 
+			if(action === ConfOrder.action.front.trash) {	// 客户删除订单, 客户不可见
 				action_prom = await Order_status_trash(id, payload);
 			} else if(action === ConfOrder.action.front.cancel) {	// 客户取消订单
 				action_prom = await Order_status_cancel(id, payload);

@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const { ObjectId } = require('mongoose').Types;
 
 const path = require('path');
-const StintUser = require(path.resolve(process.cwd(), 'app/config/stint/StintUser'));
 const dbFilter = require(path.resolve(process.cwd(), 'app/config/dbFilter'));
 
 exports.isObjectId = id => ObjectId.isValid(id);

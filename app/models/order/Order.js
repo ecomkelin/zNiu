@@ -54,6 +54,7 @@ const dbSchema = new Schema({
 	ship_info: {
 		Cita: {type: ObjectId, ref: "Cita"},
 
+		name: String,
 		firstname: String,
 		lastname: String,
 		company: String,
