@@ -68,7 +68,7 @@ exports.logout = async(req, res, objectDB) => {
 	并记录用户的登录时间 保存到数据库
 */
 exports.login = async(req, res, objectDB) => {
-	console.log("/login")
+	console.log("/login");
 	try{
 		/** 获取数据库数据 User / Client */
 		const Obj_res = await obtain_payload(req.body.system, req.body.social, req.body.Shop, objectDB);
@@ -104,6 +104,7 @@ const obtain_payload = (system_obj, social_obj, Shop, objectDB) => {
 	return new Promise(async(resolve) => {
 		try{
 			if(system_obj) {
+				console.log(111);
 				// const param = {Shop};
 				const param = {};
 				if(system_obj.code) {
