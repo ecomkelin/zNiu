@@ -187,27 +187,27 @@ exports.CartProdDelete = async(req, res) => {
 	}
 }
 
-/** 购物车删除 */
+/** post 购物车清除 */
 exports.CartProdDeleteMany = async(req, res) => {
 	console.log("/CartProdDelete");
 	try{
 		const payload = req.payload;
 
-		const id = req.params.id;		// 所要更改的CartProd的id
-		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
-
-        const paramObj = {_id: id, Shop: payload.Shop._id || payload.Shop};
+        const paramObj = {Shop: payload.Shop._id || payload.Shop};
         if(!payload.role) {
             paramObj.Client = payload._id;
         }
-        const CartProd = await CartProdDB.findOne(paramObj);
-		if(!CartProd) return MdFilter.jsonFailed(res, {message: "没有找到此CartProd信息"});
 
-		const objDel = await CartProdDB.deleteOne({_id: id});
+		if(req.body.obj) {
+			let {CartProds} = req.body.obj;
+			if(!ArrIsObjectId(CartProds)) return MdFilter.jsonFailed(res, {message: "obj.CartProds 必须是 ObjectId 数组"});
+			paramObj["_id"] = {$in: CartProds};
+		}
+		const objDel = await CartProdDB.deleteMany(paramObj);
 
-		return MdFilter.jsonSuccess(res, {message: "CartProdDelete"});
+		return MdFilter.jsonSuccess(res, {message: "CartProdDeleteMany Success"});
 	} catch(error) {
-		return MdFilter.json500(res, {message: "CartProdDelete", error});
+		return MdFilter.json500(res, {message: "CartProdDeleteMany", error});
 	}
 }
 
