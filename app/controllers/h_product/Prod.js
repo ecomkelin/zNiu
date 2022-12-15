@@ -356,9 +356,26 @@ exports.ProdPut = async(req, res) => {
 		if(obj.desp) Prod.desp = obj.desp.replace(/^\s*/g,"");
 		if(obj.unit) Prod.unit = obj.unit.replace(/^\s*/g,"");
 
-		if(!isNaN(parseInt(obj.sort))) Prod.sort = parseInt(obj.sort);
-		if(!isNaN(parseInt(obj.quantity))) Prod.quantity = parseInt(obj.quantity);
-		if(!isNaN(parseInt(obj.quantity_alert))) Prod.quantity_alert = parseInt(obj.quantity_alert);
+		if(!isNaN(obj.sort)) Prod.sort = parseInt(obj.sort);
+		if(!isNaN(obj.quantity)) {
+			obj.quantity = parseInt(obj.quantity);
+			if(Prod.quantity !== obj.quantity) {
+				if(!Prod.qtLogs) Prod.qtLogs = [];
+				if(Prod.qtLogs.length > 50) Prod.qtLogs.pop();
+				let pre = Prod.quantity;
+				let after = obj.quantity;
+				let log = after - pre;
+				Prod.qtLogs.unshift({
+					at_crt: Date.now(),
+					desp: "手动更新", // -销售/+采购/+删除销售/-删除采购/ 手动变更
+					pre,
+					log,
+					after,
+				});
+				Prod.quantity = obj.quantity;
+			}
+		} 
+		if(!isNaN(obj.quantity_alert)) Prod.quantity_alert = parseInt(obj.quantity_alert);
 
 		if(obj.is_usable) Prod.is_usable = (obj.is_usable == 1 || obj.is_usable === 'true') ? true: false;
 		if(obj.is_quick) Prod.is_quick = (obj.is_quick == 1 || obj.is_quick === 'true') ? true: false;
@@ -489,8 +506,6 @@ exports.ProdPut = async(req, res) => {
 		return MdFilter.json500(res, {message: "ProdPut", error});
 	}
 }
-
-
 
 
 

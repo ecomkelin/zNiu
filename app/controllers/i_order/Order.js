@@ -169,7 +169,6 @@ exports.OrderDelete = async(req, res) => {
 	}
 }
 
-
 const OrderDelete_Prom = (payload, id) => {
 	// console.log("/OrderDelete_Prom");
 	return new Promise(async(resolve) => {
@@ -197,7 +196,26 @@ const OrderDelete_Prom = (payload, id) => {
 				if(OrderProd.is_simple === true) {
 					let quantity = parseInt(sign * OrderProd.quantity);
 					if(isNaN(quantity)) return resolve({status: 500, message: "OrderDelete isNaN(quantity)"});
-					await ProdDB.updateOne({"_id" : OrderProd.Prod},{$inc: {quantity}} );
+					//if(!OrderProd.is_virtual) await ProdDB.updateOne({"_id" : OrderProd.Prod},{$inc: {quantity}} );
+					if(!OrderProd.is_virtual && MdFilter.isObjectId(OrderProd.Prod)){
+						const Prod = await ProdDB.findOne({_id: Prod}, {quantity: 1, qtLogs: 1});
+						if(Prod) {
+							if(!Prod.qtLogs) Prod.qtLogs = [];
+							if(Prod.qtLogs.length > 50) Prod.qtLogs.pop();
+							let pre = Prod.quantity;
+							let log = quantity;
+							let after = pre+quantity;
+							Prod.qtLogs.unshift({
+								at_crt: Date.now(),
+								desp: (type_Order===-1) ? "删除销售" : "删除采购",
+								pre,
+								log,
+								after,
+							});
+							Prod.quantity = after;
+							await Prod.save();
+						}
+					}
 				} else {
 					for(let j=0; j<OrderProd.OrderSkus.length; j++) {
 						const OrderSku = OrderProd.OrderSkus[j];
@@ -439,7 +457,7 @@ exports.printTicket = (req, res) => {
 
 
 const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
-
+/** 给订单开发票， 修改订单的发票号码， 同时也更新本店铺的最新发票号码 */
 exports.invoiceOrder = async(req, res) => { 
 	console.log("/invoiceOrder");
 	try{
@@ -450,7 +468,7 @@ exports.invoiceOrder = async(req, res) => {
 		let Order = await OrderDB.findOne({_id: Order_id, Shop: payload.Shop._id || payload.Shop});
 		if(!Order) return MdFilter.jsonFailed(res, {message: "没有找到此订单信息"});
 		await OrderDB.updateOne({_id: Order_id}, {invoice_code});
-		
+
 		let Shop = await ShopDB.findOne({_id: payload.Shop._id || payload.Shop});
 		if(!Shop) return MdFilter.jsonFailed(res, {message: "没有找到此订店铺"});
 		await ShopDB.updateOne({_id: payload.Shop._id || payload.Shop}, {invoice_code, invoice_fileName});

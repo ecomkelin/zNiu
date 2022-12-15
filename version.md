@@ -1,3 +1,4 @@
+3.15 	Prod 金出货详情
 3.14	登录 加入 Shop, 
 3.13	CartProd的一些小bug
 3.12	Categ的一些小bug

@@ -68,6 +68,7 @@ const dbSchema = new Schema({
 	quantity_alert: {type: Number, default: 0},
 	allow_backorder: {type: Boolean, default: true},	// 允许缺货下单
 
+	/** 进出货 记录 因为库存出错 */
 	qtLogs: [{
 		at_crt: Date,
 		desp: String, // -销售/+采购/+删除销售/-删除采购/ 手动变更

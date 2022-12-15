@@ -226,7 +226,23 @@ exports.OrderPost = async(req, res) => {
 
 				if(Prod) {
 					obj_OrderProd.weight = Prod.weight || 0;
-					if(!obj_OrderProd.is_virtual) await ProdDB.updateOne({"_id" : Prod._id},{$inc: {quantity}, $set: {at_upd: Date.now()}} );
+
+					// if(!obj_OrderProd.is_virtual) await ProdDB.updateOne({"_id" : Prod._id},{$inc: {quantity}, $set: {at_upd: Date.now()}} );
+					if(!obj_OrderProd.is_virtual){
+						if(!Prod.qtLogs) Prod.qtLogs = [];
+						if(Prod.qtLogs.length > 50) Prod.qtLogs.pop();
+						let pre = Prod.quantity;
+						let log = quantity;
+						let after = pre+quantity;
+						Prod.qtLogs.unshift({
+							at_crt: Date.now(),
+							desp: (type_Order===-1) ? "销售" : "采购",
+							pre,
+							log,
+							after,
+						});
+						Prod.quantity = after;
+					}
 
 					// 如果是采购 则为price_cost 否则为 price_regular. 最后我们可以根据这些信息比较销售 价格
 					obj_OrderProd.price_regular = (type_Order === 1) ? Prod.price_cost : Prod.price_regular;
