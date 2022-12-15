@@ -136,7 +136,7 @@ const obtain_payload = (system_obj, social_obj, objectDB) => {
 					// console.log("google");
 					social_res = await googleAuth_Prom(Client_accessToken);
 				} else if(login_type === "wx") {
-					// console.log(111, Client_accessToken);
+					// console.log(Client_accessToken);
 					social_res = await weixinAuth_Prom(Client_accessToken);
 				}
 				if(social_res.status !== 200) return resolve({status: social_res.status, message: social_res.message});

@@ -291,7 +291,6 @@ exports.wxPayment =  async (req, res) => {
 		let key = shop_key;
 		let stringSignTemp = stringA+'&key='+key;
 		let sign = MD5(stringSignTemp).toUpperCase();
-		// console.log(111, 'stringSignTemp', stringSignTemp);
 		let xmls = `
 		<xml>
 		    <body>${body}</body>

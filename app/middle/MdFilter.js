@@ -117,8 +117,6 @@ exports.objMatchStint = (Stint_obj, obj, fields) => {
 	if(!Stint_obj) return 'objMatchStint 请传递正确的参数 Stint_obj';
 	if(!obj) return 'objMatchStint 请传递正确的参数 obj';
 	if(!(fields instanceof Array)) return 'objMatchStint 请传递正确的参数 fields';
-	// console.log(111, Stint_obj);
-	// console.log(222, obj);
 	for(let i=0; i<fields.length; i++) {
 		const field = fields[i];
 		const Stint_field = Stint_obj[field];

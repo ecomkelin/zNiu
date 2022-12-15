@@ -1,3 +1,4 @@
+3.13	CartProd的一些小bug
 3.12	Categ的一些小bug
 3.11	清空购物车 deleteMany
 3.10	增加了购物车

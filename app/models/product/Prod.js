@@ -68,6 +68,14 @@ const dbSchema = new Schema({
 	quantity_alert: {type: Number, default: 0},
 	allow_backorder: {type: Boolean, default: true},	// 允许缺货下单
 
+	qtLogs: [{
+		at_crt: Date,
+		desp: String, // -销售/+采购/+删除销售/-删除采购/ 手动变更
+		pre: Number,
+		log: Number,
+		after: Number,
+	}],
+
 	/* 如果 is_simple 为 false 则[只读 相对 Sku] 如果 为true[只读 绝对] */
 	price_unit: Float,								// [只读] 产品价格统一
 	price_min: Float,								// [只读] 产品最低价

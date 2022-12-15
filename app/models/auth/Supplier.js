@@ -16,7 +16,6 @@ const dbSchema = new Schema({
 	// console.log("dns_code: ", dns_code); 	// 0342
 	// plat_code = plat_code.slice(dns_code.length);
 	// let shop_code = plat_code.match(/^[a-z|A-Z]+/gi);
-	// console.log(111, shop_code[0]);			// SHP
 	// 234 为Client code
 
 	/* 基本信息 */

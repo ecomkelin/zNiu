@@ -12,7 +12,9 @@ exports.CartProd_plusProd = async(req, res) => {
 	try{
 		const payload = req.payload;
 
+		console.log(111, req.params);
 		const Prod_id = req.params.Prod_id;		// 所要更改的Prod_id
+		console.log(222, Prod_id);
 		if(!MdFilter.isObjectId(Prod_id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
         // 判断 基本参数 是否正确

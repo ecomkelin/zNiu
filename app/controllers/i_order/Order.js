@@ -277,9 +277,6 @@ const Order_path_Func = (pathObj, payload, queryObj) => {
 const dbOrder = 'Order';
 exports.Orders = async(req, res) => {
 	console.log("/Orders");
-	// console.log(111, req.query)
-	// const ods = await OrderDB.find({}).limit(5);
-	// console.log(222, ods);
 	try {
 		const payload = req.payload
 		const GetDB_Filter = {

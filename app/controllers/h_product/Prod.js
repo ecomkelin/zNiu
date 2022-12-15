@@ -578,7 +578,6 @@ exports.Prods = async(req, res) => {
 }
 
 const fNiu_zNiu = async(payload) => {
-	// console.log(111111)
 	const nowDate = new Date();
 	const ps = await ProdDB.find({Firm: payload.Firm._id});
 	for(let i=0; i<ps.length; i++) {
