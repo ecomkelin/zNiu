@@ -32,7 +32,7 @@ exports.CartProd_plusProd = async(req, res) => {
 
 			obj.Shop = payload.Shop;
 			obj.Client = payload._id;
-			console.log(111, obj.Shop)
+			console.log(111, payload)
 			const Prod1 = await ProdDB.findOne({_id: Prod_id}, {price_sale: 1});
 			console.log(Prod1);
 			const Prod = await ProdDB.findOne({_id: Prod_id, Shop: obj.Shop}, {price_sale: 1});
