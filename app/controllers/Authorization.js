@@ -11,9 +11,7 @@ const ClientDB = require(path.resolve(process.cwd(), 'app/models/auth/Client'));
 const getObject = async(objectDB, param) => new Promise(async(resolve, reject) => {
 	try {
 		param.is_usable = true;
-		console.log(222, param);
 		let object = await objectDB.findOne(param);
-		console.log(333, object);
 		return resolve(object);
 	} catch(error) {
 		return reject(error);
@@ -106,8 +104,8 @@ const obtain_payload = (system_obj, social_obj, Shop, objectDB) => {
 	return new Promise(async(resolve) => {
 		try{
 			if(system_obj) {
-				// const param = {Shop};
 				const param = {};
+				if(MdFilter.isObjectId(Shop)) param.Shop = Shop;
 				if(system_obj.code) {
 					param.code = system_obj.code.replace(/^\s*/g,"").toUpperCase();
 				} else if(system_obj.email) {
@@ -119,14 +117,13 @@ const obtain_payload = (system_obj, social_obj, Shop, objectDB) => {
 					system_obj.phoneNum = system_obj.phoneNum.replace(/^\s*/g,"").toUpperCase();
 					param.phone = system_obj.phonePre+system_obj.phoneNum;
 				}
-				console.log(111, param);
 				let object = await getObject(objectDB, param);
-				console.log(444, object);
 				if(!object) return resolve({status: 400, message: "登录失败"});
 				const pwd_match_res = await MdFilter.matchBcryptProm(system_obj.pwd, object.pwd);
 				if(pwd_match_res.status != 200) return resolve({status: 400, message: "登录失败"});
 				return resolve({status: 200, data: {object}});
 			} else if(social_obj) {
+				if(!MdFilter.isObjectId(Shop)) return resolve({status: 400, message: "请传递 Shop_id ObjectId"});
 				/* ==================== 检查第三方登录是否成功 ==================== */
 				// 从前端获取 登录类型 及第三方社交账号的 token
 				const login_type = social_obj.login_type;
