@@ -71,7 +71,7 @@ exports.login = async(req, res, objectDB) => {
 	console.log("/login")
 	try{
 		/** 获取数据库数据 User / Client */
-		const Obj_res = await obtain_payload(req.body.system, req.body.social, objectDB);
+		const Obj_res = await obtain_payload(req.body.system, req.body.social, req.body.Shop, objectDB);
 		if(Obj_res.status !== 200) return MdFilter.jsonRes(res, Obj_res);
 
 		/** 给数据token */
@@ -100,10 +100,11 @@ exports.login = async(req, res, objectDB) => {
 // 获取用户信息
 // 1 账号(code,email,phone)密码登录
 // 2 第三方登录
-const obtain_payload = (system_obj, social_obj, objectDB) => {
+const obtain_payload = (system_obj, social_obj, Shop, objectDB) => {
 	return new Promise(async(resolve) => {
 		try{
 			if(system_obj) {
+				// const param = {Shop};
 				const param = {};
 				if(system_obj.code) {
 					param.code = system_obj.code.replace(/^\s*/g,"").toUpperCase();
@@ -148,7 +149,7 @@ const obtain_payload = (system_obj, social_obj, objectDB) => {
 				/* ==================== 如果第三方授权成功 ==================== */
 				// 查看是否已登录过系统
 				// 如果已经登录 则找到此系统账号
-				let object = await getObject(objectDB, {socials: { $elemMatch: {social_type: login_type, social_id: user_id}} });
+				let object = await getObject(objectDB, {Shop, socials: { $elemMatch: {social_type: login_type, social_id: user_id}} });
 
 				// 如果此第三方账号 不在系统中 则为其创建一个 系统账号
 				if(!object) {
