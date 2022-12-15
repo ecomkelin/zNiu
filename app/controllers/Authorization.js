@@ -11,7 +11,9 @@ const ClientDB = require(path.resolve(process.cwd(), 'app/models/auth/Client'));
 const getObject = async(objectDB, param) => new Promise(async(resolve, reject) => {
 	try {
 		param.is_usable = true;
+		console.log(222, param);
 		let object = await objectDB.findOne(param);
+		console.log(333, object);
 		return resolve(object);
 	} catch(error) {
 		return reject(error);
@@ -119,6 +121,7 @@ const obtain_payload = (system_obj, social_obj, Shop, objectDB) => {
 				}
 				console.log(111, param);
 				let object = await getObject(objectDB, param);
+				console.log(444, object);
 				if(!object) return resolve({status: 400, message: "登录失败"});
 				const pwd_match_res = await MdFilter.matchBcryptProm(system_obj.pwd, object.pwd);
 				if(pwd_match_res.status != 200) return resolve({status: 400, message: "登录失败"});
