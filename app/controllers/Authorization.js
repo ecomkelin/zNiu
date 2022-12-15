@@ -156,7 +156,7 @@ const obtain_payload = (system_obj, social_obj, Shop, objectDB) => {
 					// 生成新 code
 					const result_code = await generate_codeClient();
 					if(result_code.status !== 200) return resolve(result_code);
-					const obj = {};
+					const obj = {Shop};
 					obj.socials = [{
 						social_type: login_type,
 						social_id: user_id
