@@ -104,7 +104,6 @@ const obtain_payload = (system_obj, social_obj, Shop, objectDB) => {
 	return new Promise(async(resolve) => {
 		try{
 			if(system_obj) {
-				console.log(111);
 				// const param = {Shop};
 				const param = {};
 				if(system_obj.code) {
@@ -118,7 +117,7 @@ const obtain_payload = (system_obj, social_obj, Shop, objectDB) => {
 					system_obj.phoneNum = system_obj.phoneNum.replace(/^\s*/g,"").toUpperCase();
 					param.phone = system_obj.phonePre+system_obj.phoneNum;
 				}
-
+				console.log(111, param);
 				let object = await getObject(objectDB, param);
 				if(!object) return resolve({status: 400, message: "登录失败"});
 				const pwd_match_res = await MdFilter.matchBcryptProm(system_obj.pwd, object.pwd);
