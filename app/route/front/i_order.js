@@ -10,7 +10,7 @@ const MdAuth = require(path.resolve(process.cwd(), 'app/middle/MdAuth'));
 module.exports = (app) => {
 
 	/* ============================== CartProd ============================== */
-	app.put('/api/v1/CartProd_plusProd/:prod_id', MdAuth.path_Client, CartProd.CartProd_plusProd);
+	app.put('/api/v1/CartProd_plusProd/:Prod_id', MdAuth.path_Client, CartProd.CartProd_plusProd);
 	app.put('/api/v1/CartProd_menusProd/:Prod_id', MdAuth.path_Client, CartProd.CartProd_menusProd);
 	app.put('/api/v1/CartProdPut_confirm/:id', MdAuth.path_Client, CartProd.CartProdPut_confirm);
 

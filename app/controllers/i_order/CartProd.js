@@ -12,9 +12,7 @@ exports.CartProd_plusProd = async(req, res) => {
 	try{
 		const payload = req.payload;
 
-		console.log(111, req.params);
-		const Prod_id = req.params.prod_id;		// 所要更改的Prod_id
-		console.log(222, Prod_id);
+		const Prod_id = req.params.Prod_id;		// 所要更改的Prod_id
 		if(!MdFilter.isObjectId(Prod_id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
         // 判断 基本参数 是否正确
@@ -34,7 +32,9 @@ exports.CartProd_plusProd = async(req, res) => {
 
 			obj.Shop = payload.Shop;
 			obj.Client = payload._id;
-
+			console.log(111, obj.Shop)
+			const Prod1 = await ProdDB.findOne({_id: Prod_id}, {price_sale: 1});
+			console.log(Prod1);
 			const Prod = await ProdDB.findOne({_id: Prod_id, Shop: obj.Shop}, {price_sale: 1});
 			if(!Prod) return MdFilter.jsonFailed(res, {message: "没有此商品信息"});
 			obj.is_delete_Prod = false;
