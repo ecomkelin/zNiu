@@ -194,7 +194,7 @@ exports.OrderPost_CartProd = async(req, res) => {
 		// const OSinsertMany = await OrderSkuDB.insertMany(obj_OrderSkus);
 
 		const delInfo = await CartProdDB.deleteMany({_id: {$in: delCartProd_ids}});
-		console.log("delInfo", delInfo);
+		let message = `Order_post_Client 成功, 并 把购物车 CartProd 删除了 ${delInfo.deletedCount} 条数据`;
 
 		if(req.query.populateObjs) {
 			const GetDB_Filter = {
@@ -207,9 +207,10 @@ exports.OrderPost_CartProd = async(req, res) => {
 			};
 			const db_res = await GetDB.db(GetDB_Filter);
 			console.log("post getDB");
+			db_res.message = message;
 			return MdFilter.jsonSuccess(res, db_res);
 		} else {
-			return MdFilter.jsonSuccess(res, {data: {object: OrderSave}});
+			return MdFilter.jsonSuccess(res, {message, data: {object: OrderSave}});
 		}
 
 	} catch(error) {
