@@ -142,7 +142,10 @@ exports.OrderPost_CartProd = async(req, res) => {
 
 				obj_OrderProd.prod_quantity = obj_OrderProd.quantity;
 				obj_OrderProd.prod_weight = obj_OrderProd.quantity * obj_OrderProd.weight;
+				console.log(111, obj_OrderProd.quantity)
+				console.log(222, obj_OrderProd.price_regular)
 				obj_OrderProd.prod_regular = obj_OrderProd.quantity * obj_OrderProd.price_regular;
+				console.log(333, obj_OrderProd.prod_regular)
 				obj_OrderProd.prod_sale = obj_OrderProd.quantity * obj_OrderProd.price_sale;
 				obj_OrderProd.prod_price = obj_OrderProd.quantity * obj_OrderProd.price;
 				// 生成 订单(OrderProd)数据库信息
@@ -151,6 +154,7 @@ exports.OrderPost_CartProd = async(req, res) => {
 
 			if(isNaN(_OrderProd.prod_quantity) || _OrderProd.prod_quantity < 1) return MdFilter.jsonFailed(res, {message: "订单 prod_quantity 错误"});
 			if(isNaN(_OrderProd.prod_weight)) _OrderProd.prod_weight = 0;
+			console.log(444, _OrderProd.prod_regular);
 			if(isNaN(_OrderProd.prod_regular)) return MdFilter.jsonFailed(res, {message: "订单 prod_regular 错误"});
 			if(isNaN(_OrderProd.prod_sale)) return MdFilter.jsonFailed(res, {message: "订单 prod_sale 错误"});
 			if(isNaN(_OrderProd.prod_price || _OrderProd.prod_price < 0)) return MdFilter.jsonFailed(res, {message: "订单 prod_price 错误"});
