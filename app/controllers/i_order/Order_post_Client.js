@@ -96,11 +96,13 @@ exports.OrderPost_CartProd = async(req, res) => {
 
 		const obj_OrderProds = [];
 		const obj_OrderSkus = [];
+		let delCartProd_ids = [];
 		for(let i = 0; i<CartProds.length; i++){
             const CartProd = await CartProdDB.findOne({_id: CartProds[i]});
             if(!CartProd) return MdFilter.jsonFailed(res, {message: `第${i}个 购物车商品不存在`});
             const Prod = await ProdDB.findOne({_id: CartProd.Prod, Shop: obj_Order.Shop});
             if(!Prod) return MdFilter.jsonFailed(res, {message: `第${i}个 购物车中的商品已经不存在`});
+			delCartProd_ids.push(CartProd._id);	
 
             const obj_OrderProd = {};
 			obj_OrderProd.Order = _Order._id;
@@ -191,7 +193,8 @@ exports.OrderPost_CartProd = async(req, res) => {
 		const OPinsertMany = await OrderProdDB.insertMany(obj_OrderProds);
 		// const OSinsertMany = await OrderSkuDB.insertMany(obj_OrderSkus);
 
-		await CartProdDB.deleteOne({_id: CartProd._id});
+		const delInfo = await CartProdDB.deleteMany({_id: {$in: delCartProd_ids}});
+		console.log("delInfo", delInfo);
 
 		if(req.query.populateObjs) {
 			const GetDB_Filter = {
