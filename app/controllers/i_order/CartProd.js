@@ -59,16 +59,11 @@ exports.CartProd_menusProd = async(req, res) => {
 		const Prod_id = req.params.Prod_id;		// 所要更改的Prod_id
 		if(!MdFilter.isObjectId(Prod_id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
 
-		console.log(111, "payload", payload);
-		let cp = await CartProdDB.findOne({Prod: Prod_id});
-		console.log(222, "cp", cp);
-
         // 判断 基本参数 是否正确
         const paramObj = {Shop: payload.Shop, Client: payload._id, Prod: Prod_id};
-		console.log(222, "paramObj", paramObj);
 
 		const CartProd = await CartProdDB.findOne(paramObj);
-		if(CartProd) return MdFilter.jsonFailed(res, {message: "没有找到此CartProd信息"});
+		if(!CartProd) return MdFilter.jsonFailed(res, {message: "没有找到此CartProd信息"});
 
 		CartProd.quantity -= 1;
 		if(CartProd.quantity === 0) {		
