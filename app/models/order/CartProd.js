@@ -13,7 +13,7 @@ const dbSchema = new Schema({
     is_delete_Prod: {type: Boolean, default: false},
 
     price_sale: Float,									// 添加到购物车时的价格， 如果商品价格有变化 
-    is_priceChange: {type: Boolean, default: false},        // 如果商品价格有变化
+    sale_Prod: Float,                                   // 完全等于
 
     quantity: { type: Number, default: 0 },
 

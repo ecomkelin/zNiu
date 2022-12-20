@@ -38,7 +38,7 @@ exports.CartProd_plusProd = async(req, res) => {
 			obj.is_delete_Prod = false;
 			
 			obj.price_sale = Prod.price_sale;
-			obj.is_priceChange = false;
+			obj.sale_Prod = Prod.price_sale;
 
 			const _CartProd = new CartProdDB(obj);
 
@@ -97,12 +97,8 @@ exports.CartProdPut_confirm = async(req, res) => {
             return MdFilter.jsonSuccess(res, {message: "此商品 已从购物车删除"});
         }
 
-        if(CartProd.is_priceChange) {
-            const Prod = await ProdDB.findOne({_id: CartProd.Prod}, {price_sale});
-            if(!Prod) return MdFilter.jsonFailed(res, {message: "数据库中没有 此商品"});
-
-            CartProd.price_sale = Prod.price_sale;
-
+        if(CartProd.price_sale !== CartProd.sale_Prod) {
+            CartProd.price_sale = CartProd.sale_Prod;
             const objSave = await CartProd.save();
             if(!objSave) return MdFilter.jsonFailed(res, {message: "预定 数据库保存错误"});
             return MdFilter.jsonSuccess(res, {message: "CartProdPut", data: {object: objSave}});
@@ -111,6 +107,28 @@ exports.CartProdPut_confirm = async(req, res) => {
         return MdFilter.jsonSuccess(res, {message: "CartProdPut 没有数据改变"});
 	} catch(error) {
 		return MdFilter.json500(res, {message: "CartProdPut", error});
+	}
+}
+/** 购物车修改确认 只有Client 控制 */
+exports.CartProds_confirm = async(req, res) => {
+	console.log("/CartProdPut");
+	try{
+		const payload = req.payload;
+
+        let CartProds = await CartProdDB.find({Client: payload._id});
+
+		dels = [];
+		CartProds.forEach(item => {
+			if(item.is_delete_Prod === true) dels.push(item._id);
+		});
+		CartProdDB.deleteMany({_id: dels});
+		// CartProdDB.updateMany({Client: payload._id}, {})
+		
+		CartProds = await CartProdDB.find({Client: payload._id});
+
+        return MdFilter.jsonSuccess(res, {message: "CartProds_confirm Success", data: {objects: CartProds}});
+	} catch(error) {
+		return MdFilter.json500(res, {message: "CartProds_confirm", error});
 	}
 }
 
@@ -147,8 +165,7 @@ exports.CartProdPost = async(req, res) => {
         obj.is_delete_Prod = false;
         
         obj.price_sale = Prod.price_sale;
-        obj.is_priceChange = false;
-
+        obj.sale_Prod = Prod.price_sale;
 
 		const _CartProd = new CartProdDB(obj);
 
