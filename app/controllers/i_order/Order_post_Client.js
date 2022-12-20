@@ -1,6 +1,7 @@
 const moment = require('moment');
 
 const path = require('path');
+const { CartProd } = require('./CartProd');
 const ConfOrder = require(path.resolve(process.cwd(), 'app/config/conf/ConfOrder'));
 const MdFilter = require(path.resolve(process.cwd(), 'app/middle/MdFilter'));
 const ShopDB = require(path.resolve(process.cwd(), 'app/models/auth/Shop'));
@@ -189,6 +190,8 @@ exports.OrderPost_CartProd = async(req, res) => {
 		// 返回给前端，  如果不正确 可以尝试 放到 crt_OrderProds_Fucn 中。 如果正确 要删掉 res 参数
 		const OPinsertMany = await OrderProdDB.insertMany(obj_OrderProds);
 		// const OSinsertMany = await OrderSkuDB.insertMany(obj_OrderSkus);
+
+		await CartProdDB.deleteOne({_id: CartProd._id});
 
 		if(req.query.populateObjs) {
 			const GetDB_Filter = {
