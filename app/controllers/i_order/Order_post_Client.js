@@ -34,10 +34,11 @@ exports.OrderPost_CartProd = async(req, res) => {
 	try {
 		const payload = req.payload;
 		// 判断 基本参数 是否正确
-		console.log("req.body:", req.body)
-		const {CartProds} = req.body;
+		const {CartProds, obj} = req.body;
+		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的 obj 数据"});
 		if(!CartProds) return MdFilter.jsonFailed(res, {message: "请传递正确的 CartProds 数据"});
-		const obj_Order = {};
+		const obj_Order = obj;
+		// const {type_ship, ship_info} = obj;
 
 		// 确认订单所属 (Shop)
         obj_Order.Client = payload._id;

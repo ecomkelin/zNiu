@@ -50,6 +50,7 @@ const dbSchema = new Schema({
 		phone: String,
 		note: String,
 	}],
+
 	Firm: {type: ObjectId, ref: 'Firm'},
 	Shop: {type: ObjectId, ref: 'Shop'},
 	is_active: Boolean, 								// 只读
