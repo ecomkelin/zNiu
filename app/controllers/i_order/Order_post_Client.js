@@ -34,7 +34,7 @@ exports.OrderPost_CartProd = async(req, res) => {
 	try {
 		const payload = req.payload;
 		// 判断 基本参数 是否正确
-		const {CartProds} = req.body.obj;
+		const {CartProds} = req.body;
 		if(!CartProds) return MdFilter.jsonFailed(res, {message: "请传递正确的obj数据"});
 		const obj_Order = {};
 
