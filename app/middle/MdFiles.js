@@ -4,9 +4,9 @@ const path = require('path');
 const publicPath = path.resolve(process.cwd(), 'public');
 const uploadPath = publicPath+'/upload';
 
-rename = (orgSimPath, newSimPath) => new Promise((resolve, reject) => {
+rename = (orgName, newName) => new Promise((resolve, reject) => {
 	try {
-		fs.rename(orgSimPath, newSimPath, err => {
+		fs.rename(orgName, newName, err => {
 			if(err) return reject(err);
 			return resolve({status: 200, message: "success"});
 		})
@@ -16,84 +16,59 @@ rename = (orgSimPath, newSimPath) => new Promise((resolve, reject) => {
 })
 /** 上传压缩图片
 	img_Dir: 	保存在 public/upload/ 下的哪个文件夹
-	field: 		图片 属于数据库中的哪个 field (比如 "img_url" "img_urls" "img" "imgUrl");
+	field: 		图片 属于数据库中的哪个 field (比如 "img_url" "img_urls" "img" "imgKey");
 	is_Array: 	上传的图片是单张还是多张
 	跟 mkPicture_prom 区分开的原因是 一个产品需要一个正常图片和一个压缩图片
 */
-exports.PdImg_sm = async(req, img_Dir) => {
-	return new Promise((resolve, reject) => {
-		try {
-			console.log("PdImg_sm", img_Dir)
-			let payload = req.payload;
-			let img_abs = uploadPath+img_Dir;
-			let form = formidable({ multiples: true, uploadDir: img_abs});
-			form.parse(req, async(err, fields, files) => {
-				if (err) return reject(err);
-				try {
+exports.PdImg_sm = async(req, img_Dir) => new Promise((resolve, reject) => {
+	try {
+		console.log("PdImg_sm", img_Dir)
+		let payload = req.payload;
+		let img_abs = uploadPath+img_Dir;
+		let form = formidable({ multiples: true, uploadDir: img_abs});
+		form.parse(req, async(err, fields, files) => {
+			if (err) return reject(err);
+			try {
 
-					// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
-					let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
-					obj.img_urls = [];
-					if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
-	
-					let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
+				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
+				let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
+				obj.img_urls = [];
+				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
 
-					var dateNow = Date.now();
-					let imgUrls = [];
+				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
 
-					let i = 0;// 为了 img_urls
-					for(key in files) {
-						if(key === 'img_url') {
-							let imgUrl = files[key];
-							var orgUrlPath = imgUrl.path;
-							// var orgUrlsPath = imgUrls.path;
-							// 接收 图片的路由信息 以便分类存储图片， 如果路由信息不存在, 则放入默认文件夹
-							let imgUrl_Type = imgUrl.type.split('/')[1];
-							if(!imgArrs.includes(imgUrl_Type)) {
-								this.rmPicture();
-								return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
-							}
-							var img_xs = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '_sm-' + payload._id + '.' + imgSim_Type;
-							var newSimPath = publicPath + img_xs;
-							if((await rename(orgSimPath, newSimPath)).status === 200) obj.img_xs = img_xs;
-						} else if(key === 'img_xs') {
-							let imgSim = files[key];
-							var orgSimPath = imgSim.path;
-							let imgSim_Type = imgSim.type.split('/')[1];
-							if(!imgArrs.includes(imgSim_Type)) {
-								this.rmPicture();
-								return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
-							}
-							var img_url = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '-' + payload._id + '.' + imgUrl_Type;
-							var newUrlPath = publicPath + img_url;
-							if((await rename(orgUrlPath, newUrlPath)).status === 200) obj.img_url = img_url;
-						} else {
-							let img = files[key];
-							var orgUrlPath = img.path;
-							imgUrl_Type = img.type.split('/')[1];
-							if(!imgArrs.includes(imgUrl_Type)) {
-								this.rmPicture();
-								return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
-							}
-							var img_url = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '-' + payload._id + '.' + imgUrl_Type;
-							
-							var newUrlPath = publicPath + img_url;
-		
-							if((await rename(orgUrlPath, newUrlPath)).status === 200) obj.img_urls[i++] = img_url;
-						}
+				var dateNow = Date.now();
+				let imgUrls = [];
+
+				let i = 0;// 为了 img_urls
+				for(key in files) {
+					let imgKey = files[key];
+					var orgUrlPath = imgKey.path;
+					let imgType = imgKey.type.split('/')[1];
+					if(!imgArrs.includes(imgType)) {
+						this.rmPicture();
+						return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
 					}
-	
-					return resolve({status: 200, data: {obj}});
-				} catch(e) {
-					return reject({status: 500, e})
+					var relPath = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '_sm-' + payload._id + '.' + imgType;
+					var newUrlPath = publicPath + relPath;
+
+					if((await rename(orgUrlPath, newUrlPath)).status === 200) {
+						if(key === 'img_url') obj.img_xs = img_xs;
+						else if(key === 'img_xs') obj.img_url = img_url;
+						else obj.img_urls[i++] = img_url;
+					}
 				}
-			})
-		} catch(error) {
-			console.log("PdImg_sm", error)
-			return reject(error);
-		}
-	})
-}
+
+				return resolve({status: 200, data: {obj}});
+			} catch(e) {
+				return reject({status: 500, e})
+			}
+		})
+	} catch(error) {
+		console.log("PdImg_sm", error)
+		return reject(error);
+	}
+});
 
 
 
