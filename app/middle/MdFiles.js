@@ -35,14 +35,12 @@ exports.PdImg_sm = async(req, img_Dir) => new Promise((resolve, reject) => {
 				obj.img_urls = [];
 				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
 
-				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
+				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon", "ico"];
 
 				var dateNow = Date.now();
-				let imgUrls = [];
 
 				let i = 0;// 为了 img_urls
 				for(key in files) {
-					console.log(1110000, key);
 					let imgKey = files[key];
 					var orgUrlPath = imgKey.path;
 					let imgType = imgKey.type.split('/')[1];
@@ -50,16 +48,14 @@ exports.PdImg_sm = async(req, img_Dir) => new Promise((resolve, reject) => {
 						this.rmPicture();
 						return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
 					}
-					var relPath = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '_sm-' + payload._id + '.' + imgType;
+					var relPath = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '-'+key+'-' + payload._id + '.' + imgType;
 					var newUrlPath = publicPath + relPath;
 
 					if((await rename(orgUrlPath, newUrlPath)).status === 200) {
 						if(key === 'img_url') obj.img_xs = relPath;
 						else if(key === 'img_xs') obj.img_url = relPath;
 						else {
-							console.log(111111, i);
 							obj.img_urls[i++] = relPath;
-							console.log(11111222, obj.img_urls);
 						}
 					}
 				}
