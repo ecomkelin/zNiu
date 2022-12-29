@@ -335,6 +335,7 @@ exports.ProdPut = async(req, res) => {
 			obj = res_PdImg.data.obj;
 
 			if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
+			console.log(333, obj)
 
 			if(obj.img_url) {
 				if(Prod.img_url && Prod.img_url.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_url);
