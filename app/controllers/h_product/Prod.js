@@ -344,14 +344,14 @@ exports.ProdPut = async(req, res) => {
 				if(Prod.img_xs && Prod.img_xs.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_xs);
 				Prod.img_xs = obj.img_xs;
 			}
-			// if(obj.img_urls && obj.img_urls.length > 0) {
-			// 	if(Prod.img_urls && Prod.img_urls.length > 0) {
-			// 		for(let i=0; i<Prod.img_urls.length; i++) {
-			// 			await MdFiles.rmPicture(Prod.img_urls[i]);
-			// 		};
-			// 	} 
-			// 	Prod.img_urls = obj.img_urls;
-			// }
+			if(obj.img_urls && obj.img_urls.length > 0) {
+				if(Prod.img_urls && Prod.img_urls.length > 0) {
+					for(let i=0; i<Prod.img_urls.length; i++) {
+						await MdFiles.rmPicture(Prod.img_urls[i]);
+					};
+				} 
+				Prod.img_urls = obj.img_urls;
+			}
 		}
 		if(obj.desp) Prod.desp = obj.desp.replace(/^\s*/g,"");
 		if(obj.unit) Prod.unit = obj.unit.replace(/^\s*/g,"");
