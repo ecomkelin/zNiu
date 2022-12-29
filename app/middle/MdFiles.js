@@ -29,23 +29,30 @@ exports.PdImg_sm = async(req, img_Dir) => {
 			let form = formidable({ multiples: true, uploadDir: img_abs});
 			form.parse(req, async(err, fields, files) => {
 				if (err) return reject(err);
-				if(!files.img_url || !files.img_xs) return resolve({status: 400, message: "请传递files.img_url和files.img_xs"});
+				
 				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
 				let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
 				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
-				console.log(11111, files);
+
 				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
 
-				let imgUrl = files.img_url;
-				let imgSim = files.img_xs;
-				let imgUrls = files.img_urls;
+				let imgUrl = null;
+				let imgSim = null;
+
+				let imgUrls = [];
+				for(key in files) {
+					if(key === 'img_url') imgUrl = files[key];
+					else if(key === 'img_xs') imgSim = files[key];
+					else imgUrls.push(files[key])
+				}
+
 				var orgUrlPath = imgUrl.path;
 				var orgSimPath = imgSim.path;
-				var orgUrlsPath = imgUrls.path;
+
+				// var orgUrlsPath = imgUrls.path;
 				// 接收 图片的路由信息 以便分类存储图片， 如果路由信息不存在, 则放入默认文件夹
 				let imgUrl_Type = imgUrl.type.split('/')[1];
 				let imgSim_Type = imgSim.type.split('/')[1];
-				let imgUrls_Type = imgUrls.type.split('/')[1];
 
 				if(!imgArrs.includes(imgUrl_Type) || !imgArrs.includes(imgSim_Type) || !imgArrs.includes(imgUrls_Type)) {
 					this.rmPicture();
@@ -55,11 +62,42 @@ exports.PdImg_sm = async(req, img_Dir) => {
 				var dateNow = Date.now();
 				var img_url = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '-' + payload._id + '.' + imgUrl_Type;
 				var img_xs = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '_sm-' + payload._id + '.' + imgSim_Type;
+
+				for(let i=0; i<imgUrls.length; i++) {
+					var orgUrlPath = imgUrls[i].path;
+
+					let imgUrl_Type = imgUrls[i].type.split('/')[1];
+
+					if(!imgArrs.includes(imgUrl_Type)) {
+						this.rmPicture();
+						return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
+					}
+
+					var img_url = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '-' + payload._id + '.' + imgUrl_Type;
+				}
+
 				var newUrlPath = publicPath + img_url;
 				var newSimPath = publicPath + img_xs;
 
 				if((await rename(orgUrlPath, newUrlPath)).status === 200) obj.img_url = img_url;
 				if((await rename(orgSimPath, newSimPath)).status === 200) obj.img_xs = img_xs;
+
+				for(let i=0; i<imgUrls.length; i++) {
+					var orgUrlPath = imgUrls[i].path;
+
+					let imgUrl_Type = imgUrls[i].type.split('/')[1];
+
+					if(!imgArrs.includes(imgUrl_Type)) {
+						this.rmPicture();
+						return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
+					}
+
+					var img_url = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '-' + payload._id + '.' + imgUrl_Type;
+
+					var newUrlPath = publicPath + img_url;
+
+					if((await rename(orgUrlPath, newUrlPath)).status === 200) obj.img_urls[i] = img_url;
+				}
 
 				return resolve({status: 200, data: {obj}});
 			})
@@ -99,6 +137,13 @@ exports.mkPicture_prom = async(req, {img_Dir, field, is_Array}) => {
 				const warnMsg = {};
 				warnMsg.files = [];
 				multiplesPic_Func(resolve, obj, field, img_Dir, warnMsg, files, keys, payload._id, lenFile, 0);
+
+				// for(key in files) {	// 前端传递的文件数量
+				// 	if(files[key] && files[key].path) {
+						
+				// 	}
+				// }
+
 			})
 		} catch(error) {
 			console.log("mkPicture_prom", error)
@@ -157,3 +202,74 @@ exports.rmPicture = (oldfliepath) => {
 		});
 	}
 }
+
+
+
+
+/** 前台传输的 file 文件 展示
+ * 
+ * {
+  img_url: File {
+    _events: [Object: null prototype] {},
+    _eventsCount: 0,
+    _maxListeners: undefined,
+    size: 139441,
+    path: '/root/server/dev/public/upload/Prod/upload_59a66d02e98fb57fdb6eb7b5ede87e8b',
+    name: 'app_startup_image.png',
+    type: 'image/png',
+    hash: null,
+    lastModifiedDate: 2022-12-29T17:11:11.042Z,
+    _writeStream: WriteStream {
+      _writableState: [WritableState],
+      writable: false,
+      _events: [Object: null prototype] {},
+      _eventsCount: 0,
+      _maxListeners: undefined,
+      path: '/root/server/dev/public/upload/Prod/upload_59a66d02e98fb57fdb6eb7b5ede87e8b',
+      fd: null,
+      flags: 'w',
+      mode: 438,
+      start: undefined,
+      autoClose: true,
+      pos: undefined,
+      bytesWritten: 139441,
+      closed: true,
+      [Symbol(kFs)]: [Object],
+      [Symbol(kCapture)]: false,
+      [Symbol(kIsPerformingIO)]: false
+    },
+    [Symbol(kCapture)]: false
+  },
+  img_xs: File {
+    _events: [Object: null prototype] {},
+    _eventsCount: 0,
+    _maxListeners: undefined,
+    size: 10090,
+    path: '/root/server/dev/public/upload/Prod/upload_8858675d9e15b57361d424a5ff070ba9',
+    name: 'blob',
+    type: 'image/png',
+    hash: null,
+    lastModifiedDate: 2022-12-29T17:11:11.043Z,
+    _writeStream: WriteStream {
+      _writableState: [WritableState],
+      writable: false,
+      _events: [Object: null prototype] {},
+      _eventsCount: 0,
+      _maxListeners: undefined,
+      path: '/root/server/dev/public/upload/Prod/upload_8858675d9e15b57361d424a5ff070ba9',
+      fd: null,
+      flags: 'w',
+      mode: 438,
+      start: undefined,
+      autoClose: true,
+      pos: undefined,
+      bytesWritten: 10090,
+      closed: false,
+      [Symbol(kFs)]: [Object],
+      [Symbol(kCapture)]: false,
+      [Symbol(kIsPerformingIO)]: false
+    },
+    [Symbol(kCapture)]: false
+  }
+}
+ */
