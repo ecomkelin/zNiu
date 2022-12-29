@@ -55,11 +55,13 @@ exports.PdImg_sm = async(req, img_Dir) => new Promise((resolve, reject) => {
 					if((await rename(orgUrlPath, newUrlPath)).status === 200) {
 						if(key === 'img_url') obj.img_xs = relPath;
 						else if(key === 'img_xs') obj.img_url = relPath;
-						else obj.img_urls[i++] = relPath;
-						console.log(111, obj);
+						else {
+							console.log(111111, i);
+							obj.img_urls[i++] = relPath;
+							console.log(11111222, obj.img_urls);
+						}
 					}
 				}
-				console.log(222, obj);
 				return resolve({status: 200, data: {obj}});
 			} catch(e) {
 				return reject({status: 500, e})
