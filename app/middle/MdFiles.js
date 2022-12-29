@@ -32,6 +32,7 @@ exports.PdImg_sm = async(req, img_Dir) => {
 				
 				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
 				let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
+				obj.img_urls = [];
 				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
 
 				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
