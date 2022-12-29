@@ -42,6 +42,7 @@ exports.PdImg_sm = async(req, img_Dir) => new Promise((resolve, reject) => {
 
 				let i = 0;// 为了 img_urls
 				for(key in files) {
+					console.log(1110000, key);
 					let imgKey = files[key];
 					var orgUrlPath = imgKey.path;
 					let imgType = imgKey.type.split('/')[1];
