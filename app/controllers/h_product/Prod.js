@@ -510,6 +510,72 @@ exports.ProdPut = async(req, res) => {
 
 
 
+exports.ProdPut_imgs = async(req, res) => {
+	console.log("/ProdPut_imgs");
+	try{
+		const payload = req.payload;
+		const id = req.params.id;
+		if(!MdFilter.isObjectId(id)) return MdFilter.jsonFailed(res, {message: "请传递正确的数据_id"});
+
+		/** 找到这个 Prod */
+		const pathObj = {_id: id};
+		Prod_path_Func(pathObj, payload);
+		const Prod = await ProdDB.findOne(pathObj);
+		if(!Prod) return MdFilter.jsonFailed(res, {message: "没有找到此商品信息"});
+
+		if(req.body.general) {
+			/** 删除 img_urls */
+			let del_imgs = req.body.general;
+			if(!(del_imgs instanceof Array)) return MdFilter.jsonFailed(res, {message: "请传递需要删除的 imgs 的url"});
+			let fail_urls = [];
+			for(let i=0; i<del_imgs.length; i++) {
+				let j=0;
+				for(; j<Prod.img_urls.length; j++) {
+					if(Prod.img_urls[j] === del_imgs[i]) {
+						if(Prod.img_urls[j].split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_urls[j]);
+						break;
+					}
+				}
+				if(j < Prod.img_urls.l) {
+					Prod.img_urls.splice(j, 1);
+				} else {
+					fail_urls.push(del_imgs[i]);
+				}
+			}
+		} else {
+			/** 给产品 添加 上传新的 img_urls */
+			let res_PdImg = await MdFiles.PdImg_sm(req, {img_Dir: "/Area", field: "img_url"});
+			if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
+			let obj = res_PdImg.data.obj;
+			if(!obj || !(obj.img_urls instanceof Array)) return MdFilter.jsonFailed(res, {message: "产品多图 上传错误"});
+
+			for(let i = 0; i<obj.img_urls.length; i++) {
+				Prod.img_urls.push(obj.img_urls[i]);
+			}
+		}
+		let ProdSave = await Prod.save();
+
+
+		if(req.query.populateObjs) {	// 如果传入populate 则重新查找
+			const GetDB_Filter = {
+				id: objSave._id,
+				payload,
+				queryObj: req.query,
+				objectDB: ProdDB,
+				path_Callback: Prod_path_Func,
+				dbName: dbProd,
+			};
+			const db_res = await GetDB.db(GetDB_Filter);
+			db_res.message = "Prod 修改成功"
+			return MdFilter.jsonSuccess(res, db_res);
+		} else {
+			return MdFilter.jsonSuccess(res, {message: "ProdPut_imgs", data: {object: ProdSave}});
+		}
+		
+	} catch(error) {
+		return MdFilter.json500(res, {message: "ProdPut_imgs", error});
+	}
+}
 
 
 

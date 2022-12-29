@@ -3,10 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const publicPath = path.resolve(process.cwd(), 'public');
 const uploadPath = publicPath+'/upload';
-/*
+/** 上传压缩图片
 	img_Dir: 	保存在 public/upload/ 下的哪个文件夹
 	field: 		图片 属于数据库中的哪个 field (比如 "img_url" "img_urls" "img" "imgUrl");
 	is_Array: 	上传的图片是单张还是多张
+	跟 mkPicture_prom 区分开的原因是 一个产品需要一个正常图片和一个压缩图片
 */
 exports.PdImg_sm = async(req, img_Dir) => {
 	return new Promise((resolve, reject) => {
@@ -17,10 +18,10 @@ exports.PdImg_sm = async(req, img_Dir) => {
 			let form = formidable({ multiples: true, uploadDir: img_abs});
 			form.parse(req, (err, fields, files) => {
 				if (err) return reject(err);
+				if(!files.img_url || !files.img_xs) return resolve({status: 400, message: "请传递files.img_url和files.img_xs"});
 				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
 				let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
 				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
-				if(!files.img_url || !files.img_xs) return resolve({status: 400, message: "请传递files.img_url和files.img_xs"});
 
 				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
 
@@ -67,7 +68,7 @@ exports.PdImg_sm = async(req, img_Dir) => {
 
 
 
-
+/** 上传正常的图片 */
 exports.mkPicture_prom = async(req, {img_Dir, field, is_Array}) => {
 	return new Promise((resolve, reject) => {
 		try {
