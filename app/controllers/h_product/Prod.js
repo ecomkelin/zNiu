@@ -536,7 +536,7 @@ exports.ProdPut_imgs = async(req, res) => {
 						break;
 					}
 				}
-				if(j < Prod.img_urls.l) {
+				if(j < Prod.img_urls.length) {
 					Prod.img_urls.splice(j, 1);
 				} else {
 					fail_urls.push(del_imgs[i]);
@@ -544,7 +544,7 @@ exports.ProdPut_imgs = async(req, res) => {
 			}
 		} else {
 			/** 给产品 添加 上传新的 img_urls */
-			let res_PdImg = await MdFiles.PdImg_sm(req, {img_Dir: "/Area", field: "img_url"});
+			let res_PdImg = await MdFiles.mkPicture_prom(req, {img_Dir: "/Prod", field: "img_urls", is_Array: true});
 			if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
 			let obj = res_PdImg.data.obj;
 			if(!obj || !(obj.img_urls instanceof Array)) return MdFilter.jsonFailed(res, {message: "产品多图 上传错误"});

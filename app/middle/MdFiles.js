@@ -3,6 +3,17 @@ const fs = require('fs');
 const path = require('path');
 const publicPath = path.resolve(process.cwd(), 'public');
 const uploadPath = publicPath+'/upload';
+
+rename = (orgSimPath, newSimPath) => new Promise((resolve, reject) => {
+	try {
+		fs.rename(orgSimPath, newSimPath, err => {
+			if(err) return reject(err);
+			return resolve({status: 200, message: "success"});
+		})
+	} catch(e) {
+		reject(e);
+	}
+})
 /** 上传压缩图片
 	img_Dir: 	保存在 public/upload/ 下的哪个文件夹
 	field: 		图片 属于数据库中的哪个 field (比如 "img_url" "img_urls" "img" "imgUrl");
@@ -16,7 +27,7 @@ exports.PdImg_sm = async(req, img_Dir) => {
 			let payload = req.payload;
 			let img_abs = uploadPath+img_Dir;
 			let form = formidable({ multiples: true, uploadDir: img_abs});
-			form.parse(req, (err, fields, files) => {
+			form.parse(req, async(err, fields, files) => {
 				if (err) return reject(err);
 				if(!files.img_url || !files.img_xs) return resolve({status: 400, message: "请传递files.img_url和files.img_xs"});
 				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
@@ -42,21 +53,10 @@ exports.PdImg_sm = async(req, img_Dir) => {
 				var newUrlPath = publicPath + img_url;
 				var newSimPath = publicPath + img_xs;
 
-				fs.rename(orgUrlPath, newUrlPath, err => {
-					if(err) {
-						console.log("img_url", err)
-						return resolve({status: 400, message: "您传递的 img_url 错误"});
-					}
-					obj.img_url = img_url;
-					fs.rename(orgSimPath, newSimPath, err => {
-						if(err) {
-							console.log("img_xs", err)
-							return resolve({status: 400, message: "您传递的 img_xs 错误"});
-						}
-						obj.img_xs = img_xs;
-						return resolve({status: 200, data: {obj}})
-					})
-				})
+				if((await rename(orgUrlPath, newUrlPath)).status === 200) obj.img_url = img_url;
+				if((await rename(orgSimPath, newSimPath)).status === 200) obj.img_xs = img_xs;
+
+				return resolve({status: 200, data: {obj}});
 			})
 		} catch(error) {
 			console.log("PdImg_sm", error)
