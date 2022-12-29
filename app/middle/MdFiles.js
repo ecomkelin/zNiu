@@ -33,20 +33,25 @@ exports.PdImg_sm = async(req, img_Dir) => {
 				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
 				let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
 				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
-
+				console.log(11111, files);
 				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon"];
 
 				let imgUrl = files.img_url;
 				let imgSim = files.img_xs;
+				let imgUrls = files.img_urls;
 				var orgUrlPath = imgUrl.path;
 				var orgSimPath = imgSim.path;
+				var orgUrlsPath = imgUrls.path;
 				// 接收 图片的路由信息 以便分类存储图片， 如果路由信息不存在, 则放入默认文件夹
 				let imgUrl_Type = imgUrl.type.split('/')[1];
 				let imgSim_Type = imgSim.type.split('/')[1];
-				if(!imgArrs.includes(imgUrl_Type) || !imgArrs.includes(imgSim_Type)) {
+				let imgUrls_Type = imgUrls.type.split('/')[1];
+
+				if(!imgArrs.includes(imgUrl_Type) || !imgArrs.includes(imgSim_Type) || !imgArrs.includes(imgUrls_Type)) {
 					this.rmPicture();
 					return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
 				}
+
 				var dateNow = Date.now();
 				var img_url = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '-' + payload._id + '.' + imgUrl_Type;
 				var img_xs = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '_sm-' + payload._id + '.' + imgSim_Type;
@@ -79,11 +84,15 @@ exports.mkPicture_prom = async(req, {img_Dir, field, is_Array}) => {
 				if (err) return reject(err);
 				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
 				const obj = (fields.obj) ? JSON.parse(fields.obj) : {};
+
+				/** 如果后端控制器给的是数组 比如 img_urls */
 				if(is_Array) obj[field] = [];
+
 				if(!files) return resolve(obj);	// 如果没有传递正确的 file文件 则直接返回
+
 				let lenFile = 0;
 				let keys = [];
-				for(key in files) {
+				for(key in files) {	// 前端传递的文件数量
 					keys.push(key);
 					lenFile++;
 				}
