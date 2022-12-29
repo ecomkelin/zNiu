@@ -85,6 +85,7 @@ exports.PdImg_sm = async(req, img_Dir) => {
 					if((await rename(orgSimPath, newSimPath)).status === 200) obj.img_xs = img_xs;
 	
 					for(let i=0; i<imgUrls.length; i++) {
+						console.log(111, imgUrls[i])
 						var orgUrlPath = imgUrls[i].path;
 	
 						let imgUrl_Type = imgUrls[i].type.split('/')[1];
@@ -93,10 +94,12 @@ exports.PdImg_sm = async(req, img_Dir) => {
 							this.rmPicture();
 							return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
 						}
-	
+						
 						var img_url = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '-' + payload._id + '.' + imgUrl_Type;
-	
+						console.log(222, img_url)
+						
 						var newUrlPath = publicPath + img_url;
+						console.log(333, newUrlPath)
 	
 						if((await rename(orgUrlPath, newUrlPath)).status === 200) obj.img_urls[i] = img_url;
 					}
