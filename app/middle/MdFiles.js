@@ -53,9 +53,9 @@ exports.PdImg_sm = async(req, img_Dir) => new Promise((resolve, reject) => {
 					var newUrlPath = publicPath + relPath;
 
 					if((await rename(orgUrlPath, newUrlPath)).status === 200) {
-						if(key === 'img_url') obj.img_xs = img_xs;
-						else if(key === 'img_xs') obj.img_url = img_url;
-						else obj.img_urls[i++] = img_url;
+						if(key === 'img_url') obj.img_xs = relPath;
+						else if(key === 'img_xs') obj.img_url = relPath;
+						else obj.img_urls[i++] = relPath;
 					}
 				}
 
