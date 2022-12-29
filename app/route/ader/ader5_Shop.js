@@ -57,6 +57,7 @@ module.exports = (app) => {
 			obj.allow_virtualOrder = obj.allow_virtualOrder ? true : false;	// 是否允许生成虚拟订单
 			obj.allow_codeDuplicate = obj.allow_codeDuplicate ? true : false;	// 是否允许多code
 			obj.allow_Supplier = obj.allow_Supplier ? true : false;	// 是否允许 有专属供应商
+			obj.allow_online = obj.allow_online ? true : false;	// 是否允许 有专属供应商
 
 			obj.is_Pnome = obj.is_Pnome ? true : false;			// 是否存储产品名称
 
@@ -80,6 +81,7 @@ module.exports = (app) => {
 			obj.allow_virtualOrder = obj.allow_virtualOrder ? true : false;
 			obj.allow_codeDuplicate = obj.allow_codeDuplicate ? true : false;
 			obj.allow_Supplier = obj.allow_Supplier ? true : false;
+			obj.allow_online = obj.allow_online ? true : false;
 			obj.is_Pnome = obj.is_Pnome ? true : false;
 
 			if(obj.code) {

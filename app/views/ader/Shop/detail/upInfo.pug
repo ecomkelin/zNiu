@@ -56,6 +56,14 @@ a.btn.btn-warning(href="#", data-toggle="modal", data-target="#upInfo") 修改�
 								else
 									input#allow_Supplier.form-check-input(type="checkbox", name="obj[allow_Supplier]")
 					.form-group.row
+						label.col-3.col-form-label(for="allow_online") 是否允许线上经营
+						.col-9
+							.form-check.form-check-inline
+								if Shop.allow_online
+									input#allow_online.form-check-input(type="checkbox", name="obj[allow_online]" checked)
+								else
+									input#allow_online.form-check-input(type="checkbox", name="obj[allow_online]")
+					.form-group.row
 						label.col-3.col-form-label(for="is_Pnome") 存产品名
 						.col-9
 							.form-check.form-check-inline

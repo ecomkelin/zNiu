@@ -21,6 +21,7 @@ block content
 							th(title="是否允许店铺加入虚拟订单") 虚拟订单
 							th(title="是否允许不同供应商有相同的产品号") 同产品号
 							th(title="是否允许加入专属供应商") 专属供应商
+							th(title="可以看到Categ等信息") 线上经营
 							th(title="是否存储产品名称, 暂时全部存储 只是前台显不显示") 存产品名
 							th 所属公司
 							th.del_show 删除
@@ -46,6 +47,11 @@ block content
 										span 否
 								td
 									if Shop.allow_Supplier === true
+										span 是
+									else
+										span 否
+								td
+									if Shop.allow_online === true
 										span 是
 									else
 										span 否

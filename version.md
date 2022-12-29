@@ -1,3 +1,4 @@
+3.17	Shop 加入 allow_online 线上经营模式
 3.16 	OrderPost_Client
 3.15 	Prod 金出货详情
 3.14	登录 加入 Shop, 

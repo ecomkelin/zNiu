@@ -43,6 +43,13 @@ table.mt-3.table.table-hover
 			else
 				span 否
 	tr
+		td: strong 线上经营:
+		td
+			if Shop.allow_online === true
+				span 是
+			else
+				span 否
+	tr
 		td: strong 是否要加载产品名称:
 		td
 			if Shop.is_Pnome === true

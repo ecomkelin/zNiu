@@ -33,6 +33,7 @@ const dbSchema = new Schema({
 	allow_virtualOrder: {type: Boolean, default: false},		// 是否允许生成虚拟订单
 	allow_codeDuplicate: {type: Boolean, default: false}, // 是否允许重复code, 重复code需要添加 codeMatchs
 	allow_Supplier: {type: Boolean, default: false},	// 在产品上 是否允许专属供应商 产品code显示为 code(产品)-code(供应商)
+	allow_online: {type: Boolean, default: false},		// 是否允许线上经营 如果允许 那么商家可以看到 Categ 等线上运营信息
 
 	is_Pnome: {type: Boolean, default: false},	// 是否使用 Pnome
 	is_main: {type: Boolean, default: false},	// 是否为公司主店

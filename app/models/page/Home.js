@@ -25,7 +25,9 @@ const dbSchema = new Schema({
         at_upd: Date,								// [只读 绝对]
     }],
 
-    categs: [{
+    homeProds: [{type: ObjectId, ref: 'Prod'}],
+
+    homeCategs: [{
         sort: Number,
         Categ: {type: ObjectId, ref: 'Categ'},
         desp: String,
