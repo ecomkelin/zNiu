@@ -54,7 +54,7 @@ exports.PdImg_sm = async(req, img_Dir) => {
 				let imgUrl_Type = imgUrl.type.split('/')[1];
 				let imgSim_Type = imgSim.type.split('/')[1];
 
-				if(!imgArrs.includes(imgUrl_Type) || !imgArrs.includes(imgSim_Type) || !imgArrs.includes(imgUrls_Type)) {
+				if(!imgArrs.includes(imgUrl_Type) || !imgArrs.includes(imgSim_Type)) {
 					this.rmPicture();
 					return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
 				}
