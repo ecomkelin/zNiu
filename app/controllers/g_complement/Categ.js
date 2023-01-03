@@ -262,10 +262,12 @@ const Categs_path_Func = (pathObj, payload, queryObj) => {
 		pathObj["Categ_sons"] = {$in: ids};
 	}
 	if(!isNaN(queryObj.sortgte)) {
+		console.log("Categ sortgte")
 		let val = parseInt(queryObj.sortgte)
 		pathObj["sort"] = {$gte: val};
 	}
 	if(!isNaN(queryObj.sortlte)) {
+		console.log("Categ sortlte")
 		let val = parseInt(queryObj.sortlte)
 		pathObj["sort"] = {$lte: val};
 	}
