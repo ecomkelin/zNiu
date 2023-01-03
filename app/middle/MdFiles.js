@@ -43,8 +43,10 @@ exports.imageUpload = async(req, img_Dir) => new Promise((resolve, reject) => {
 				for(key in files) {
 					let imgKey = files[key];
 					var orgUrlPath = imgKey.path;
-					console.log(imgKey)
-					if(!imgKey || !imgKey.type) return reject({status: 400, message: "只允许输入jpg png gif格式图片"});
+					if(!imgKey || !imgKey.type) {
+						console.log(imgKey)
+						return reject({status: 400, message: "只允许输入jpg png gif格式图片"});
+					}
 					let imgType = imgKey.type.split('/')[1];
 					if(!imgArrs.includes(imgType)) {
 						this.rmPicture();
