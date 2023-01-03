@@ -634,16 +634,6 @@ const Prod_path_Func = (pathObj, payload, queryObj) => {
 		const ids = MdFilter.stringToObjectIds(queryObj.Categs);
 		pathObj["Categs"] = {$in: ids};
 	}
-	if(!isNaN(queryObj.sortgte)) {
-		console.log("Prod sortgte")
-		let val = parseInt(queryObj.sortgte)
-		pathObj["sort"] = {$gte: val};
-	}
-	if(!isNaN(queryObj.sortlte)) {
-		console.log("Prod sortlte")
-		let val = parseInt(queryObj.sortlte)
-		pathObj["sort"] = {$lte: val};
-	}
 }
 
 
