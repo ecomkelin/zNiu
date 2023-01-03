@@ -10,7 +10,9 @@ const dbSchema = new Schema({
 
 	nome: String,
 
+	img_xs: String,
 	img_url: String,
+	img_urls: [String],
 
 	langs: [{
 		Lang: {type: ObjectId, ref: 'Lang'},

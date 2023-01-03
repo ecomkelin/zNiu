@@ -50,7 +50,7 @@ exports.PdPost = async(req, res) => {
 		const payload = req.payload;
 		let obj = req.body.obj;
 		if(!obj) {
-			res_PdImg = await MdFiles.PdImg_sm(req, "/Pd");
+			res_PdImg = await MdFiles.imageUpload(req, "/Pd");
 			if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
 			obj = res_PdImg.data.obj;
 		}
@@ -109,7 +109,7 @@ exports.PdPut = async(req, res) => {
 			Pd_delete_img_urls(res, req.body.delete_img_urls, Pd, payload);
 		} else {
 			// 判断是否用上传文件的形式 传递了数据
-			res_PdImg = await MdFiles.PdImg_sm(req, "/Pd");
+			res_PdImg = await MdFiles.imageUpload(req, "/Pd");
 			if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
 			obj = res_PdImg.data.obj;
 

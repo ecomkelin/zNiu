@@ -17,7 +17,7 @@ exports.CategPost = async(req, res) => {
 		let Shop = payload.Shop._id || payload.Shop;
 
 		let obj = req.body.obj;
-		if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Categ", field: "img_url"});
+		if(!obj) obj = await MdFiles.imageUpload(req, "/Categ");
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 
 		/** code nome 一致性 */
@@ -88,14 +88,26 @@ exports.CategDelete = async(req, res) => {
 		let Categ = await CategDB.findOne(pathObj);
 		if(!Categ) return MdFilter.jsonFailed(res, {message: "没有找到此分类信息"});
 
+		/** 检查分类下是否有子分类， 现在的处理方式 是如果有的话 就不可删除 */
 		let Categ_sons = await CategDB.findOne({_id: {$in: Categ.Categ_sons}});
 		if(Categ_sons) return MdFilter.jsonFailed(res, {message: "请先删除其子分类"});
 
-		let Prods = await ProdDB.find({Categs: Categ._id});
-		if(Prods && Prods.length > 0) return MdFilter.jsonFailed(res, {message: "分类下还有产品, 尽量改名 别删除"});
+		/** 检查此分类下是否 包含产品， 现在以不可删除处理 */
+		let existProd = await ProdDB.findOne({Categs: Categ._id});
+		if(existProd) return MdFilter.jsonFailed(res, {message: "分类下还有产品, 尽量改名 别删除"});
 
+		/** 删除图片 */
 		if(Categ.img_url && Categ.img_url.split("Categ").length > 1) await MdFiles.rmPicture(Categ.img_url);
-		let objDel = await CategDB.deleteOne({_id: Categ._id});
+		if(Categ.img_xs && Categ.img_xs.split("Categ").length > 1) await MdFiles.rmPicture(Categ.img_xs);
+		if(obj.img_urls && obj.img_urls.length > 0) {
+			if(Categ.img_urls && Categ.img_urls.length > 0) {
+				for(let i=0; i<Categ.img_urls.length; i++) {
+					await MdFiles.rmPicture(Categ.img_urls[i]);
+				};
+			} 
+		}
+
+		await CategDB.deleteOne({_id: Categ._id});
 
 		return MdFilter.jsonSuccess(res, {message: "删除成功"});
 	} catch(error) {
@@ -119,7 +131,7 @@ exports.CategPut = async(req, res) => {
 		if(!Categ) return MdFilter.jsonFailed(res, {message: "没有找到此分类信息"});
 
 		let obj = req.body.general;
-		if(!obj) obj = await MdFiles.mkPicture_prom(req, {img_Dir: "/Categ", field: "img_url"});
+		if(!obj) obj = await MdFiles.imageUpload(req, "/Categ");
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 
 		delete obj.num_sons;

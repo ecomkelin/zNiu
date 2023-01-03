@@ -20,9 +20,9 @@ rename = (orgName, newName) => new Promise((resolve, reject) => {
 	is_Array: 	上传的图片是单张还是多张
 	跟 mkPicture_prom 区分开的原因是 一个产品需要一个正常图片和一个压缩图片
 */
-exports.PdImg_sm = async(req, img_Dir) => new Promise((resolve, reject) => {
+exports.imageUpload = async(req, img_Dir) => new Promise((resolve, reject) => {
 	try {
-		console.log("PdImg_sm", img_Dir)
+		console.log("imageUpload", img_Dir)
 		let payload = req.payload;
 		let img_abs = uploadPath+img_Dir;
 		let form = formidable({ multiples: true, uploadDir: img_abs});
@@ -33,7 +33,7 @@ exports.PdImg_sm = async(req, img_Dir) => new Promise((resolve, reject) => {
 				// 接受 body信息 obj 的具体信息是 fields中的obj存储的信息
 				let obj = (fields.obj) ? JSON.parse(fields.obj) : {};
 				obj.img_urls = [];
-				if(!files) return resolve({status: 200, data:{obj}});	// 如果没有传递正确的 file文件 则直接返回
+				if(!files) return resolve(obj);	// 如果没有传递正确的 file文件 则直接返回
 
 				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon", "ico"];
 
@@ -46,26 +46,26 @@ exports.PdImg_sm = async(req, img_Dir) => new Promise((resolve, reject) => {
 					let imgType = imgKey.type.split('/')[1];
 					if(!imgArrs.includes(imgType)) {
 						this.rmPicture();
-						return resolve({status: 400, message: "只允许输入jpg png gif格式图片"});
+						return reject({status: 400, message: "只允许输入jpg png gif格式图片"});
 					}
 					var relPath = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '-'+key+'-' + payload._id + '.' + imgType;
 					var newUrlPath = publicPath + relPath;
 
 					if((await rename(orgUrlPath, newUrlPath)).status === 200) {
-						if(key === 'img_url') obj.img_xs = relPath;
-						else if(key === 'img_xs') obj.img_url = relPath;
+						if(key === 'img_url') obj.img_url = relPath;
+						else if(key === 'img_xs') obj.img_xs = relPath;
 						else {
 							obj.img_urls[i++] = relPath;
 						}
 					}
 				}
-				return resolve({status: 200, data: {obj}});
+				return resolve(obj);
 			} catch(e) {
 				return reject({status: 500, e})
 			}
 		})
 	} catch(error) {
-		console.log("PdImg_sm", error)
+		console.log("imageUpload", error)
 		return reject(error);
 	}
 });

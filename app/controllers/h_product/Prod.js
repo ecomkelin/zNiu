@@ -134,11 +134,7 @@ exports.ProdPost = async(req, res) => {
 		if(payload.role < ConfUser.role_set.boss || !payload.Shop) return MdFilter.jsonFailed(res, {message: "您没有所属商店"});
 
 		let obj = req.body.obj;
-		if(!obj) {
-			res_PdImg = await MdFiles.PdImg_sm(req, "/Prod");
-			if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
-			obj = res_PdImg.data.obj;
-		}
+		if(!obj) obj = await MdFiles.imageUpload(req, "/Prod");
 		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 		Prod_PdNull(res, req.query, obj, payload);
 
@@ -298,6 +294,13 @@ exports.ProdDelete = async(req, res) => {
 
 		if(Prod.img_url && Prod.img_url.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_url);
 		if(Prod.img_xs && Prod.img_xs.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_xs);
+		if(obj.img_urls && obj.img_urls.length > 0) {
+			if(Prod.img_urls && Prod.img_urls.length > 0) {
+				for(let i=0; i<Prod.img_urls.length; i++) {
+					await MdFiles.rmPicture(Prod.img_urls[i]);
+				};
+			} 
+		}
 
 		RecordCT.RecordPost_func(payload, {dbName: dbProd, is_Delete: true}, Prod);
 
@@ -330,10 +333,7 @@ exports.ProdPut = async(req, res) => {
 		if(req.body.general) {
 			obj = req.body.general;
 		} else {
-			res_PdImg = await MdFiles.PdImg_sm(req, "/Prod");
-			if(res_PdImg.status !== 200) return MdFilter.jsonFailed(res, res_PdImg);
-			obj = res_PdImg.data.obj;
-
+			obj = await MdFiles.imageUpload(req, "/Prod");
 			if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
 
 			if(obj.img_url) {
