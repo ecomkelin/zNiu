@@ -261,6 +261,14 @@ const Categs_path_Func = (pathObj, payload, queryObj) => {
 		let ids = MdFilter.stringToObjectIds(queryObj.Categ_sons);
 		pathObj["Categ_sons"] = {$in: ids};
 	}
+	if(!isNaN(queryObj.sortgte)) {
+		let val = parseInt(queryObj.sortgte)
+		pathObj["sort"] = {$gte: val};
+	}
+	if(!isNaN(queryObj.sortlte)) {
+		let val = parseInt(queryObj.sortlte)
+		pathObj["sort"] = {$lte: val};
+	}
 }
 const Categ_path_Func = (pathObj, payload, queryObj) => {
 	pathObj.Firm = payload.Firm._id || payload.Firm;
