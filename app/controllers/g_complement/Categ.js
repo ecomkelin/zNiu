@@ -130,9 +130,30 @@ exports.CategPut = async(req, res) => {
 		const Categ = await CategDB.findOne(pathObj);
 		if(!Categ) return MdFilter.jsonFailed(res, {message: "没有找到此分类信息"});
 
-		let obj = req.body.general;
-		if(!obj) obj = await MdFiles.imageUpload(req, "/Categ");
-		if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
+		let obj = null;
+		if(req.body.general) {
+			obj = req.body.general;
+		} else {
+			obj = await MdFiles.imageUpload(req, "/Categ");
+			if(!obj) return MdFilter.jsonFailed(res, {message: "请传递正确的数据obj对象数据"});
+
+			if(obj.img_url) {
+				if(Categ.img_url && Categ.img_url.split("Categ").length > 1) await MdFiles.rmPicture(Categ.img_url);
+				Categ.img_url = obj.img_url;
+			}
+			if(obj.img_xs) {
+				if(Categ.img_xs && Categ.img_xs.split("Categ").length > 1) await MdFiles.rmPicture(Categ.img_xs);
+				Categ.img_xs = obj.img_xs;
+			}
+			if(obj.img_urls && obj.img_urls.length > 0) {
+				if(Categ.img_urls && Categ.img_urls.length > 0) {
+					for(let i=0; i<Categ.img_urls.length; i++) {
+						await MdFiles.rmPicture(Categ.img_urls[i]);
+					};
+				} 
+				Categ.img_urls = obj.img_urls;
+			}
+		}
 
 		delete obj.num_sons;
 		delete obj.level;
@@ -169,12 +190,6 @@ const Categ_general = async(res, obj, Categ, payload) => {
 
 				Categ.code = Categ.nome = obj.code;
 			}
-		}
-
-		/** 删除图片 */
-		if(obj.img_url && (obj.img_url != Categ.img_url) && Categ.img_url && Categ.img_url.split("Categ").length > 1){
-			await MdFiles.rmPicture(Categ.img_url);
-			Categ.img_url = obj.img_url;
 		}
 
 		if(!isNaN(obj.sort)) Categ.sort = parseInt(obj.sort);
