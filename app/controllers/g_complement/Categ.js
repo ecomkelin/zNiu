@@ -99,7 +99,7 @@ exports.CategDelete = async(req, res) => {
 		/** 删除图片 */
 		if(Categ.img_url && Categ.img_url.split("Categ").length > 1) await MdFiles.rmPicture(Categ.img_url);
 		if(Categ.img_xs && Categ.img_xs.split("Categ").length > 1) await MdFiles.rmPicture(Categ.img_xs);
-		if(obj.img_urls && obj.img_urls.length > 0) {
+		if(Categ.img_urls && Categ.img_urls.length > 0) {
 			if(Categ.img_urls && Categ.img_urls.length > 0) {
 				for(let i=0; i<Categ.img_urls.length; i++) {
 					await MdFiles.rmPicture(Categ.img_urls[i]);

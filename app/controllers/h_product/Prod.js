@@ -294,7 +294,7 @@ exports.ProdDelete = async(req, res) => {
 
 		if(Prod.img_url && Prod.img_url.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_url);
 		if(Prod.img_xs && Prod.img_xs.split("Prod").length > 1) await MdFiles.rmPicture(Prod.img_xs);
-		if(obj.img_urls && obj.img_urls.length > 0) {
+		if(Prod.img_urls && Prod.img_urls.length > 0) {
 			if(Prod.img_urls && Prod.img_urls.length > 0) {
 				for(let i=0; i<Prod.img_urls.length; i++) {
 					await MdFiles.rmPicture(Prod.img_urls[i]);
