@@ -35,7 +35,7 @@ exports.imageUpload = async(req, img_Dir) => new Promise((resolve, reject) => {
 				obj.img_urls = [];
 				if(!files) return resolve(obj);	// 如果没有传递正确的 file文件 则直接返回
 
-				let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon", "ico"];
+				// let imgArrs = ["jpg", "jpeg", "png", "gif", "svg", "icon", "ico"];
 
 				var dateNow = Date.now();
 
@@ -45,10 +45,10 @@ exports.imageUpload = async(req, img_Dir) => new Promise((resolve, reject) => {
 					var orgUrlPath = imgKey.path;
 					if(!imgKey || !imgKey.type) return reject({status: 400, message: "文件传输错误"});
 					let imgType = imgKey.type.split('/')[1];
-					if(!imgArrs.includes(imgType)) {
-						this.rmPicture();
-						return reject({status: 400, message: "只允许输入jpg png gif格式图片"});
-					}
+					// if(!imgArrs.includes(imgType)) {
+					// 	this.rmPicture();
+					// 	return reject({status: 400, message: "只允许输入jpg png gif格式图片"});
+					// }
 					var relPath = "/upload"+img_Dir+"/" + payload.Firm+'-'+dateNow + '-'+key+'-' + payload._id + '.' + imgType;
 					var newUrlPath = publicPath + relPath;
 
