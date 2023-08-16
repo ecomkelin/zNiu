@@ -189,7 +189,7 @@ const OrderDelete_Prom = (payload, id) => {
 				});
 			if(!Order) return resolve({status: 400, message: "没有找到此订单信息"});
 
-			// console.log(Order)
+			console.log(222, 111, Order)
 			let sign = -parseInt(Order.type_Order);
 			for(let i=0; i<Order.OrderProds.length; i++) {
 				const OrderProd = Order.OrderProds[i];
