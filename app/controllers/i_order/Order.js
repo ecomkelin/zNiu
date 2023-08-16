@@ -208,7 +208,7 @@ const OrderDelete_Prom = (payload, id) => {
 							let after = pre+quantity;
 							Prod.qtLogs.unshift({
 								at_crt: Date.now(),
-								desp: (type_Order===-1) ? "删除销售" : "删除采购",
+								desp: (Order.type_Order===-1) ? "删除销售" : "删除采购",
 								pre,
 								log,
 								after,
