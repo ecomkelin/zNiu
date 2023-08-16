@@ -138,8 +138,6 @@ exports.OrderDelete = async(req, res) => {
 		// const force = req.query.force;
 		// if(force !== payload.code) return MdFilter.jsonFailed(res, {message: "请传递force的值为本人code"});
 
-		console.log(111, 111, payload);
-		console.log(111, 222, id);
 		const res_del = await OrderDelete_Prom(payload, id);
 
 		RecordCT.RecordPost_func(payload, {dbName: dbOrder, is_Delete: true}, res_del.data.object);
@@ -167,7 +165,6 @@ exports.OrderDelete = async(req, res) => {
 		
 		return MdFilter.jsonRes(res, res_del);
 	} catch(error) {
-		console.log(111, 555, error);
 		return MdFilter.json500(res, {message: "OrderDelete", error});
 	}
 }
@@ -183,7 +180,6 @@ const OrderDelete_Prom = (payload, id) => {
 			};
 			if(payload.Shop) pathObj.Shop = payload.Shop._id || payload.Shop;
 
-			console.log(222, 111, pathObj);
 			const Order = await OrderDB.findOne(pathObj, {code: 1, order_imp: 1, OrderProds: 1, type_Order: 1})
 				.populate({
 					path: "OrderProds",
@@ -196,13 +192,12 @@ const OrderDelete_Prom = (payload, id) => {
 			let sign = -parseInt(Order.type_Order);
 			for(let i=0; i<Order.OrderProds.length; i++) {
 				const OrderProd = Order.OrderProds[i];
-				console.log(222, 222, OrderProd)
 				if(OrderProd.is_simple === true) {
 					let quantity = parseInt(sign * OrderProd.quantity);
 					if(isNaN(quantity)) return resolve({status: 500, message: "OrderDelete isNaN(quantity)"});
 					//if(!OrderProd.is_virtual) await ProdDB.updateOne({"_id" : OrderProd.Prod},{$inc: {quantity}} );
 					if(!OrderProd.is_virtual && MdFilter.isObjectId(OrderProd.Prod)){
-						const Prod = await ProdDB.findOne({_id: Prod}, {quantity: 1, qtLogs: 1});
+						const Prod = await ProdDB.findOne({_id: OrderProd.Prod}, {quantity: 1, qtLogs: 1});
 						if(Prod) {
 							if(!Prod.qtLogs) Prod.qtLogs = [];
 							if(Prod.qtLogs.length > 50) Prod.qtLogs.pop();
@@ -236,7 +231,6 @@ const OrderDelete_Prom = (payload, id) => {
 
 			return resolve({status: 200, message: "OrderDelete", data: {object: Order}});
 		} catch(error) {
-			console.log(222, 555, error);
 			return resolve({status: 500, message: "OrderDelete", error});
 		}
 	})
