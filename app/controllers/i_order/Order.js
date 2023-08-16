@@ -180,7 +180,6 @@ const OrderDelete_Prom = (payload, id) => {
 			};
 			if(payload.Shop) pathObj.Shop = payload.Shop._id || payload.Shop;
 
-			console.log(222, 111, pathObj);
 			const Order = await OrderDB.findOne(pathObj, {code: 1, order_imp: 1, OrderProds: 1, type_Order: 1})
 				.populate({
 					path: "OrderProds",
@@ -193,7 +192,6 @@ const OrderDelete_Prom = (payload, id) => {
 			let sign = -parseInt(Order.type_Order);
 			for(let i=0; i<Order.OrderProds.length; i++) {
 				const OrderProd = Order.OrderProds[i];
-				console.log(222, 222, OrderProd)
 				if(OrderProd.is_simple === true) {
 					let quantity = parseInt(sign * OrderProd.quantity);
 					if(isNaN(quantity)) return resolve({status: 500, message: "OrderDelete isNaN(quantity)"});
@@ -230,10 +228,8 @@ const OrderDelete_Prom = (payload, id) => {
 			OrderSkuDB.deleteMany({Order: id});
 			OrderProdDB.deleteMany({Order: id});
 			await OrderDB.deleteOne({_id: id});
-			console.log(222, 333, Order);
 			return resolve({status: 200, message: "OrderDelete", data: {object: Order}});
 		} catch(error) {
-			console.log(222, 555, error);
 			return resolve({status: 500, message: "OrderDelete", error});
 		}
 	})
